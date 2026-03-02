@@ -103,3 +103,8 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()  # створення БД якщо нема
     socketio.run(app, debug=True)
+
+
+
+
+    #давай дрочити разом на сайт
