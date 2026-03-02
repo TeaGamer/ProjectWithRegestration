@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#111;color:white;text-align:center;margin-top:150px;font-family:Arial;">
+
+<h2>Login</h2>
+
+<!-- форма логіну (Chrome запропонує зберегти пароль) -->
+<form method="POST" autocomplete="on">
+    <input name="username"
+           placeholder="Username"
+           autocomplete="username"><br><br>
+
+    <input name="password"
+           type="password"
+           placeholder="Password"
+           autocomplete="current-password"><br><br>
+
+    <!-- запам'ятати сесію -->
+    <label>
+        <input type="checkbox" name="remember">
+        Remember me
+    </label><br><br>
+
+    <button type="submit">Login</button>
+</form>
+
+<a href="/register" style="color:#9FE2BF;">Register</a>
+
+</body>
+</html>
