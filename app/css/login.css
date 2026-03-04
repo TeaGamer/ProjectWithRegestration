@@ -1,3 +1,5 @@
-.Background{
-    background-color: azure;
+.Background {
+    background-color: lightgray;
+    width: 100%;
+    min-height: 100%;
 }
