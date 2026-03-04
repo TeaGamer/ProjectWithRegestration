@@ -7,7 +7,7 @@ export default function HomePage() {
       <div className="Background">
         <main>
           <h1>Welcome to Alex Site</h1>
-          <a href="/chat"><button>Login</button></a>
+          <a href="/login"><button>Login</button></a>
         </main>
       </div>  
     );
