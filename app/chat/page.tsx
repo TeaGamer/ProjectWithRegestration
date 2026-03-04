@@ -1,4 +1,4 @@
-import "../CSS/Chat.css";
+import "../css/chat.css";
 
 export default function ChatPage() {
     return (
