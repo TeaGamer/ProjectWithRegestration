@@ -98,7 +98,7 @@ def profile():
         # зміна аватара (користувач вводить тільки назву файлу)
         if request.form.get("avatar_path"):
             filename = request.form["avatar_path"]
-            current_user.avatar = "/static/avatars/" + filename  # додаємо шлях автоматично
+            current_user.avatar = "/static/avatars/avatar.png" + filename  # додаємо шлях автоматично
 
         db.session.commit()  # зберігаємо зміни
 
@@ -159,3 +159,35 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()  # створення таблиць якщо нема
     socketio.run(app, debug=True)  # запуск сервера
+
+# ===== ЗБЕРІГАННЯ ІНФУ ПРО ПРОФІЛЬ В БД =====
+if request.method == "POST":
+
+    current_user.username = request.form["username"]
+    current_user.first_name = request.form["first_name"]
+    current_user.last_name = request.form["last_name"]
+    current_user.age = request.form["age"]
+
+    # якщо ввели новий пароль
+    if request.form["new_password"]:
+        current_user.set_password(request.form["new_password"])
+
+    # якщо введено новий аватар
+    if request.form["avatar_path"]:
+        current_user.avatar = request.form["avatar_path"]
+
+    db.session.commit()
+    
+# ===== ЗБЕРІГАТИ E-MAIL І РЕГІОН В БД =====
+if request.method == "POST":
+
+    current_user.first_name = request.form["first_name"]
+    current_user.last_name = request.form["last_name"]
+    current_user.age = request.form["age"]
+    current_user.email = request.form["email"]
+    current_user.region = request.form["region"]
+
+    if request.form["new_password"]:
+        current_user.set_password(request.form["new_password"])
+
+    db.session.commit()
