@@ -1,6 +1,6 @@
 
 # ===== ІМПОРТИ =====
-from flask import Flask, render_template, request, redirect, url_for  # основа Flask
+from flask import Flask, render_template, request, redirect, url_for, jsonify  # додав jsonify
 from flask_sqlalchemy import SQLAlchemy  # база даних
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user  # авторизація
 from flask_socketio import SocketIO, emit  # WebSocket
@@ -9,171 +9,23 @@ from datetime import datetime  # час повідомлень
 import requests  # запит до твого AI
 
 # ===== НАЛАШТУВАННЯ =====
-# створення Flask-додатку, налаштування бази даних, WebSocket та авторизації
-app = Flask(__name__)  # створення Flask-додатку
-app.config["SECRET_KEY"] = "secretkey"  # ключ для сесій
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"  # підключення SQLite
+# Тут ми налаштовуємо Flask, SQLAlchemy, Flask-Login та SocketIO. Ми також визначаємо константу AI_URL для запитів до твого AI та створюємо множину online_users для відстеження онлайн-користувачів.
+app = Flask(__name__)
+app.config["SECRET_KEY"] = "secretkey"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 
-db = SQLAlchemy(app)  # ініціалізація БД
-socketio = SocketIO(app)  # підключення WebSocket
+db = SQLAlchemy(app)
+socketio = SocketIO(app)
 
-login_manager = LoginManager()  # менеджер логіну
-login_manager.init_app(app)  # прив'язка до Flask
-login_manager.login_view = "login"  # якщо не залогінений — перекидає на /login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
-AI_URL = "http://127.0.0.1:5001/ask"  # endpoint твого ШІ
-online_users = set()  # множина для зберігання онлайн-користувачів
-
-# ===== МОДЕЛЬ КОРИСТУВАЧА =====
-# ця модель описує структуру таблиці users в базі даних. Вона містить поля для зберігання інформації про користувача, такої як ім'я, прізвище, вік, логін, пароль та аватар. Клас User успадковує UserMixin для інтеграції з Flask-Login та db.Model для роботи з SQLAlchemy.
-class User(UserMixin, db.Model):  # модель таблиці users
-    id = db.Column(db.Integer, primary_key=True)  # ID
-    username = db.Column(db.String(100), unique=True)  # логін
-    first_name = db.Column(db.String(100))  # ім'я
-    last_name = db.Column(db.String(100))  # прізвище
-    age = db.Column(db.Integer)  # вік
-    password = db.Column(db.String(200))  # хеш паролю
-    avatar = db.Column(db.String(200), default="/static/avatars/default.png")  # шлях до аватара
-
-# ===== МОДЕЛЬ ПОВІДОМЛЕНЬ =====
-# ця модель описує структуру таблиці messages в базі даних. Вона містить поля для зберігання інформації про повідомлення, такої як ID, ID користувача, текст повідомлення, відправник (користувач або AI) та час відправлення.
-class Message(db.Model):  # таблиця повідомлень
-    id = db.Column(db.Integer, primary_key=True)  # ID повідомлення
-    user_id = db.Column(db.Integer)  # ID користувача
-    text = db.Column(db.Text)  # текст
-    sender = db.Column(db.String(10))  # user або ai
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)  # дата і час
-
-# ===== ЗАВАНТАЖЕННЯ КОРИСТУВАЧА =====
-# ця функція потрібна для Flask-Login, щоб завантажувати користувача по його ID. Вона викликається кожного разу, коли Flask-Login потребує інформацію про поточного користувача (наприклад, для перевірки, чи він залогінений). Функція отримує ID користувача, шукає його в базі даних і повертає об'єкт User.
-@login_manager.user_loader
-def load_user(user_id):  # функція для Flask-Login
-    return User.query.get(int(user_id))  # повертає користувача по ID
-
-# ===== РЕЄСТРАЦІЯ =====
-# ця функція обробляє реєстрацію нового користувача. Вона приймає POST-запит з формою, хешує пароль, створює нового користувача в базі даних і перенаправляє на сторінку логіну. Якщо це GET-запит, відображає сторінку реєстрації.
-@app.route("/register", methods=["GET","POST"])  # маршрут /register
-def register():
-    if request.method == "POST":  # якщо форма відправлена
-        hashed = generate_password_hash(request.form["password"])  # хешуємо пароль
-        user = User(  # створюємо користувача
-            username=request.form["username"],
-            password=hashed
-        )
-        db.session.add(user)  # додаємо в БД
-        db.session.commit()  # зберігаємо
-        return redirect(url_for("login"))  # перекидаємо на логін
-    return render_template("register.html")  # показати сторінку
-
-# ===== ЛОГІН =====
-# ця функція обробляє логін користувача. Вона приймає POST-запит з формою, шукає користувача в базі даних за логіном, перевіряє пароль і, якщо все вірно, виконує вхід і перенаправляє на сторінку чату. Якщо дані неправильні або це GET-запит, відображає сторінку логіну.
-@app.route("/login", methods=["GET","POST"])  # маршрут /login
-def login():
-    if request.method == "POST":
-        user = User.query.filter_by(username=request.form["username"]).first()  # шукаємо юзера
-        if user and check_password_hash(user.password, request.form["password"]):  # перевірка паролю
-            login_user(user)  # логінимо
-            return redirect(url_for("chat"))  # на чат
-    return render_template("login.html")
-
-# ===== ЧАТ =====
-# ця функція відображає головну сторінку з чатом. Вона доступна тільки для залогінених користувачів. На сторінці показуються всі повідомлення користувача, а також індикатор онлайн-статусу.
-@app.route("/")  # головна сторінка
-@login_required  # тільки для залогінених
-def chat():
-    messages = Message.query.filter_by(user_id=current_user.id)\
-        .order_by(Message.timestamp).all()  # всі повідомлення юзера
-    is_online = current_user.id in online_users  # перевірка онлайн
-    return render_template("chat.html", messages=messages, online=is_online)
-
-# ===== ПРОФІЛЬ =====
-# ця функція дозволяє користувачу переглядати та редагувати свій профіль. Вона доступна тільки для залогінених користувачів. Користувач може змінити своє ім'я, прізвище, вік, пароль та аватар. Зміни зберігаються в базі даних.
-@app.route("/profile", methods=["GET","POST"])
-@login_required
-def profile():
-    if request.method == "POST":
-
-        # оновлення даних профілю
-        current_user.username = request.form["username"]
-        current_user.first_name = request.form["first_name"]
-        current_user.last_name = request.form["last_name"]
-        current_user.age = request.form["age"]
-
-        # зміна паролю
-        if request.form.get("new_password"):
-            current_user.password = generate_password_hash(request.form["new_password"])
-
-        # зміна аватара (користувач вводить тільки назву файлу)
-        if request.form.get("avatar_path"):
-            filename = request.form["avatar_path"]
-            current_user.avatar = "/static/avatars/" + filename # додаємо шлях автоматично
-
-        db.session.commit()  # зберігаємо зміни
-
-    return render_template("profile.html")
-
-# ===== ВИЙТИ =====
-# ця функція виконує вихід користувача з системи і перенаправляє його на сторінку логіну. Вона доступна тільки для залогінених користувачів.
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()  # вихід
-    return redirect(url_for("login"))
-
-# ===== ВИДАЛЕННЯ АКАУНТУ =====
-# ця функція видаляє поточного користувача з бази даних і перенаправляє на сторінку реєстрації. Вона доступна тільки для залогінених користувачів.
-@app.route("/delete_account")
-@login_required
-def delete_account():
-    db.session.delete(current_user)  # видаляємо з БД
-    db.session.commit()
-    return redirect(url_for("register"))
-
-# ===== WEBSOCKET =====
-# ці функції обробляють підключення, відключення та отримання повідомлень через WebSocket. Коли користувач підключається, його ID додається до множини онлайн-користувачів. При відключенні — видаляється. Коли приходить повідомлення, воно зберігається в базі даних, відправляється запит до твого AI, відповідь також зберігається і відправляється назад клієнту.
-@socketio.on("connect")
-def connect():
-    if current_user.is_authenticated:  # якщо авторизований
-        online_users.add(current_user.id)  # додаємо в онлайн
-
-@socketio.on("disconnect")
-def disconnect():
-    if current_user.is_authenticated:
-        online_users.discard(current_user.id)  # прибираємо з онлайн
-
-@socketio.on("send_message")
-def handle_message(data):
-    user_message = data["message"]  # текст від користувача
-
-    # запис повідомлення користувача
-    user_msg = Message(user_id=current_user.id, text=user_message, sender="user")
-    db.session.add(user_msg)
-    db.session.commit()
-
-    # запит до твого AI
-    response = requests.post(AI_URL, json={"message": user_message})
-    ai_reply = response.json().get("reply")
-
-    # запис відповіді AI
-    ai_msg = Message(user_id=current_user.id, text=ai_reply, sender="ai")
-    db.session.add(ai_msg)
-    db.session.commit()
-
-    # відправка відповіді назад через WebSocket
-    emit("receive_message", {
-        "text": ai_reply,
-        "time": ai_msg.timestamp.strftime("%H:%M %d-%m-%Y")
-    })
-
-# ===== ЗАПУСК =====
-# при запуску створюємо таблиці (якщо їх нема) і запускаємо сервер
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()  # створення таблиць якщо нема
-    socketio.run(app, debug=True)  # запуск сервера
+AI_URL = "http://127.0.0.1:5001/ask"
+online_users = set()
 
 # ===== МОДЕЛЬ КОРИСТУВАЧА =====
-# ця модель описує структуру таблиці users в базі даних. Вона містить поля для зберігання інформації про користувача, такої як ім'я, прізвище, вік, логін, пароль та аватар. Клас User успадковує UserMixin для інтеграції з Flask-Login та db.Model для роботи з SQLAlchemy.
+# Ця модель зберігає інформацію про користувачів, включаючи їх унікальний username, ім'я, прізвище, вік, email, регіон, хешований пароль та аватар. Вона також успадковує UserMixin для інтеграції з Flask-Login.
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True)
@@ -183,5 +35,134 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120))
     region = db.Column(db.String(120))
     password = db.Column(db.String(200))
-    avatar = db.Column(db.String(200), 
-    default="/static/avatars/avatar.png")
+    avatar = db.Column(db.String(200), default="/static/avatars/avatar.png")
+
+# ===== МОДЕЛЬ ПОВІДОМЛЕНЬ =====
+# Ця модель зберігає повідомлення, які надсилають користувачі та відповіді AI. Кожне повідомлення має текст, відправника (користувач або AI), час відправлення та ідентифікатор користувача, щоб пов'язати його з конкретним користувачем.
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    text = db.Column(db.Text)
+    sender = db.Column(db.String(10))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# ===== НОВИЙ МАРШРУТ ОНОВЛЕННЯ ПРОФІЛЮ =====
+# Цей маршрут обробляє POST-запит для оновлення профілю користувача. Він вимагає, щоб користувач ввів свій старий пароль для підтвердження особи, а також дозволяє оновити різні поля профілю, включаючи Username (з перевіркою на унікальність) та пароль (якщо введено новий).
+@app.route("/update_profile", methods=["POST"])
+@login_required
+def update_profile():
+    data = request.json
+    old_password = data.get("old_password")
+
+    # 1. Перевірка старого пароля (ОБОВ'ЯЗКОВО)
+    # Для безпеки ми вимагаємо, щоб користувач підтвердив свою особу, ввівши старий пароль. Ми використовуємо check_password_hash для порівняння введеного пароля з тим, що збережено в базі даних. Якщо пароль неправильний, ми повертаємо помилку і не дозволяємо оновити профіль.
+    if not check_password_hash(current_user.password, old_password):
+        return jsonify({"status": "error", "message": "Неправильний старий пароль!"}), 400
+
+    # 2. Оновлення Username (перевірка на унікальність)
+    # Якщо користувач хоче змінити свій Username, ми перевіряємо, чи не зайнятий він іншим користувачем. Якщо все в порядку, оновлюємо його в базі даних.
+    new_username = data.get("username")
+    if new_username and new_username != current_user.username:
+        user_exists = User.query.filter_by(username=new_username).first()
+        if user_exists:
+            return jsonify({"status": "error", "message": "Цей Username вже зайнятий!"}), 400
+        current_user.username = new_username
+
+    # 3. Оновлення інших полів
+    # Ми оновлюємо лише ті поля, які були передані в запиті. Якщо поле не було передано, воно залишиться без змін.
+    if data.get("first_name"): current_user.first_name = data["first_name"]
+    if data.get("last_name"): current_user.last_name = data["last_name"]
+    if data.get("email"): current_user.email = data["email"]
+    if data.get("region"): current_user.region = data["region"]
+    
+    # Оновлення пароля (якщо введено новий)
+    # Якщо користувач хоче змінити пароль, він повинен ввести новий пароль у полі "new_password". Ми хешуємо його і зберігаємо в базі даних.
+    if data.get("new_password"):
+        current_user.password = generate_password_hash(data["new_password"])
+
+    db.session.commit()
+    return jsonify({"status": "success", "message": "Профіль оновлено успішно!"})
+
+# ===== РЕЄСТРАЦІЯ =====
+# Тут ми хешуємо пароль за допомогою generate_password_hash і зберігаємо його в базі даних. Це важливо для безпеки, щоб не зберігати паролі у відкритому вигляді.
+@app.route("/register", methods=["GET","POST"])
+def register():
+    if request.method == "POST":
+        hashed = generate_password_hash(request.form["password"])
+        user = User(
+            username=request.form["username"],
+            password=hashed
+        )
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for("login"))
+    return render_template("register.html")
+
+# ===== ЛОГІН =====
+# Тут ми перевіряємо, чи існує користувач з таким username і чи збігається пароль (за допомогою check_password_hash). Якщо все вірно, то викликаємо login_user(user) для авторизації користувача і перенаправляємо його на сторінку чату.
+@app.route("/login", methods=["GET","POST"])
+def login():
+    if request.method == "POST":
+        user = User.query.filter_by(username=request.form["username"]).first()
+        if user and check_password_hash(user.password, request.form["password"]):
+            login_user(user)
+            return redirect(url_for("chat"))
+    return render_template("login.html")
+
+# ===== ЧАТ =====
+# В цьому маршруті ми також передаємо інформацію про те, чи є користувач онлайн, щоб відобразити це в інтерфейсі
+@app.route("/")
+@login_required
+def chat():
+    messages = Message.query.filter_by(user_id=current_user.id)\
+        .order_by(Message.timestamp).all()
+    is_online = current_user.id in online_users
+    return render_template("chat.html", messages=messages, online=is_online)
+
+# ===== ВИЙТИ =====
+# Цей маршрут просто викликає функцію logout_user() і перенаправляє користувача на сторінку логіну
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+# ===== WEBSOCKET =====
+# Тут ми обробляємо підключення та відключення користувачів, а також отримання повідомлень від клієнта і відповідь від AI
+@socketio.on("connect")
+def connect():
+    if current_user.is_authenticated:
+        online_users.add(current_user.id)
+
+@socketio.on("disconnect")
+def disconnect():
+    if current_user.is_authenticated:
+        online_users.discard(current_user.id)
+
+@socketio.on("send_message")
+def handle_message(data):
+    user_message = data["message"]
+    user_msg = Message(user_id=current_user.id, text=user_message, sender="user")
+    db.session.add(user_msg)
+    db.session.commit()
+
+    response = requests.post(AI_URL, json={"message": user_message})
+    ai_reply = response.json().get("reply")
+
+    ai_msg = Message(user_id=current_user.id, text=ai_reply, sender="ai")
+    db.session.add(ai_msg)
+    db.session.commit()
+
+    emit("receive_message", {
+        "text": ai_reply,
+        "time": ai_msg.timestamp.strftime("%H:%M %d-%m-%Y")
+    })
+
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    socketio.run(app, debug=True)
