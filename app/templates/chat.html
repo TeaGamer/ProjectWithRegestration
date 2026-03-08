@@ -1,7 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <title> Chat </title>
 
@@ -24,14 +24,22 @@ var socket = io()
 function sendMessage(){
 let input = document.getElementById("messageInput")
 let message = input.value
+if(message.trim() !== ""){
+let box = document.getElementById("messages")
+box.innerHTML += `
+<div class="message user">
+<div class="text">${message}</div>
+</div>
+`
 socket.emit("send_message",{message:message})
 input.value=""
+}
 }
 
 socket.on("receive_message",function(data){
 let box = document.getElementById("messages")
 box.innerHTML += `
-<div class="message">
+<div class="message ai">
 <div class="text">${data.text}</div>
 </div>
 `
