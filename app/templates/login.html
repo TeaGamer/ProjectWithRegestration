@@ -1,200 +1,132 @@
 <!DOCTYPE html>
-<html lang="pl">
-
+<html lang="en">
 <head>
-
-<meta charset="UTF-8">
-<title>Logowanie</title>
-
-<style>
-
-/* ===== BODY ===== */
-
-body{
-    margin:0;
-    font-family:Arial;
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    height:100vh;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-/* ===== BUBBLE ===== */
-
-.login-box{
-    background:#1f2937;
-    padding:40px;
-
-    width:350px;
-
-    border-radius:15px;
-
-    box-shadow:0 10px 40px rgba(0,0,0,0.5);
-
-    animation:appear 0.6s ease;
-}
-
-/* ===== ANIMATION ===== */
-
-@keyframes appear{
-
-from{
-opacity:0;
-transform:translateY(-20px);
-}
-
-to{
-opacity:1;
-transform:translateY(0);
-}
-
-}
-
-/* ===== TITLE ===== */
-
-h2{
-    text-align:center;
-    color:white;
-    margin-bottom:25px;
-}
-
-/* ===== INPUT ===== */
-
-input{
-
-width:100%;
-
-padding:12px;
-
-margin:10px 0;
-
-border-radius:8px;
-
-border:none;
-
-background:#374151;
-
-color:white;
-
-font-size:15px;
-
-}
-
-/* ===== INPUT FOCUS ===== */
-
-input:focus{
-
-outline:none;
-
-background:#4b5563;
-
-}
-
-/* ===== BUTTON ===== */
-
-button{
-
-width:100%;
-
-padding:12px;
-
-margin-top:10px;
-
-border:none;
-
-border-radius:8px;
-
-background:#3b82f6;
-
-color:white;
-
-font-size:16px;
-
-cursor:pointer;
-
-transition:0.3s;
-
-}
-
-/* ===== BUTTON HOVER ===== */
-
-button:hover{
-
-background:#2563eb;
-
-transform:scale(1.03);
-
-}
-
-/* ===== LINK ===== */
-
-a{
-
-color:#60a5fa;
-
-text-decoration:none;
-
-}
-
-a:hover{
-
-text-decoration:underline;
-
-}
-
-/* ===== TEXT ===== */
-
-p{
-
-text-align:center;
-
-color:#9ca3af;
-
-margin-top:20px;
-
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .error {
+            color: #d32f2f;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 5px;
+        }
+    </style>
 </head>
-
 <body>
+    <div class="container">
+        <h1>Login</h1>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        <form method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div class="register-link">
+            Don't have an account? <a href="/register">Register here</a>
 
-<div class="login-box">
-
-<h2>Logowanie</h2>
-
-<form method="POST">
-
-<input
-type="text"
-name="username"
-placeholder="Nazwa użytkownika"
-required
->
-
-<input
-type="password"
-name="password"
-placeholder="Hasło"
-required
->
-
-<button type="submit">
-Zaloguj się
-</button>
-
-</form>
-
-<p>
-Nie masz konta?
-<a href="/register">Zarejestruj się</a>
-</p>
-
-</div>
-
+                    <!-- Подвал -->
+        <footer class="footer">
+            <a href="/privacy.html">Privacy</a>
+            <a href="/terms.html">Terms</a>
+            <a href="/rights.html">Rights</a>
+        </footer>
+        </div>
+    </div>
 </body>
-
 </html>

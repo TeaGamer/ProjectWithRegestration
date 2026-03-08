@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Chat</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- Sidebar -->
+<div class="sidebar">
+
+<h2>Chats</h2>
+
+<div class="chat-item">Bot Chat</div>
+<div class="chat-item">Test Chat</div>
+
+</div>
+
+<!-- Chat -->
+<div class="chat-container">
+
+<div class="messages" id="messages"></div>
+
+<div class="input-box">
+
+<input type="text" id="messageInput" placeholder="Type a message...">
+
+<button onclick="sendMessage()">Send</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const userAvatar = "{{ url_for('static', filename='avatars/avatar.png') }}"
+const botAvatar = "{{ url_for('static', filename='avatars/anonymous.png') }}"
+
+function getTime(){
+
+const now = new Date()
+
+let h = now.getHours()
+let m = now.getMinutes()
+
+if(m < 10){ m = "0" + m }
+
+return h + ":" + m
+
+}
+
+function addMessage(text, sender){
+
+const messages = document.getElementById("messages")
+
+const msg = document.createElement("div")
+msg.classList.add("message")
+msg.classList.add(sender)
+
+const avatar = document.createElement("img")
+avatar.classList.add("avatar")
+
+avatar.src = sender === "user" ? userAvatar : botAvatar
+
+const bubble = document.createElement("div")
+bubble.classList.add("bubble")
+
+bubble.innerHTML = text + `<div class="time">${getTime()}</div>`
+
+msg.appendChild(avatar)
+msg.appendChild(bubble)
+
+messages.appendChild(msg)
+
+messages.scrollTop = messages.scrollHeight
+
+}
+
+function sendMessage(){
+
+const input = document.getElementById("messageInput")
+
+const text = input.value
+
+if(text === "") return
+
+addMessage(text,"user")
+
+input.value=""
+
+setTimeout(()=>{
+
+addMessage("Bot in: "+text,"bot")
+
+},700)
+
+}
+
+</script>
+
+</body>
+</html>
