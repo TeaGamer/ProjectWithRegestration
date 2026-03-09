@@ -2,18 +2,24 @@
 import { useState } from "react";
 import "../static/css/login.css";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [loginData, setLoginData] = useState({
-        username: "",
+        email: "",
         password: "",
         remember: false,
     });
     const [registerData, setRegisterData] = useState({
-        username: "",
+        login: "",
+        email: "",
         password: "",
         confirmPassword: "",
+        first_name: "",
+        last_name: "",
+        region: "",
         agreedToTerms: false,
     });
     const [error, setError] = useState("");
@@ -40,29 +46,40 @@ export default function LoginPage() {
         setError("");
         setSuccess("");
 
+        if (!loginData.email || !loginData.email.includes("@")) {
+            setError("Введіть коректну пошту!");
+            return;
+        }
+
         try {
-            const response = await fetch("/api/login", {
+            const response = await fetch(`${API_BASE}/api/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    username: loginData.username,
+                    login: loginData.email,
                     password: loginData.password,
-                    remember: loginData.remember,
                 }),
             });
 
+            const data = await response.json();
+
             if (response.ok) {
                 setSuccess("Успішно увійшли! Перенаправляємо...");
+                // Збереження токена
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data.user));
+                }
                 setTimeout(() => {
                     window.location.href = "/Dashboard";
                 }, 1500);
             } else {
-                setError("Невірне ім'я користувача або пароль!");
+                setError(data.error || "Невірна пошта або пароль!");
             }
         } catch (err) {
-            setError("Помилка з'єднання. Спробуйте ще раз.");
+            setError("Помилка з'єднання з сервером. Спробуйте ще раз.");
         }
     };
 
@@ -76,6 +93,11 @@ export default function LoginPage() {
             return;
         }
 
+        if (!registerData.email || !registerData.email.includes("@")) {
+            setError("Введіть коректну пошту!");
+            return;
+        }
+
         if (registerData.password !== registerData.confirmPassword) {
             setError("Паролі не збігаються!");
             return;
@@ -86,55 +108,63 @@ export default function LoginPage() {
             return;
         }
 
+        if (!registerData.login.trim()) {
+            setError("Введіть ім'я користувача!");
+            return;
+        }
+
         try {
-            const response = await fetch("/api/register", {
+            const response = await fetch(`${API_BASE}/api/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    username: registerData.username,
+                    login: registerData.login,
+                    email: registerData.email,
                     password: registerData.password,
+                    first_name: registerData.first_name || registerData.login,
+                    last_name: registerData.last_name || "",
+                    region: registerData.region || "Ukraine",
                 }),
             });
 
+            const data = await response.json();
+
             if (response.ok) {
                 setSuccess("Реєстрація успішна! Переходимо до входу...");
-                setRegisterData({ username: "", password: "", confirmPassword: "", agreedToTerms: false });
+                setRegisterData({ 
+                    login: "", 
+                    email: "", 
+                    password: "", 
+                    confirmPassword: "", 
+                    first_name: "",
+                    last_name: "",
+                    region: "Ukraine",
+                    agreedToTerms: false 
+                });
                 setTimeout(() => {
                     setIsLogin(true);
                     setSuccess("");
                 }, 1500);
             } else {
-                setError("Помилка реєстрації. Ім'я користувача може вже існувати.");
+                setError(data.error || "Помилка реєстрації. Можливо, цей email вже зареєстрований.");
             }
         } catch (err) {
-            setError("Помилка з'єднання. Спробуйте ще раз.");
+            setError("Помилка з'єднання з сервером. Перевірте, чи запущен бекенд на http://localhost:8000");
         }
     };
 
     const termsAndConditionsText = `
 TERMS OF SERVICE
-
-By using the Alex service, you agree to these terms.
-
-The service is provided "as is". We do not guarantee 100% accuracy of AI responses.
-
-It is prohibited to use the service for unlawful activities.
-
+By using the Alex service, you agree to these terms. The service is provided "as is". We do not guarantee 100% accuracy of AI responses. It is prohibited to use the service for unlawful activities.
 Prohibited:
 - spam
 - harassment
 - illegal activity
 - exploitation of AI
 
-The administration may block users.
-
-We reserve the right to change these terms without prior notice.
-
-
 USER RIGHTS
-
 User has the right to:
 - Obtain access to your data
 - Delete your account
@@ -183,12 +213,12 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                         <h2>Вхід</h2>
                         <form className="login-form" onSubmit={handleLoginSubmit}>
                             <input
-                                name="username"
-                                placeholder="Ім'я користувача"
-                                type="text"
-                                value={loginData.username}
+                                name="email"
+                                placeholder="Пошта"
+                                type="email"
+                                value={loginData.email}
                                 onChange={handleLoginChange}
-                                autoComplete="username"
+                                autoComplete="email"
                                 required
                             />
 
@@ -225,12 +255,37 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                         <h2>Створити акаунт</h2>
                         <form className="login-form" onSubmit={handleRegisterSubmit}>
                             <input
-                                name="username"
+                                name="login"
                                 placeholder="Ім'я користувача"
                                 type="text"
-                                value={registerData.username}
+                                value={registerData.login}
                                 onChange={handleRegisterChange}
                                 required
+                            />
+
+                            <input
+                                name="email"
+                                placeholder="Пошта"
+                                type="email"
+                                value={registerData.email}
+                                onChange={handleRegisterChange}
+                                required
+                            />
+
+                            <input
+                                name="first_name"
+                                placeholder="Ім'я"
+                                type="text"
+                                value={registerData.first_name}
+                                onChange={handleRegisterChange}
+                            />
+
+                            <input
+                                name="last_name"
+                                placeholder="Прізвище"
+                                type="text"
+                                value={registerData.last_name}
+                                onChange={handleRegisterChange}
                             />
 
                             <input
@@ -250,6 +305,36 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                 onChange={handleRegisterChange}
                                 required
                             />
+
+                            <select
+                                name="region"
+                                value={registerData.region}
+                                onChange={handleRegisterChange}
+                            >
+                                <option value="">Оберіть регіон</option>
+                                <option value="Ukraine">Вся Україна</option>
+                                <option value="Kyiv">Київ</option>
+                                <option value="Kharkiv">Харків</option>
+                                <option value="Odesa">Одеса</option>
+                                <option value="Dnipropetrovsk">Дніпропетровськ</option>
+                                <option value="Lviv">Львів</option>
+                                <option value="Zaporizhzhia">Запоріжжя</option>
+                                <option value="Mykolaiv">Миколаїв</option>
+                                <option value="Donetsk">Донецьк</option>
+                                <option value="Luhansk">Луганськ</option>
+                                <option value="Kherson">Херсон</option>
+                                <option value="Chernihiv">Чернігів</option>
+                                <option value="Cherkasy">Черкаси</option>
+                                <option value="Poltava">Полтава</option>
+                                <option value="Sumy">Суми</option>
+                                <option value="Vinnytsia">Вінниця</option>
+                                <option value="Rivne">Рівне</option>
+                                <option value="Zhytomyr">Житомир</option>
+                                <option value="Khmelnytskyi">Хмельницький</option>
+                                <option value="Ternopil">Тернопіль</option>
+                                <option value="Ivano-Frankivsk">Івано-Франківськ</option>
+                                <option value="Volyn">Волинь</option>
+                            </select>
 
                             <label className="checkbox-label">
                                 <input
@@ -281,12 +366,6 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
                                 <h3>Умови обслуговування</h3>
-                                <button
-                                    className="modal-close"
-                                    onClick={() => setShowTermsModal(false)}
-                                >
-                                    ✕
-                                </button>
                             </div>
                             <div className="modal-body">
                                 <pre>{termsAndConditionsText}</pre>
