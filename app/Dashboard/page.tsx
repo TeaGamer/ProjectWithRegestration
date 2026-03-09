@@ -13,7 +13,7 @@ interface User {
     avatar?: string;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || \"http://localhost:8000\";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 export default function Dashboard() {
     const [user, setUser] = useState<User | null>(null);
@@ -95,7 +95,7 @@ export default function Dashboard() {
                     setEditSuccess("");
                 }, 1500);
             } else {
-                setEditError(data.error || \"Помилка при оновленні профілю. Спробуйте пізніше.\");
+                setEditError(data.error || "Помилка при оновленні профілю. Спробуйте пізніше.");
             }
         } catch (err) {
             setEditError("Помилка з'єднання з сервером. Перевірте, чи запущен бекенд на http://localhost:8000");
