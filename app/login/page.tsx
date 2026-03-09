@@ -25,16 +25,16 @@ export default function LoginPage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, type, checked, value } = e.target;
+    const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, type, checked, value } = e.target as HTMLInputElement;
         setLoginData((prev) => ({
             ...prev,
             [name]: type === "checkbox" ? checked : value,
         }));
     };
 
-    const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, type, checked, value } = e.target;
+    const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, type, checked, value } = e.target as HTMLInputElement;
         setRegisterData((prev) => ({
             ...prev,
             [name]: type === "checkbox" ? checked : value,
