@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import "../static/css/dashboard.css";
+import "../css/dashboard.css";
 
 interface User {
     id: number;
