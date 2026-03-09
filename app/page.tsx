@@ -1,6 +1,6 @@
 "use client";
 
-import "./static/css/login.css";
+import "./css/login.css";
 
 export default function HomePage() {
     return (
