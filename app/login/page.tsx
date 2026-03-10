@@ -47,7 +47,7 @@ export default function LoginPage() {
         setSuccess("");
 
         if (!loginData.email || !loginData.email.includes("@")) {
-            setError("Введіть коректну пошту!");
+            setError("Use correct email!");
             return;
         }
 
@@ -66,8 +66,8 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (response.ok) {
-                setSuccess("Успішно увійшли! Перенаправляємо...");
-                // Збереження токена
+                setSuccess("Successfully logged in! Redirecting...");
+                // Save token
                 if (data.token) {
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
@@ -76,10 +76,10 @@ export default function LoginPage() {
                     window.location.href = "/Dashboard";
                 }, 1500);
             } else {
-                setError(data.error || "Невірна пошта або пароль!");
+                setError(data.error || "Invalid email or password!");
             }
         } catch (err) {
-            setError("Помилка з'єднання з сервером. Спробуйте ще раз.");
+            setError("Connection error. Please try again.");
         }
     };
 
@@ -89,27 +89,27 @@ export default function LoginPage() {
         setSuccess("");
 
         if (!registerData.agreedToTerms) {
-            setError("Ви повинні прийняти Умови обслуговування!");
+            setError("You must accept the Terms of Service!");
             return;
         }
 
         if (!registerData.email || !registerData.email.includes("@")) {
-            setError("Введіть коректну пошту!");
+            setError("Enter a valid email!");
             return;
         }
 
         if (registerData.password !== registerData.confirmPassword) {
-            setError("Паролі не збігаються!");
+            setError("Passwords do not match!");
             return;
         }
 
         if (registerData.password.length < 6) {
-            setError("Пароль повинен мати мінімум 6 символів!");
+            setError("Password must be at least 6 characters long!");
             return;
         }
 
         if (!registerData.login.trim()) {
-            setError("Введіть ім'я користувача!");
+            setError("Enter a username!");
             return;
         }
 
@@ -132,7 +132,7 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (response.ok) {
-                setSuccess("Реєстрація успішна! Переходимо до входу...");
+                setSuccess("Registration successful! Redirecting to login...");
                 setRegisterData({ 
                     login: "", 
                     email: "", 
@@ -148,10 +148,10 @@ export default function LoginPage() {
                     setSuccess("");
                 }, 1500);
             } else {
-                setError(data.error || "Помилка реєстрації. Можливо, цей email вже зареєстрований.");
+                setError(data.error || "Registration error. This email may already be registered.");
             }
         } catch (err) {
-            setError("Помилка з'єднання з сервером. Перевірте, чи запущен бекенд на http://localhost:8000");
+            setError("Connection error. Please check if the backend is running at http://localhost:8000");
         }
     };
 
@@ -190,7 +190,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                             setSuccess("");
                         }}
                     >
-                        Вхід
+                        Log In
                     </button>
                     <button
                         className={`tab-btn ${!isLogin ? "active" : ""}`}
@@ -200,7 +200,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                             setSuccess("");
                         }}
                     >
-                        Реєстрація
+                        Register
                     </button>
                 </div>
 
@@ -210,11 +210,11 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                 {/* Login Form */}
                 {isLogin && (
                     <div className="form-container">
-                        <h2>Вхід</h2>
+                        <h2>Log In</h2>
                         <form className="login-form" onSubmit={handleLoginSubmit}>
                             <input
                                 name="email"
-                                placeholder="Пошта"
+                                placeholder="Email"
                                 type="email"
                                 value={loginData.email}
                                 onChange={handleLoginChange}
@@ -225,7 +225,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                             <input
                                 name="password"
                                 type="password"
-                                placeholder="Пароль"
+                                placeholder="Password"
                                 value={loginData.password}
                                 onChange={handleLoginChange}
                                 autoComplete="current-password"
@@ -239,11 +239,11 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                     checked={loginData.remember}
                                     onChange={handleLoginChange}
                                 />
-                                {" "}Запам'ятати мене
+                                {" "}Remember me
                             </label>
 
                             <button type="submit" className="submit-btn">
-                                Увійти
+                                Log In
                             </button>
                         </form>
                     </div>
@@ -252,11 +252,11 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                 {/* Register Form */}
                 {!isLogin && (
                     <div className="form-container">
-                        <h2>Створити акаунт</h2>
+                        <h2>Create Account</h2>
                         <form className="login-form" onSubmit={handleRegisterSubmit}>
                             <input
                                 name="login"
-                                placeholder="Ім'я користувача"
+                                placeholder="Username"
                                 type="text"
                                 value={registerData.login}
                                 onChange={handleRegisterChange}
@@ -265,7 +265,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
 
                             <input
                                 name="email"
-                                placeholder="Пошта"
+                                placeholder="Email"
                                 type="email"
                                 value={registerData.email}
                                 onChange={handleRegisterChange}
@@ -274,7 +274,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
 
                             <input
                                 name="first_name"
-                                placeholder="Ім'я"
+                                placeholder="First Name"
                                 type="text"
                                 value={registerData.first_name}
                                 onChange={handleRegisterChange}
@@ -282,7 +282,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
 
                             <input
                                 name="last_name"
-                                placeholder="Прізвище"
+                                placeholder="Last Name"
                                 type="text"
                                 value={registerData.last_name}
                                 onChange={handleRegisterChange}
@@ -291,7 +291,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                             <input
                                 name="password"
                                 type="password"
-                                placeholder="Пароль"
+                                placeholder="Password"
                                 value={registerData.password}
                                 onChange={handleRegisterChange}
                                 required
@@ -300,7 +300,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                             <input
                                 name="confirmPassword"
                                 type="password"
-                                placeholder="Підтвердіть пароль"
+                                placeholder="Confirm Password"
                                 value={registerData.confirmPassword}
                                 onChange={handleRegisterChange}
                                 required
@@ -311,29 +311,29 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                 value={registerData.region}
                                 onChange={handleRegisterChange}
                             >
-                                <option value="">Оберіть регіон</option>
-                                <option value="Ukraine">Вся Україна</option>
-                                <option value="Kyiv">Київ</option>
-                                <option value="Kharkiv">Харків</option>
-                                <option value="Odesa">Одеса</option>
-                                <option value="Dnipropetrovsk">Дніпропетровськ</option>
-                                <option value="Lviv">Львів</option>
-                                <option value="Zaporizhzhia">Запоріжжя</option>
-                                <option value="Mykolaiv">Миколаїв</option>
-                                <option value="Donetsk">Донецьк</option>
-                                <option value="Luhansk">Луганськ</option>
-                                <option value="Kherson">Херсон</option>
-                                <option value="Chernihiv">Чернігів</option>
-                                <option value="Cherkasy">Черкаси</option>
-                                <option value="Poltava">Полтава</option>
-                                <option value="Sumy">Суми</option>
-                                <option value="Vinnytsia">Вінниця</option>
-                                <option value="Rivne">Рівне</option>
-                                <option value="Zhytomyr">Житомир</option>
-                                <option value="Khmelnytskyi">Хмельницький</option>
-                                <option value="Ternopil">Тернопіль</option>
-                                <option value="Ivano-Frankivsk">Івано-Франківськ</option>
-                                <option value="Volyn">Волинь</option>
+                                <option value="">Select a region</option>
+                                <option value="Ukraine">All Ukraine</option>
+                                <option value="Kyiv">Kyiv</option>
+                                <option value="Kharkiv">Kharkiv</option>
+                                <option value="Odesa">Odesa</option>
+                                <option value="Dnipropetrovsk">Dnipropetrovsk</option>
+                                <option value="Lviv">Lviv</option>
+                                <option value="Zaporizhzhia">Zaporizhzhia</option>
+                                <option value="Mykolaiv">Mykolaiv</option>
+                                <option value="Donetsk">Donetsk</option>
+                                <option value="Luhansk">Luhansk</option>
+                                <option value="Kherson">Kherson</option>
+                                <option value="Chernihiv">Chernihiv</option>
+                                <option value="Cherkasy">Cherkasy</option>
+                                <option value="Poltava">Poltava</option>
+                                <option value="Sumy">Sumy</option>
+                                <option value="Vinnytsia">Vinnytsia</option>
+                                <option value="Rivne">Rivne</option>
+                                <option value="Zhytomyr">Zhytomyr</option>
+                                <option value="Khmelnytskyi">Khmelnytskyi</option>
+                                <option value="Ternopil">Ternopil</option>
+                                <option value="Ivano-Frankivsk">Ivano-Frankivsk</option>
+                                <option value="Volyn">Volyn</option>
                             </select>
 
                             <label className="checkbox-label">
@@ -343,18 +343,18 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                     checked={registerData.agreedToTerms}
                                     onChange={handleRegisterChange}
                                 />
-                                {" "}Я согласен з{" "}
+                                {" "}I agree to the{" "}
                                 <button
                                     type="button"
                                     className="terms-link"
                                     onClick={() => setShowTermsModal(true)}
                                 >
-                                    Умовами обслуговування
+                                    Terms of Service
                                 </button>
                             </label>
 
                             <button type="submit" className="submit-btn">
-                                Зареєструватися
+                                Register
                             </button>
                         </form>
                     </div>
@@ -365,7 +365,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                     <div className="modal-overlay" onClick={() => setShowTermsModal(false)}>
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">
-                                <h3>Умови обслуговування</h3>
+                                <h3>Terms of Service</h3>
                             </div>
                             <div className="modal-body">
                                 <pre>{termsAndConditionsText}</pre>
@@ -375,7 +375,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                     className="modal-btn"
                                     onClick={() => setShowTermsModal(false)}
                                 >
-                                    Закрити
+                                    Close
                                 </button>
                             </div>
                         </div>

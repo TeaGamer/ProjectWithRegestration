@@ -40,7 +40,7 @@ export default function Dashboard() {
             setUser(userData);
             setEditData(userData);
         } catch (e) {
-            console.error("Помилка при парсингу користувача:", e);
+            console.error("Error parsing user data:", e);
             window.location.href = "/login";
         } finally {
             setLoading(false);
@@ -86,8 +86,8 @@ export default function Dashboard() {
             const data = await response.json();
 
             if (response.ok) {
-                setEditSuccess("Профіль оновлено успішно!");
-                // Оновлення користувача в localStorage
+                setEditSuccess("Profile updated successfully!");
+                // Update user in localStorage
                 localStorage.setItem("user", JSON.stringify(data.user));
                 setUser(data.user);
                 setTimeout(() => {
@@ -95,19 +95,19 @@ export default function Dashboard() {
                     setEditSuccess("");
                 }, 1500);
             } else {
-                setEditError(data.error || "Помилка при оновленні профілю. Спробуйте пізніше.");
+                setEditError(data.error || "Error updating profile. Please try again later.");
             }
         } catch (err) {
-            setEditError("Помилка з'єднання з сервером. Перевірте, чи запущен бекенд на http://localhost:8000");
+            setEditError("Connection error. Please check if the backend is running at http://localhost:8000");
         }
     };
 
     if (loading) {
-        return <div className="dashboard-container"><p>Завантаження...</p></div>;
+        return <div className="dashboard-container"><p>Loading...</p></div>;
     }
 
     if (!user) {
-        return <div className="dashboard-container"><p>Користувач не знайдений</p></div>;
+        return <div className="dashboard-container"><p>User not found</p></div>;
     }
 
     return (
@@ -115,7 +115,7 @@ export default function Dashboard() {
             {/* Topbar */}
             <div className="topbar">
                 <div className="topbar-left">
-                    <h1>Панель управління</h1>
+                    <h1>Dashboard</h1>
                 </div>
                 <div className="topbar-right">
                     <div className="user-info-display">
@@ -125,12 +125,12 @@ export default function Dashboard() {
                         <button
                             className="profile-avatar-btn"
                             onClick={() => setShowProfileMenu(!showProfileMenu)}
-                            title="Профіль користувача"
+                            title="User Profile"
                         >
                             {user.avatar ? (
                                 <img
                                     src={user.avatar}
-                                    alt="Аватар користувача"
+                                    alt="User Avatar"
                                     className="avatar-circle"
                                 />
                             ) : (
@@ -147,7 +147,7 @@ export default function Dashboard() {
                                     {user.avatar ? (
                                         <img
                                             src={user.avatar}
-                                            alt="Аватар"
+                                            alt="User Avatar"
                                             className="menu-avatar"
                                         />
                                     ) : (
@@ -164,10 +164,10 @@ export default function Dashboard() {
                                 <div className="profile-menu-divider"></div>
 
                                 <div className="profile-menu-details">
-                                    <p><strong>Ім'я користувача:</strong> {user.login}</p>
-                                    <p><strong>Повне ім'я:</strong> {user.first_name} {user.last_name}</p>
-                                    {user.region && <p><strong>Регіон:</strong> {user.region}</p>}
-                                    {user.date_of_birth && <p><strong>Дата народження:</strong> {user.date_of_birth}</p>}
+                                    <p><strong>Username:</strong> {user.login}</p>
+                                    <p><strong>Full Name:</strong> {user.first_name} {user.last_name}</p>
+                                    {user.region && <p><strong>Region:</strong> {user.region}</p>}
+                                    {user.date_of_birth && <p><strong>Date of Birth:</strong> {user.date_of_birth}</p>}
                                 </div>
 
                                 <div className="profile-menu-divider"></div>
@@ -179,11 +179,11 @@ export default function Dashboard() {
                                         setShowProfileMenu(false);
                                     }}
                                 >
-                                    Змінити дані
+                                    Edit Profile
                                 </button>
 
                                 <button className="profile-menu-logout" onClick={handleLogout}>
-                                    Вийти
+                                    Log Out
                                 </button>
                             </div>
                         )}
@@ -196,7 +196,7 @@ export default function Dashboard() {
                 <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2>Змінити дані профілю</h2>
+                            <h2>Edit Profile</h2>
                             <button 
                                 className="modal-close"
                                 onClick={() => setShowEditModal(false)}
@@ -210,62 +210,62 @@ export default function Dashboard() {
 
                         <form onSubmit={handleEditSubmit} className="edit-profile-form">
                             <div className="form-group">
-                                <label>Ім'я</label>
+                                <label>First Name</label>
                                 <input
                                     type="text"
                                     name="first_name"
                                     value={editData?.first_name || ""}
                                     onChange={handleEditChange}
-                                    placeholder="Ім'я"
+                                    placeholder="First Name"
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label>Прізвище</label>
+                                <label>Last Name</label>
                                 <input
                                     type="text"
                                     name="last_name"
                                     value={editData?.last_name || ""}
                                     onChange={handleEditChange}
-                                    placeholder="Прізвище"
+                                    placeholder="Last Name"
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label>Регіон</label>
+                                <label>Region</label>
                                 <select
                                     name="region"
                                     value={editData?.region || ""}
                                     onChange={handleEditChange}
                                 >
-                                    <option value="">Оберіть регіон</option>
-                                    <option value="Ukraine">Вся Україна</option>
-                                    <option value="Kyiv">Київ</option>
-                                    <option value="Kharkiv">Харків</option>
-                                    <option value="Odesa">Одеса</option>
-                                    <option value="Dnipropetrovsk">Дніпропетровськ</option>
-                                    <option value="Lviv">Львів</option>
-                                    <option value="Zaporizhzhia">Запоріжжя</option>
-                                    <option value="Mykolaiv">Миколаїв</option>
-                                    <option value="Donetsk">Донецьк</option>
-                                    <option value="Luhansk">Луганськ</option>
-                                    <option value="Kherson">Херсон</option>
-                                    <option value="Chernihiv">Чернігів</option>
-                                    <option value="Cherkasy">Черкаси</option>
-                                    <option value="Poltava">Полтава</option>
-                                    <option value="Sumy">Суми</option>
-                                    <option value="Vinnytsia">Вінниця</option>
-                                    <option value="Rivne">Рівне</option>
-                                    <option value="Zhytomyr">Житомир</option>
-                                    <option value="Khmelnytskyi">Хмельницький</option>
-                                    <option value="Ternopil">Тернопіль</option>
-                                    <option value="Ivano-Frankivsk">Івано-Франківськ</option>
-                                    <option value="Volyn">Волинь</option>
+                                    <option value="">Select Region</option>
+                                    <option value="Ukraine">All Ukraine</option>
+                                    <option value="Kyiv">Kyiv</option>
+                                    <option value="Kharkiv">Kharkiv</option>
+                                    <option value="Odesa">Odesa</option>
+                                    <option value="Dnipropetrovsk">Dnipro</option>
+                                    <option value="Lviv">Lviv</option>
+                                    <option value="Zaporizhzhia">Zaporizhzhia</option>
+                                    <option value="Mykolaiv">Mykolaiv</option>
+                                    <option value="Donetsk">Donetsk</option>
+                                    <option value="Luhansk">Luhansk</option>
+                                    <option value="Kherson">Kherson</option>
+                                    <option value="Chernihiv">Chernihiv</option>
+                                    <option value="Cherkasy">Cherkasy</option>
+                                    <option value="Poltava">Poltava</option>
+                                    <option value="Sumy">Sumy</option>
+                                    <option value="Vinnytsia">Vinnytsia</option>
+                                    <option value="Rivne">Rivne</option>
+                                    <option value="Zhytomyr">Zhytomyr</option>
+                                    <option value="Khmelnytskyi">Khmelnytskyi</option>
+                                    <option value="Ternopil">Ternopil</option>
+                                    <option value="Ivano-Frankivsk">Ivano-Frankivsk</option>
+                                    <option value="Volyn">Volyn</option>
                                 </select>
                             </div>
 
                             <div className="form-group">
-                                <label>Дата народження</label>
+                                <label>Date of birth</label>
                                 <input
                                     type="date"
                                     name="date_of_birth"
@@ -276,14 +276,14 @@ export default function Dashboard() {
 
                             <div className="modal-buttons">
                                 <button type="submit" className="modal-submit-btn">
-                                    Зберегти
+                                    Save
                                 </button>
                                 <button 
                                     type="button" 
                                     className="modal-cancel-btn"
                                     onClick={() => setShowEditModal(false)}
                                 >
-                                    Скасувати
+                                    Cancel
                                 </button>
                             </div>
                         </form>
@@ -294,20 +294,20 @@ export default function Dashboard() {
             {/* Main Content */}
             <div className="dashboard-container">
                 <div className="welcome-message">
-                    <h2>Вітаємо, {user.first_name || user.login}!</h2>
-                    <p>Ви успішно увійшли в систему.</p>
+                    <h2>Welcome, {user.first_name || user.login}!</h2>
+                    <p>You have successfully logged in.</p>
                 </div>
 
                 <div className="user-profile">
-                    <h3>Ваш профіль</h3>
+                    <h3>Your Profile</h3>
                     <div className="profile-info">
                         <p><strong>ID:</strong> {user.id}</p>
-                        <p><strong>Ім'я користувача:</strong> {user.login}</p>
-                        <p><strong>Пошта:</strong> {user.email}</p>
-                        <p><strong>Ім'я:</strong> {user.first_name}</p>
-                        <p><strong>Прізвище:</strong> {user.last_name}</p>
-                        {user.region && <p><strong>Регіон:</strong> {user.region}</p>}
-                        {user.date_of_birth && <p><strong>Дата народження:</strong> {user.date_of_birth}</p>}
+                        <p><strong>Username:</strong> {user.login}</p>
+                        <p><strong>Email:</strong> {user.email}</p>
+                        <p><strong>First Name:</strong> {user.first_name}</p>
+                        <p><strong>Last Name:</strong> {user.last_name}</p>
+                        {user.region && <p><strong>Region:</strong> {user.region}</p>}
+                        {user.date_of_birth && <p><strong>Date of Birth:</strong> {user.date_of_birth}</p>}
                     </div>
                 </div>
             </div>
