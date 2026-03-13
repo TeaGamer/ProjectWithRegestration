@@ -4,12 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import './globals.css';
 
-{
-  "compilerOptions": {
-    "jsx": "react-jsx"  // или "react" для старых версий
-  }
-}
-
 export default function Home() {
   return (
     <main className="hero-container">
