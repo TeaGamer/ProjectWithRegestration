@@ -1,14 +1,45 @@
-"use client";
 
-import "./css/login.css";
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import './globals.css';
 
-export default function HomePage() {
-    return (
-      <div className="Background">
-        <main>
-          <h1>Welcome to Alex Site</h1>
-          <a href="/login"><button>Login</button></a>
-        </main>
-      </div>  
-    );
+{
+  "compilerOptions": {
+    "jsx": "react-jsx"  // или "react" для старых версий
+  }
+}
+
+export default function Home() {
+  return (
+    <main className="hero-container">
+      <div className="container hero-section">
+        
+        {/* Left Side: Project Info */}
+        <div className="hero-text">
+          <p className="subtitle">Our Startup Project</p>
+          <h1>AI Planner & <br />Smart Alarms</h1>
+          <p className="description">
+            Meet your new assistant, <strong>AI Alex</strong>. 
+            Designed to help you organize, schedule, and master your daily routine with ease.
+          </p>
+        </div>
+
+        <div className="hero-profile">
+          <div className="avatar-wrapper">
+            <img 
+              src="/knight.png" 
+              alt="AI Alex Avatar" 
+              className="avatar-img"
+            />
+          </div>
+          <h2 className="ai-name">Alex</h2>
+          <Link href="/login" className="login-bubble-btn">
+            Login
+          </Link>
+        </div>
+
+      </div>
+    </main>
+  );
 }
