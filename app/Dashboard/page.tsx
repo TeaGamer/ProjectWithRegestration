@@ -235,10 +235,10 @@ export default function Dashboard() {
                                 <label>Region</label>
                                 <select
                                     name="region"
-                                    value={editData?.region || ""}
+                                    value={editData?.region || ""} //базове значення в "",внизу всі знячення value="Значення" 
                                     onChange={handleEditChange}
                                 >
-                                    <option value="">Select Region</option>
+                                    <option value="">Select Region</option> 
                                     <option value="Ukraine">All Ukraine</option>
                                     <option value="Kyiv">Kyiv</option>
                                     <option value="Kharkiv">Kharkiv</option>
