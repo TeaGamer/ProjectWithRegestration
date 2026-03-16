@@ -13,7 +13,7 @@ interface User {
     avatar?: string;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:10000";
 
 export default function Dashboard() {
     const [user, setUser] = useState<User | null>(null);
@@ -98,7 +98,7 @@ export default function Dashboard() {
                 setEditError(data.error || "Error updating profile. Please try again later.");
             }
         } catch (err) {
-            setEditError("Connection error. Please check if the backend is running at http://localhost:8000");
+            setEditError("Connection error. Please check if the backend is running at http://localhost:10000");
         }
     };
 

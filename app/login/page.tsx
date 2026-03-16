@@ -2,7 +2,7 @@
 import { useState } from "react";
 import "../css/login.css";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
 
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
