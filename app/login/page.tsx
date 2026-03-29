@@ -7,6 +7,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
     const [showTermsModal, setShowTermsModal] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [loginData, setLoginData] = useState({
         email: "",
         password: "",
@@ -290,12 +291,15 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
 
                             <input
                                 name="password"
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Password"
                                 value={registerData.password}
                                 onChange={handleRegisterChange}
+                                id="pwd"
                                 required
                             />
+                            <input type="checkbox" onChange={(e) => setShowPassword(e.target.checked)} checked={showPassword} />
+                            <label htmlFor="pwd">Показати пароль</label>
 
                             <input
                                 name="confirmPassword"
