@@ -7,7 +7,8 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
     const [showTermsModal, setShowTermsModal] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+    const [showLoginPassword, setShowLoginPassword] = useState(false);
+    const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
@@ -233,15 +234,25 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                 required
                             />
 
-                            <input
-                                name="password"
-                                type="password"
-                                placeholder="Password"
-                                value={loginData.password}
-                                onChange={handleLoginChange}
-                                autoComplete="current-password"
-                                required
-                            />
+                            <div className="password-input-wrapper">
+                                <input
+                                    name="password"
+                                    type={showLoginPassword ? "text" : "password"}
+                                    placeholder="Password"
+                                    value={loginData.password}
+                                    onChange={handleLoginChange}
+                                    autoComplete="current-password"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                                    className="password-toggle-btn"
+                                    aria-label="Toggle password visibility"
+                                >
+                                    {showLoginPassword ? "1" : "0"}
+                                </button>
+                            </div>
 
                             <label className="checkbox-label">
                                 <input
@@ -299,26 +310,24 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                 onChange={handleRegisterChange}
                             />
 
-                            <input
-                                name="password"
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Password"
-                                value={registerData.password}
-                                onChange={handleRegisterChange}
-                                id="pwd"
-                                required
-                            />
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "-10px", marginBottom: "15px" }}>
-                                <input 
-                                    type="checkbox" 
-                                    onChange={(e) => setShowPassword(e.target.checked)} 
-                                    checked={showPassword}
-                                    id="showPwdCheckbox"
-                                    style={{ margin: 0, cursor: "pointer" }}
+                            <div className="password-input-wrapper">
+                                <input
+                                    name="password"
+                                    type={showRegisterPassword ? "text" : "password"}
+                                    placeholder="Password"
+                                    value={registerData.password}
+                                    onChange={handleRegisterChange}
+                                    id="pwd"
+                                    required
                                 />
-                                <label htmlFor="showPwdCheckbox" style={{ margin: 0, cursor: "pointer" }}>
-                                    Показати пароль
-                                </label>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                                    className="password-toggle-btn"
+                                    aria-label="Toggle password visibility"
+                                >
+                                    {showRegisterPassword ? "1" : "0"}
+                                </button>
                             </div>
 
                             <input
