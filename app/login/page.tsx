@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../css/login.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
@@ -8,6 +8,16 @@ export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && showTermsModal) {
+                setShowTermsModal(false);
+            }
+        };
+        window.addEventListener("keydown", handleEsc);
+        return () => window.removeEventListener("keydown", handleEsc);
+    }, [showTermsModal]);
     const [loginData, setLoginData] = useState({
         email: "",
         password: "",
@@ -298,8 +308,18 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                 id="pwd"
                                 required
                             />
-                            <input type="checkbox" onChange={(e) => setShowPassword(e.target.checked)} checked={showPassword} />
-                            <label htmlFor="pwd">Показати пароль</label>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "-10px", marginBottom: "15px" }}>
+                                <input 
+                                    type="checkbox" 
+                                    onChange={(e) => setShowPassword(e.target.checked)} 
+                                    checked={showPassword}
+                                    id="showPwdCheckbox"
+                                    style={{ margin: 0, cursor: "pointer" }}
+                                />
+                                <label htmlFor="showPwdCheckbox" style={{ margin: 0, cursor: "pointer" }}>
+                                    Показати пароль
+                                </label>
+                            </div>
 
                             <input
                                 name="confirmPassword"

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
 
 interface ProfileProps {
@@ -11,6 +11,16 @@ export default function Profile({ user, onClose }: ProfileProps) {
     const [editData, setEditData] = useState<User>(user);
     const [editError, setEditError] = useState("");
     const [editSuccess, setEditSuccess] = useState("");
+
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose();
+            }
+        };
+        window.addEventListener("keydown", handleEsc);
+        return () => window.removeEventListener("keydown", handleEsc);
+    }, [onClose]);
 
     const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
