@@ -205,7 +205,7 @@ export default function KalendarPage() {
   }
 
   return (
-    <div className="dashboard-layout-calendar" style={{ paddingRight: isChatOpen ? "420px" : "20px" }}>
+    <div className="dashboard-layout-calendar" style={{ paddingRight: isChatOpen ? "460px" : "20px" }}>
       {/* Верхня панель з логотипом і користувачем */}
       <div className="topbar-cal">
         <div className="logo-section">Calendar with Alex</div>
