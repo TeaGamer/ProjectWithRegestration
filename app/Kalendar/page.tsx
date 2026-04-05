@@ -82,6 +82,13 @@ export default function KalendarPage() {
     [notes, selectedNoteId]
   );
 
+  const [chatMessages, setChatMessages] = useState<{
+    id: number;
+    sender: "user" | "ai";
+    text: string;
+  }[]>([]);
+  const [chatInput, setChatInput] = useState("");
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const monthName = currentDate.toLocaleString("uk-UA", { month: "long" });
@@ -89,9 +96,35 @@ export default function KalendarPage() {
   const firstDayIndex = new Date(year, month, 1).getDay();
   const shift = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
 
-  const dayHasNotes = (day: number) => {
-    const dayString = String(day).padStart(2, "0");
-    return filteredNotes.some((note) => note.date.endsWith(`-${dayString}`));
+  const normalizeMonth = (offset: number) => {
+    const actual = month + offset;
+    return ((actual % 12) + 12) % 12;
+  };
+
+  const noteMatchesCell = (note: Note, day: number, offset: number) => {
+    const noteDate = new Date(note.date);
+    return noteDate.getDate() === day && noteDate.getMonth() === normalizeMonth(offset);
+  };
+
+  const cellNotes = (day: number, offset: number) => {
+    return filteredNotes.filter((note) => noteMatchesCell(note, day, offset));
+  };
+
+  const prevMonthDays = new Date(year, month, 0).getDate();
+  const totalCells = 42;
+
+  const calendarCells = Array.from({ length: totalCells }, (_, index) => {
+    if (index < shift) {
+      return { day: prevMonthDays - shift + 1 + index, offset: -1 };
+    }
+    if (index < shift + daysInMonth) {
+      return { day: index - shift + 1, offset: 0 };
+    }
+    return { day: index - shift - daysInMonth + 1, offset: 1 };
+  });
+
+  const dayHasNotes = (day: number, offset: number) => {
+    return cellNotes(day, offset).length > 0;
   };
 
   const openModal = (type: "note" | "holiday") => {
@@ -201,7 +234,7 @@ export default function KalendarPage() {
 
       <div className="main-grid-cal">
         {/* Колонка фільтрів категорій */}
-        <div>
+        <div className="category-panel">
           <div className="kategories-header">Kategories</div>
           <button className="side-cat-btn" onClick={() => setSelectedCategory("all")}>All</button>
           {CATEGORY_OPTIONS.map((cat) => (
@@ -212,27 +245,38 @@ export default function KalendarPage() {
         </div>
 
         {/* Календар */}
-        <div>
+        <div className="calendar-block">
           <div className="month-picker">
-            <button className="arrow-btn" onClick={() => changeMonth(-1)}>&lt;</button>
-            <div className="month-name-display">{monthName} {year}</div>
-            <button className="arrow-btn" onClick={() => changeMonth(1)}>&gt;</button>
+            <button className="month-arrow" onClick={() => changeMonth(-1)}>&lt;</button>
+            <div className="month-pill">{monthName} {year}</div>
+            <button className="month-arrow" onClick={() => changeMonth(1)}>&gt;</button>
           </div>
 
           <div className="days-grid">
             {WEEKDAYS.map((day) => (
               <div key={day} className="grid-head-cell">{day}</div>
             ))}
-            {Array.from({ length: shift }).map((_, index) => (
-              <div key={`empty-${index}`} className="grid-cell"></div>
-            ))}
-            {Array.from({ length: daysInMonth }).map((_, index) => {
-              const day = index + 1;
-              const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
+            {calendarCells.map((cell, index) => {
+              const isCurrentMonth = cell.offset === 0;
+              const isToday = isCurrentMonth && new Date().toDateString() === new Date(year, month, cell.day).toDateString();
+              const notesInCell = cellNotes(cell.day, cell.offset);
+
               return (
-                <div key={day} className={`grid-cell ${isToday ? "today-highlight" : ""}`}>
-                  <div>{day}</div>
-                  {dayHasNotes(day) && <div style={{ marginTop: "8px", fontSize: "0.8rem", color: "#555" }}>•</div>}
+                <div
+                  key={`${index}-${cell.day}-${cell.offset}`}
+                  className={`grid-cell ${!isCurrentMonth ? "grid-cell-inactive" : ""} ${isToday ? "today-highlight" : ""}`}
+                >
+                  <div className="cell-top-row">
+                    <span className="cell-day-number">{cell.day}</span>
+                    {notesInCell.length > 0 && <span className="note-marker">{notesInCell.length}</span>}
+                  </div>
+                  <div className="cell-notes">
+                    {notesInCell.slice(0, 2).map((note) => (
+                      <div key={note.id} className={`cell-note-badge ${note.category.toLowerCase()}`}>
+                        {note.category}: {note.text}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               );
             })}
@@ -322,12 +366,55 @@ export default function KalendarPage() {
       {/* Чат ШІ */}
       {isChatOpen && (
         <div className="ai-chat-box">
-          <div className="chat-top">Спілкування з Alex AI</div>
+          <div className="chat-top">
+            <span>Спілкування з Alex AI</span>
+            <button className="chat-close-btn" onClick={() => setIsChatOpen(false)}>✕</button>
+          </div>
           <div className="chat-mid">
-            <div className="ai-text">Hi, {user.login}! How is your day going?</div>
+            {chatMessages.length === 0 ? (
+              <div className="ai-text">Welcome, {user.login}! Напишіть повідомлення, щоб почати.</div>
+            ) : (
+              chatMessages.map((message) => (
+                <div key={message.id} className={`chat-message ${message.sender}`}>
+                  <span className="message-sender">{message.sender === "user" ? "You" : "Alex"}</span>
+                  <p>{message.text}</p>
+                </div>
+              ))
+            )}
           </div>
           <div className="chat-bottom">
-            <input className="ai-input" placeholder="Ask something..." />
+            <input
+              className="ai-input"
+              placeholder="Ask something..."
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (chatInput.trim()) {
+                    setChatMessages((prev) => [
+                      ...prev,
+                      { id: Date.now(), sender: "user", text: chatInput.trim() },
+                    ]);
+                    setChatInput("");
+                  }
+                }
+              }}
+            />
+            <button
+              className="send-message-btn"
+              type="button"
+              onClick={() => {
+                if (!chatInput.trim()) return;
+                setChatMessages((prev) => [
+                  ...prev,
+                  { id: Date.now(), sender: "user", text: chatInput.trim() },
+                ]);
+                setChatInput("");
+              }}
+            >
+              Send
+            </button>
           </div>
         </div>
       )}
