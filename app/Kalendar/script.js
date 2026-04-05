@@ -53,7 +53,7 @@ export default function Dashboard( ) {
     // Логіка календаря: обчислюємо поточний місяць і зсув для першого дня тижня
     const year = currentDate.getFullYear( );
     const month = currentDate.getMonth( );
-    const monthName = currentDate.toLocaleString('uk-UA', { month: 'long' });
+    const monthName = currentDate.toLocaleString('en-US', { month: 'long' });
     const daysInMonth = new Date(year, month + 1, 0).getDate( );
     const firstDayIndex = new Date(year, month, 1).getDay( );
     // Якщо тиждень починається з понеділка, перетворюємо індекс для нульової зміщення

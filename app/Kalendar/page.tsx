@@ -91,7 +91,7 @@ export default function KalendarPage() {
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-  const monthName = currentDate.toLocaleString("uk-UA", { month: "long" });
+  const monthName = currentDate.toLocaleString("en-US", { month: "long" });
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDayIndex = new Date(year, month, 1).getDay();
   const shift = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
@@ -367,12 +367,12 @@ export default function KalendarPage() {
       {isChatOpen && (
         <div className="ai-chat-box">
           <div className="chat-top">
-            <span>Спілкування з Alex AI</span>
+            <span>Chat with Alex</span>
             <button className="chat-close-btn" onClick={() => setIsChatOpen(false)}>✕</button>
           </div>
           <div className="chat-mid">
             {chatMessages.length === 0 ? (
-              <div className="ai-text">Welcome, {user.login}! Напишіть повідомлення, щоб почати.</div>
+              <div className="ai-text">Welcome, {user.login}! Ask something...</div>
             ) : (
               chatMessages.map((message) => (
                 <div key={message.id} className={`chat-message ${message.sender}`}>
