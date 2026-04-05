@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- HTML сторінка для календаря Alex: головна розмітка, кнопки та модальні вікна -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,6 +16,7 @@
             </div>
         </header>
 
+        <!-- Панель керування: додавання, редагування та видалення нотаток -->
         <div class="controls">
             <button class="btn-text blue-t" onclick="openModal('holiday')">Add Date</button>
             <button class="btn-text yellow-t">Edit Note</button>
@@ -23,6 +25,7 @@
         </div>
 
         <main class="main-content">
+            <!-- Бокова панель з фільтрацією категорій нотаток -->
             <aside class="sidebar">
                 <div class="category-header">Kategories</div>
                 <button class="cat-btn" onclick="filterCategory('all')">All</button>
@@ -49,6 +52,7 @@
         </main>
     </div>
 
+    <!-- Модальне вікно для створення або редагування нотатки -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <h3 id="modalTitle">New Note</h3>
@@ -68,8 +72,9 @@
         </div>
     </div>
 
+    <!-- Скрипт, що читає логін користувача з localStorage і вставляє його у заголовок -->
     <script>
-        // Load user name from localStorage
+        // Завантаження імені користувача з localStorage для відображення в календарі
         const userStr = localStorage.getItem('user');
         if (userStr) {
             try {
@@ -84,6 +89,7 @@
         }
     </script>
 
+    <!-- Підключення JS-коду, який відповідає за логіку календаря та обробку подій -->
     <script src="script.js"></script>
 </body>
 </html>

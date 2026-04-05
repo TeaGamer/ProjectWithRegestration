@@ -1,3 +1,4 @@
+/* Стилі для сторінки Dashboard та модальних вікон */
 .dashboard-layout {
     display: flex;
     flex-direction: column;
@@ -75,7 +76,7 @@ html, body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Profile Menu Dropdown */
+/* Список інформації про профіль, що з'являється при натисканні на аватар */
 .profile-menu-dropdown {
     position: absolute;
     right: 0;
@@ -140,6 +141,7 @@ html, body {
     margin: 0;
 }
 
+/* Детальний блок даних користувача всередині меню */
 .profile-menu-details {
     padding: 15px 20px;
     max-height: 300px;
@@ -204,7 +206,7 @@ html, body {
     font-weight: 500;
 }
 
-/* Modal Overlay */
+/* Темна фонова накладка для модальних вікон */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -273,7 +275,7 @@ html, body {
     color: #333;
 }
 
-/* Edit Profile Form */
+/* Форми редагування профілю у модалці */
 .edit-profile-form {
     padding: 20px;
 }
@@ -358,7 +360,7 @@ html, body {
     font-weight: bold;
 }
 
-/* Main Dashboard Container */
+/* Основна область контенту Dashboard, вміщає повідомлення і деталі профілю */
 .dashboard-container {
     width: 100%;
     padding: 40px 20px;

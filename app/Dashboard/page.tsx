@@ -1,22 +1,24 @@
 "use client";
+// Цей компонент виконується на клієнтській стороні і взаємодіє з localStorage
 import { useState, useEffect } from "react";
 import "../css/dashboard.css";
 import Profile from "../components/Profile";
 import { User } from "../constants/profileConfig";
 
 export default function Dashboard() {
+    // Стан користувача і додаткові прапорці для інтерфейсу
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
 
     useEffect(() => {
-        // Отримання користувача з localStorage
+        // При першому рендері читаємо дані користувача та токен з localStorage
         const userStr = localStorage.getItem("user");
         const token = localStorage.getItem("token");
 
         if (!token || !userStr) {
-            // Перенаправлення на вхід якщо немає токена
+            // Якщо немає авторизаційних даних, то переходимо на сторінку входу
             window.location.href = "/login";
             return;
         }
@@ -25,6 +27,7 @@ export default function Dashboard() {
             const userData = JSON.parse(userStr);
             setUser(userData);
         } catch (e) {
+            // Якщо дані пошкоджені, видаляємо їх і повертаємось на логін
             console.error("Error parsing user data:", e);
             window.location.href = "/login";
         } finally {
@@ -33,6 +36,7 @@ export default function Dashboard() {
     }, []);
 
     const handleLogout = () => {
+        // Видаляємо збережений токен і дані користувача при виході
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         window.location.href = "/login";
@@ -48,7 +52,7 @@ export default function Dashboard() {
 
     return (
         <div className="dashboard-layout">
-            {/* Topbar */}
+            {/* Topbar: верхня панель з назвою та інформацією про користувача */}
             <div className="topbar">
                 <div className="topbar-left">
                     <h1>Dashboard</h1>
@@ -100,6 +104,7 @@ export default function Dashboard() {
                                 <div className="profile-menu-divider"></div>
 
                                 <div className="profile-menu-details">
+                                    {/* Детальна інформація про користувача у випадаючому меню */}
                                     <p><strong>Username:</strong> {user.login}</p>
                                     <p><strong>Full Name:</strong> {user.first_name} {user.last_name}</p>
                                     {user.region && <p><strong>Region:</strong> {user.region}</p>}
@@ -127,7 +132,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Edit Profile Modal */}
+            {/* Edit Profile Modal: показує компонент редагування профілю */}
             {showEditModal && user && (
                 <Profile 
                     user={user}
@@ -150,8 +155,10 @@ export default function Dashboard() {
                 </div>
 
                 <div className="user-profile">
+                    {/* Блок з детальною інформацією профілю користувача */}
                     <h3>Your Profile</h3>
                     <div className="profile-info">
+                    {/* Відображаємо інформацію профілю користувача у вигляді карток */}
                         <p><strong>ID:</strong> {user.id}</p>
                         <p><strong>Username:</strong> {user.login}</p>
                         <p><strong>Email:</strong> {user.email}</p>

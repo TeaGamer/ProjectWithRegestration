@@ -1,5 +1,4 @@
-
-/* Фоновий градієнт як ви просили */
+/* Стилі для сторінки календаря: фон, кольори та розташування */
 .dashboard-wrapper {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -9,7 +8,7 @@
   overflow: hidden;
 }
 
-/* Бульбашка користувача */
+/* Бульбашка користувача у верхньому правому куті */
 .user-bubble {
   position: absolute;
   top: 20px;
@@ -200,7 +199,7 @@
   transform: scale(1.1); 
 }
 
-/* Календарна сітка */
+/* Основні стилі для календарної сітки та розташування колонок */
 .main-grid-cal { 
   display: grid; 
   grid-template-columns: 180px 1fr 100px; 
@@ -268,7 +267,7 @@
   position: relative; 
 }
 
-/* AI НЕОНОВИЙ КРУЖОК */
+/* Стиль неонової кнопки для відкриття AI-чату */
 .ai-neon-circle {
   position: fixed; 
   bottom: 30px; 
@@ -289,7 +288,7 @@
   object-fit: cover; 
 }
 
-/* ВІКНО ШІ */
+/* Стиль вікна чату ШІ: плаває над вмістом */
 .ai-chat-box {
   position: fixed; 
   bottom: 30px; 

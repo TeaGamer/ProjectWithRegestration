@@ -1,0 +1,350 @@
+"use client";
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import "../css/kalendar.css";
+import "../css/dashboard.css";
+import Profile from "../components/Profile";
+import { User } from "../constants/profileConfig";
+
+interface Note {
+  id: number;
+  text: string;
+  date: string;
+  time: string;
+  category: string;
+}
+
+const CATEGORY_OPTIONS = ["Meeting", "Birthday", "Holiday", "Event"];
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+export default function KalendarPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+  const [noteType, setNoteType] = useState<"note" | "holiday">("note");
+  const [noteText, setNoteText] = useState("");
+  const [noteDate, setNoteDate] = useState("");
+  const [noteTime, setNoteTime] = useState("");
+  const [noteCategory, setNoteCategory] = useState(CATEGORY_OPTIONS[0]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  useEffect(() => {
+    const userStr = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
+    if (!token || !userStr) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const userData = JSON.parse(userStr);
+      setUser(userData);
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      router.push("/login");
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    const savedNotes = localStorage.getItem("calendarNotes");
+    if (savedNotes) {
+      try {
+        setNotes(JSON.parse(savedNotes));
+      } catch {
+        setNotes([]);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("calendarNotes", JSON.stringify(notes));
+  }, [notes]);
+
+  const filteredNotes = useMemo(() => {
+    return selectedCategory === "all"
+      ? notes
+      : notes.filter((note) => note.category === selectedCategory);
+  }, [notes, selectedCategory]);
+
+  const selectedNote = useMemo(
+    () => notes.find((note) => note.id === selectedNoteId) || null,
+    [notes, selectedNoteId]
+  );
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const monthName = currentDate.toLocaleString("uk-UA", { month: "long" });
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDayIndex = new Date(year, month, 1).getDay();
+  const shift = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+
+  const dayHasNotes = (day: number) => {
+    const dayString = String(day).padStart(2, "0");
+    return filteredNotes.some((note) => note.date.endsWith(`-${dayString}`));
+  };
+
+  const openModal = (type: "note" | "holiday") => {
+    setNoteType(type);
+    setNoteCategory(type === "holiday" ? "Holiday" : "Meeting");
+    setNoteText("");
+    setNoteDate("");
+    setNoteTime("");
+    setSelectedNoteId(null);
+    setIsNoteModalOpen(true);
+  };
+
+  const openEditNote = () => {
+    if (selectedNote) {
+      setNoteType("note");
+      setNoteCategory(selectedNote.category);
+      setNoteDate(selectedNote.date);
+      setNoteTime(selectedNote.time);
+      setNoteText(selectedNote.text);
+      setIsNoteModalOpen(true);
+    } else {
+      openModal("note");
+    }
+  };
+
+  const closeModal = () => {
+    setIsNoteModalOpen(false);
+    setSelectedNoteId(null);
+    setNoteText("");
+    setNoteDate("");
+    setNoteTime("");
+  };
+
+  const handleSaveNote = () => {
+    if (!noteText || !noteDate) {
+      return;
+    }
+
+    const newNote: Note = {
+      id: selectedNote ? selectedNote.id : Date.now(),
+      text: noteText,
+      date: noteDate,
+      time: noteTime,
+      category: noteCategory,
+    };
+
+    if (selectedNote) {
+      setNotes((prev) => prev.map((item) => (item.id === selectedNote.id ? newNote : item)));
+    } else {
+      setNotes((prev) => [...prev, newNote]);
+    }
+
+    closeModal();
+  };
+
+  const handleNoteClick = (note: Note) => {
+    if (isDeleteMode) {
+      setNotes((prev) => prev.filter((item) => item.id !== note.id));
+      if (selectedNoteId === note.id) {
+        setSelectedNoteId(null);
+      }
+      return;
+    }
+
+    setSelectedNoteId(note.id);
+  };
+
+  const changeMonth = (direction: number) => {
+    setCurrentDate(new Date(year, month + direction, 1));
+  };
+
+  if (loading) {
+    return <div className="dashboard-container"><p>Loading...</p></div>;
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <div className="dashboard-layout-calendar">
+      {/* Верхня панель з логотипом і користувачем */}
+      <div className="topbar-cal">
+        <div className="logo-section">Calendar with Alex</div>
+        <button className="user-bubble-nav" onClick={() => setShowEditModal(true)}>
+          <span>{user.login}</span>
+          <div className="avatar-circle-nav">
+            {user.avatar ? (
+              <Image src={user.avatar} alt="Avatar" width={40} height={40} className="nav-img" />
+            ) : (
+              <div className="avatar-letter">{user.login.charAt(0).toUpperCase()}</div>
+            )}
+          </div>
+        </button>
+      </div>
+
+      {/* Панель дій */}
+      <div className="controls-row">
+        <button className="ctrl-btn yellow" onClick={() => openModal("holiday")}>Add Date</button>
+        <button className="ctrl-btn" onClick={openEditNote}>Edit Note</button>
+        <button className={`ctrl-btn pink ${isDeleteMode ? "active-del" : ""}`} onClick={() => setIsDeleteMode((prev) => !prev)}>
+          Delete Note
+        </button>
+        <button className="ctrl-btn green" onClick={() => openModal("note")}>Add Note</button>
+        <button className="ctrl-btn" onClick={() => setIsChatOpen((prev) => !prev)}>{isChatOpen ? "Close Chat" : "AI Chat"}</button>
+      </div>
+
+      <div className="main-grid-cal">
+        {/* Колонка фільтрів категорій */}
+        <div>
+          <div className="kategories-header">Kategories</div>
+          <button className="side-cat-btn" onClick={() => setSelectedCategory("all")}>All</button>
+          {CATEGORY_OPTIONS.map((cat) => (
+            <button key={cat} className="side-cat-btn" onClick={() => setSelectedCategory(cat)}>
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Календар */}
+        <div>
+          <div className="month-picker">
+            <button className="arrow-btn" onClick={() => changeMonth(-1)}>&lt;</button>
+            <div className="month-name-display">{monthName} {year}</div>
+            <button className="arrow-btn" onClick={() => changeMonth(1)}>&gt;</button>
+          </div>
+
+          <div className="days-grid">
+            {WEEKDAYS.map((day) => (
+              <div key={day} className="grid-head-cell">{day}</div>
+            ))}
+            {Array.from({ length: shift }).map((_, index) => (
+              <div key={`empty-${index}`} className="grid-cell"></div>
+            ))}
+            {Array.from({ length: daysInMonth }).map((_, index) => {
+              const day = index + 1;
+              const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
+              return (
+                <div key={day} className={`grid-cell ${isToday ? "today-highlight" : ""}`}>
+                  <div>{day}</div>
+                  {dayHasNotes(day) && <div style={{ marginTop: "8px", fontSize: "0.8rem", color: "#555" }}>•</div>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Інформація про Alex і нотатки */}
+        <div className="alex-profile">
+          <span>ALEX</span>
+          <div className="circle purple"></div>
+          <div style={{ marginTop: "20px", color: "white" }}>
+            <strong>Notes ({filteredNotes.length})</strong>
+            {filteredNotes.map((note) => (
+              <button
+                key={note.id}
+                type="button"
+                onClick={() => handleNoteClick(note)}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left",
+                  marginTop: "10px",
+                  padding: "10px",
+                  borderRadius: "10px",
+                  border: selectedNoteId === note.id ? "2px solid #fff" : "1px solid rgba(255,255,255,0.5)",
+                  background: selectedNoteId === note.id ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                {note.category}: {note.text}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Модальне вікно для нотаток */}
+      {isNoteModalOpen && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{noteType === "holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
+              <button className="modal-close" onClick={closeModal}>✕</button>
+            </div>
+            <div className="modal-body">
+              <label style={{ display: "block", marginBottom: "10px" }}>Text</label>
+              <input
+                type="text"
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                style={{ width: "100%", padding: "10px", marginBottom: "15px", borderRadius: "8px", border: "1px solid #ccc" }}
+              />
+              <label style={{ display: "block", marginBottom: "10px" }}>Date</label>
+              <input
+                type="date"
+                value={noteDate}
+                onChange={(e) => setNoteDate(e.target.value)}
+                style={{ width: "100%", padding: "10px", marginBottom: "15px", borderRadius: "8px", border: "1px solid #ccc" }}
+              />
+              <label style={{ display: "block", marginBottom: "10px" }}>Time</label>
+              <input
+                type="time"
+                value={noteTime}
+                onChange={(e) => setNoteTime(e.target.value)}
+                style={{ width: "100%", padding: "10px", marginBottom: "15px", borderRadius: "8px", border: "1px solid #ccc" }}
+              />
+              <label style={{ display: "block", marginBottom: "10px" }}>Category</label>
+              <select
+                value={noteCategory}
+                onChange={(e) => setNoteCategory(e.target.value)}
+                style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }}
+              >
+                {CATEGORY_OPTIONS.map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+            </div>
+            <div className="modal-footer">
+              <button className="modal-btn" onClick={handleSaveNote}>Save</button>
+              <button className="modal-btn" onClick={closeModal}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Чат ШІ */}
+      {isChatOpen && (
+        <div className="ai-chat-box">
+          <div className="chat-top">Спілкування з Alex AI</div>
+          <div className="chat-mid">
+            <div className="ai-text">Hi, {user.login}! How is your day going?</div>
+          </div>
+          <div className="chat-bottom">
+            <input className="ai-input" placeholder="Ask something..." />
+          </div>
+        </div>
+      )}
+
+      {/* Редагування профілю */}
+      {showEditModal && (
+        <Profile
+          user={user}
+          onClose={() => {
+            setShowEditModal(false);
+            const userStr = localStorage.getItem("user");
+            if (userStr) {
+              setUser(JSON.parse(userStr));
+            }
+          }}
+        />
+      )}
+    </div>
+  );
+}

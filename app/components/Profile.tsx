@@ -1,4 +1,5 @@
 "use client";
+// Модальний компонент для редагування профілю користувача
 import { useState, useEffect } from "react";
 import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
 
@@ -8,11 +9,13 @@ interface ProfileProps {
 }
 
 export default function Profile({ user, onClose }: ProfileProps) {
+    // Локальний стан редагованого профілю, помилок та повідомлень успіху
     const [editData, setEditData] = useState<User>(user);
     const [editError, setEditError] = useState("");
     const [editSuccess, setEditSuccess] = useState("");
 
     useEffect(() => {
+        // Додаємо закриття модалки через клавішу Escape
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
                 onClose();
@@ -22,6 +25,7 @@ export default function Profile({ user, onClose }: ProfileProps) {
         return () => window.removeEventListener("keydown", handleEsc);
     }, [onClose]);
 
+    // Обробник змін полів форми редагування профілю
     const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setEditData({
@@ -35,6 +39,8 @@ export default function Profile({ user, onClose }: ProfileProps) {
         setEditError("");
         setEditSuccess("");
 
+        // Відправляємо оновлені дані профілю на бекенд
+        // Тут можна додати локальну валідацію перед запитом, якщо буде потрібно
         try {
             const response = await fetch(`${API_BASE}/api/profile`, {
                 method: "PUT",
@@ -54,7 +60,7 @@ export default function Profile({ user, onClose }: ProfileProps) {
 
             if (response.ok) {
                 setEditSuccess("Profile updated successfully!");
-                // Update user in localStorage
+                // Оновлюємо дані користувача у localStorage, щоб інші сторінки побачили зміни
                 localStorage.setItem("user", JSON.stringify(data.user));
                 setTimeout(() => {
                     onClose();
@@ -63,12 +69,13 @@ export default function Profile({ user, onClose }: ProfileProps) {
             } else {
                 setEditError(data.error || "Error updating profile. Please try again later.");
             }
-        } catch (err) {
+        } catch {
             setEditError("Connection error. Please check if the backend is running at http://localhost:10000");
         }
     };
 
     return (
+        // Фонова накладка модального вікна викликає onClose при натисканні поза вікном
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
