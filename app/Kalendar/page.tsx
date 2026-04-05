@@ -205,7 +205,7 @@ export default function KalendarPage() {
   }
 
   return (
-    <div className="dashboard-layout-calendar">
+    <div className="dashboard-layout-calendar" style={{ paddingRight: isChatOpen ? "420px" : "20px" }}>
       {/* Верхня панель з логотипом і користувачем */}
       <div className="topbar-cal">
         <div className="logo-section">Calendar with Alex</div>
@@ -317,10 +317,10 @@ export default function KalendarPage() {
       {/* Модальне вікно для нотаток */}
       {isNoteModalOpen && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
+          <div className="modal-content note-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header note-modal">
               <h2>{noteType === "holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
-              <button className="modal-close" onClick={closeModal}>✕</button>
+              <button className="modal-close note-modal" onClick={closeModal}>✕</button>
             </div>
             <div className="modal-body">
               <label style={{ display: "block", marginBottom: "10px" }}>Text</label>
@@ -356,8 +356,8 @@ export default function KalendarPage() {
               </select>
             </div>
             <div className="modal-footer">
-              <button className="modal-btn" onClick={handleSaveNote}>Save</button>
-              <button className="modal-btn" onClick={closeModal}>Cancel</button>
+              <button className="modal-btn save-btn" onClick={handleSaveNote}>Save</button>
+              <button className="modal-btn cancel-btn" onClick={closeModal}>Cancel</button>
             </div>
           </div>
         </div>

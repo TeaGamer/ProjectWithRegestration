@@ -242,6 +242,82 @@ html, body {
     }
 }
 
+.modal-content.note-modal {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(79, 70, 229, 0.95));
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+.modal-header.note-modal {
+    padding: 24px 24px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.06);
+}
+
+.modal-header.note-modal h2 {
+    color: #f8fafc;
+}
+
+.modal-close.note-modal {
+    color: #e2e8f0;
+}
+
+.modal-content.note-modal input,
+.modal-content.note-modal select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    color: white;
+    margin-bottom: 16px;
+}
+
+.modal-content.note-modal label {
+    color: #e2e8f0;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+    padding: 20px 24px 24px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 14px 18px;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.modal-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.modal-btn.save-btn {
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    color: white;
+}
+
+.modal-btn.cancel-btn {
+    background: rgba(255,255,255,0.12);
+    color: #e2e8f0;
+}
+
+.modal-btn.cancel-btn:hover {
+    background: rgba(255,255,255,0.18);
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -307,6 +383,45 @@ html, body {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+    padding: 20px 24px 24px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 14px 18px;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.modal-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.modal-btn.save-btn {
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    color: white;
+}
+
+.modal-btn.cancel-btn {
+    background: rgba(255,255,255,0.12);
+    color: #e2e8f0;
+}
+
+.modal-btn.cancel-btn:hover {
+    background: rgba(255,255,255,0.18);
 }
 
 /* Modal Buttons */
