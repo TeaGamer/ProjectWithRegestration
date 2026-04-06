@@ -429,8 +429,7 @@ export default function KalendarPage() {
             if (userStr) {
               setUser(JSON.parse(userStr));
             }
-          }}
-        />
+          } } isOpen={false}        />
       )}
     </div>
   );
