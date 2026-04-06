@@ -1,26 +1,18 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
+import Modal from "./Modal";
 
 interface ProfileProps {
     user: User;
+    isOpen: boolean;
     onClose: () => void;
 }
 
-export default function Profile({ user, onClose }: ProfileProps) {
+export default function Profile({ user, isOpen, onClose }: ProfileProps) {
     const [editData, setEditData] = useState<User>(user);
     const [editError, setEditError] = useState("");
     const [editSuccess, setEditSuccess] = useState("");
-
-    useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                onClose();
-            }
-        };
-        window.addEventListener("keydown", handleEsc);
-        return () => window.removeEventListener("keydown", handleEsc);
-    }, [onClose]);
 
     const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -69,22 +61,11 @@ export default function Profile({ user, onClose }: ProfileProps) {
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2>Edit Profile</h2>
-                    <button 
-                        className="modal-close"
-                        onClick={onClose}
-                    >
-                        ✕
-                    </button>
-                </div>
+        <Modal isOpen={isOpen} onClose={onClose} title="Edit Profile">
+            {editError && <div className="error-message">{editError}</div>}
+            {editSuccess && <div className="success-message">{editSuccess}</div>}
 
-                {editError && <div className="error-message">{editError}</div>}
-                {editSuccess && <div className="success-message">{editSuccess}</div>}
-
-                <form onSubmit={handleEditSubmit} className="edit-profile-form">
+            <form onSubmit={handleEditSubmit} className="edit-profile-form">
                     <div className="form-group">
                         <label>First Name</label>
                         <input
@@ -146,7 +127,6 @@ export default function Profile({ user, onClose }: ProfileProps) {
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+        </Modal>
     );
 }

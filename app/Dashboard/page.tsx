@@ -128,19 +128,18 @@ export default function Dashboard() {
             </div>
 
             {/* Edit Profile Modal */}
-            {showEditModal && user && (
-                <Profile 
-                    user={user}
-                    onClose={() => {
-                        setShowEditModal(false);
-                        // Оновити користувача з localStorage після редагування
-                        const userStr = localStorage.getItem("user");
-                        if (userStr) {
-                            setUser(JSON.parse(userStr));
-                        }
-                    }}
-                />
-            )}
+            <Profile 
+                user={user}
+                isOpen={showEditModal}
+                onClose={() => {
+                    setShowEditModal(false);
+                    // Оновити користувача з localStorage після редагування
+                    const userStr = localStorage.getItem("user");
+                    if (userStr) {
+                        setUser(JSON.parse(userStr));
+                    }
+                }}
+            />
 
             {/* Main Content */}
             <div className="dashboard-container">
