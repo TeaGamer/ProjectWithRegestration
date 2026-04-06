@@ -1,16 +1,19 @@
 "use client";
+// Компонент сторінки логіну/реєстрації, що рендериться на клієнті
 import { useState, useEffect } from "react";
 import "../css/login.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
 
 export default function LoginPage() {
+    // Прапорці, які керують формою та її станом
     const [isLogin, setIsLogin] = useState(true);
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [showLoginPassword, setShowLoginPassword] = useState(false);
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
     useEffect(() => {
+        // Закриваємо модалку з правилами при натисканні Escape
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === "Escape" && showTermsModal) {
                 setShowTermsModal(false);
@@ -19,11 +22,13 @@ export default function LoginPage() {
         window.addEventListener("keydown", handleEsc);
         return () => window.removeEventListener("keydown", handleEsc);
     }, [showTermsModal]);
+    // Стан полів форми логіну: email, пароль та запам'ятати мене
     const [loginData, setLoginData] = useState({
         email: "",
         password: "",
         remember: false,
     });
+    // Стан полів форми реєстрації, що містить усі дані користувача
     const [registerData, setRegisterData] = useState({
         login: "",
         email: "",
@@ -37,6 +42,8 @@ export default function LoginPage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
+    // Оновлюємо стан полів форми логіну або реєстрації при зміні значень
+    // Оновлюємо значення полів логіну при введенні користувачем
     const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, checked, value } = e.target as HTMLInputElement;
         setLoginData((prev) => ({
@@ -45,6 +52,7 @@ export default function LoginPage() {
         }));
     };
 
+    // Оновлюємо значення полів реєстрації при введенні користувачем
     const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, checked, value } = e.target as HTMLInputElement;
         setRegisterData((prev) => ({
@@ -58,6 +66,7 @@ export default function LoginPage() {
         setError("");
         setSuccess("");
 
+        // Перевірка базових даних перед відправкою логіну
         if (!loginData.email || !loginData.email.includes("@")) {
             setError("Use correct email!");
             return;
@@ -85,7 +94,7 @@ export default function LoginPage() {
                     localStorage.setItem("user", JSON.stringify(data.user));
                 }
                 setTimeout(() => {
-                    window.location.href = "/Dashboard";
+                    window.location.href = "/Kalendar";
                 }, 1500);
             } else {
                 setError(data.error || "Invalid email or password!");
@@ -100,6 +109,7 @@ export default function LoginPage() {
         setError("");
         setSuccess("");
 
+        // Перевіряємо, що користувач погодився з правилами перед реєстрацією
         if (!registerData.agreedToTerms) {
             setError("You must accept the Terms of Service!");
             return;
@@ -221,6 +231,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
 
                 {/* Login Form */}
                 {isLogin && (
+                    // Відображення форми логіну, якщо обрана вкладка Log In
                     <div className="form-container">
                         <h2>Log In</h2>
                         <form className="login-form" onSubmit={handleLoginSubmit}>
@@ -273,6 +284,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
 
                 {/* Register Form */}
                 {!isLogin && (
+                    // Відображення форми реєстрації, якщо активна вкладка Register
                     <div className="form-container">
                         <h2>Create Account</h2>
                         <form className="login-form" onSubmit={handleRegisterSubmit}>
@@ -370,6 +382,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                             </select>
 
                             <label className="checkbox-label">
+                                {/* Прапорець згоди з умовами використання перед реєстрацією */}
                                 <input
                                     type="checkbox"
                                     name="agreedToTerms"
@@ -395,6 +408,7 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
 
                 {/* Terms Modal */}
                 {showTermsModal && (
+                    // Модальне вікно з текстом умов використання
                     <div className="modal-overlay" onClick={() => setShowTermsModal(false)}>
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                             <div className="modal-header">

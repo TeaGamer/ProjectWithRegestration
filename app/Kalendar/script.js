@@ -1,5 +1,6 @@
 
 "use client";
+// Компонент календаря на основі React / Next.js, що використовує локальний роутинг і стан користувача
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import "../css/dashboard.css";
@@ -10,6 +11,7 @@ export default function Dashboard( ) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    // Параметри меню профілю та модального вікна редагування
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
 
@@ -18,6 +20,7 @@ export default function Dashboard( ) {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isDeleteMode, setIsDeleteMode] = useState(false);
 
+    // Guard: якщо немає авторизованого користувача, переходимо на сторінку логіну
     useEffect(() => {
         const userStr = localStorage.getItem("user");
         const token = localStorage.getItem("token");
@@ -47,12 +50,13 @@ export default function Dashboard( ) {
     if (loading) return <div className="dashboard-container"><p>Loading...</p></div>;
     if (!user) return null;
 
-    // Логіка календаря
+    // Логіка календаря: обчислюємо поточний місяць і зсув для першого дня тижня
     const year = currentDate.getFullYear( );
     const month = currentDate.getMonth( );
-    const monthName = currentDate.toLocaleString('uk-UA', { month: 'long' });
+    const monthName = currentDate.toLocaleString('en-US', { month: 'long' });
     const daysInMonth = new Date(year, month + 1, 0).getDate( );
     const firstDayIndex = new Date(year, month, 1).getDay( );
+    // Якщо тиждень починається з понеділка, перетворюємо індекс для нульової зміщення
     const shift = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
 
     return (
@@ -135,6 +139,7 @@ export default function Dashboard( ) {
 
             {/* Вікно чату з ШІ */}
             {isChatOpen && (
+                // Вікно чату з AI, яке відкривається натисканням неонової кнопки
                 <div className="ai-chat-popup">
                     <div className="chat-head">Спілкування з Alex AI</div>
                     <div className="chat-body">

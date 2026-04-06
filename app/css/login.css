@@ -1,3 +1,4 @@
+/* Стилі для сторінки логіну та реєстрації */
 .login-container {
     background: #e8e8e8;
     color: white;
@@ -56,7 +57,7 @@
     border-bottom-color: #4CAF50;
 }
 
-/* Form Container */
+/* Контейнер форми: плавне появлення при рендері */
 .form-container {
     animation: fadeIn 0.3s ease;
 }
@@ -78,6 +79,7 @@
     align-items: center;
 }
 
+/* Поля вводу форми: текстові, пароль та селект */
 .login-form input[type="text"],
 .login-form input[type="password"],
 .login-form input[type="email"],
@@ -97,6 +99,7 @@
     color-scheme: dark;
 }
 
+/* Обгортка для поля пароля з кнопкою показу/приховування */
 .password-input-wrapper {
     position: relative;
     margin-bottom: 15px;
@@ -168,6 +171,7 @@
     cursor: pointer;
 }
 
+/* Стиль кнопки відправки форми логіну або реєстрації */
 .submit-btn {
     padding: 12px 30px;
     cursor: pointer;
@@ -217,7 +221,7 @@
     margin-top: 20px;
 }
 
-/* Terms Link */
+/* Стиль кнопки-посилання для перегляду умов користування */
 .terms-link {
     background: none;
     border: none;

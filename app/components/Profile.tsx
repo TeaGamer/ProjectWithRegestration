@@ -27,6 +27,8 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
         setEditError("");
         setEditSuccess("");
 
+        // Відправляємо оновлені дані профілю на бекенд
+        // Тут можна додати локальну валідацію перед запитом, якщо буде потрібно
         try {
             const response = await fetch(`${API_BASE}/api/profile`, {
                 method: "PUT",
@@ -46,7 +48,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
 
             if (response.ok) {
                 setEditSuccess("Profile updated successfully!");
-                // Update user in localStorage
+                // Оновлюємо дані користувача у localStorage, щоб інші сторінки побачили зміни
                 localStorage.setItem("user", JSON.stringify(data.user));
                 setTimeout(() => {
                     onClose();
@@ -55,7 +57,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
             } else {
                 setEditError(data.error || "Error updating profile. Please try again later.");
             }
-        } catch (err) {
+        } catch {
             setEditError("Connection error. Please check if the backend is running at http://localhost:10000");
         }
     };
