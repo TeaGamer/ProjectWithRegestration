@@ -160,6 +160,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                                 name="date_of_birth"
                                 value={editData.date_of_birth || ""}
                                 onChange={handleEditChange}
+                                max={new Date().toISOString().split('T')[0]}
                             />
                         </div>
 
