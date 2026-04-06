@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
 import Modal from "./Modal";
+import "../css/Profile.css";
 
 interface ProfileProps {
     user: User;
@@ -10,6 +11,7 @@ interface ProfileProps {
 }
 
 export default function Profile({ user, isOpen, onClose }: ProfileProps) {
+    const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState<User>(user);
     const [editError, setEditError] = useState("");
     const [editSuccess, setEditSuccess] = useState("");
@@ -51,7 +53,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                 // Оновлюємо дані користувача у localStorage, щоб інші сторінки побачили зміни
                 localStorage.setItem("user", JSON.stringify(data.user));
                 setTimeout(() => {
-                    onClose();
+                    setIsEditing(false);
                     setEditSuccess("");
                 }, 1500);
             } else {
@@ -62,73 +64,124 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
         }
     };
 
+    const handleClose = () => {
+        setIsEditing(false);
+        setEditError("");
+        setEditSuccess("");
+        setEditData(user);
+        onClose();
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Edit Profile">
-            {editError && <div className="error-message">{editError}</div>}
-            {editSuccess && <div className="success-message">{editSuccess}</div>}
-
-            <form onSubmit={handleEditSubmit} className="edit-profile-form">
-                    <div className="form-group">
-                        <label>First Name</label>
-                        <input
-                            type="text"
-                            name="first_name"
-                            value={editData.first_name || ""}
-                            onChange={handleEditChange}
-                            placeholder="First Name"
-                        />
+        <Modal isOpen={isOpen} onClose={handleClose} title={isEditing ? "Edit Profile" : "Profile"}>
+            {!isEditing ? (
+                // Переглядпрофілю
+                <div className="profile-view-container">
+                    <div className="profile-info-field">
+                        <strong>First Name:</strong>
+                        <p>{user.first_name || "N/A"}</p>
                     </div>
-
-                    <div className="form-group">
-                        <label>Last Name</label>
-                        <input
-                            type="text"
-                            name="last_name"
-                            value={editData.last_name || ""}
-                            onChange={handleEditChange}
-                            placeholder="Last Name"
-                        />
+                    <div className="profile-info-field">
+                        <strong>Last Name:</strong>
+                        <p>{user.last_name || "N/A"}</p>
                     </div>
-
-                    <div className="form-group">
-                        <label>Region</label>
-                        <select
-                            name="region"
-                            value={editData.region || ""}
-                            onChange={handleEditChange}
+                    <div className="profile-info-field">
+                        <strong>Region:</strong>
+                        <p>{user.region || "N/A"}</p>
+                    </div>
+                    <div className="profile-info-field">
+                        <strong>Date of Birth:</strong>
+                        <p>{user.date_of_birth || "N/A"}</p>
+                    </div>
+                    <div className="modal-buttons profile-buttons-container">
+                        <button 
+                            className="modal-submit-btn"
+                            onClick={() => setIsEditing(true)}
                         >
-                            <option value="">Select Region</option>
-                            {UKRAINIAN_REGIONS.map((region) => (
-                                <option key={region} value={region}>
-                                    {region}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Date of birth</label>
-                        <input
-                            type="date"
-                            name="date_of_birth"
-                            value={editData.date_of_birth || ""}
-                            onChange={handleEditChange}
-                        />
-                    </div>
-
-                    <div className="modal-buttons">
-                        <button type="submit" className="modal-submit-btn">
-                            Save
+                            Edit Profile
                         </button>
                         <button 
-                            type="button" 
                             className="modal-cancel-btn"
-                            onClick={onClose}
+                            onClick={handleClose}
                         >
-                            Cancel
+                            Close
                         </button>
                     </div>
-                </form>
+                </div>
+            ) : (
+                // Форма редагування
+                <>
+                    {editError && <div className="error-message">{editError}</div>}
+                    {editSuccess && <div className="success-message">{editSuccess}</div>}
+
+                    <form onSubmit={handleEditSubmit} className="edit-profile-form">
+                        <div className="form-group">
+                            <label>First Name</label>
+                            <input
+                                type="text"
+                                name="first_name"
+                                value={editData.first_name || ""}
+                                onChange={handleEditChange}
+                                placeholder="First Name"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Last Name</label>
+                            <input
+                                type="text"
+                                name="last_name"
+                                value={editData.last_name || ""}
+                                onChange={handleEditChange}
+                                placeholder="Last Name"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Region</label>
+                            <select
+                                name="region"
+                                value={editData.region || ""}
+                                onChange={handleEditChange}
+                            >
+                                <option value="">Select Region</option>
+                                {UKRAINIAN_REGIONS.map((region) => (
+                                    <option key={region} value={region}>
+                                        {region}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Date of birth</label>
+                            <input
+                                type="date"
+                                name="date_of_birth"
+                                value={editData.date_of_birth || ""}
+                                onChange={handleEditChange}
+                            />
+                        </div>
+
+                        <div className="modal-buttons">
+                            <button type="submit" className="modal-submit-btn">
+                                Save
+                            </button>
+                            <button 
+                                type="button" 
+                                className="modal-cancel-btn"
+                                onClick={() => {
+                                    setIsEditing(false);
+                                    setEditData(user);
+                                    setEditError("");
+                                }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </>
+            )}
         </Modal>
     );
 }
