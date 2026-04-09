@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
@@ -213,7 +214,7 @@ export default function KalendarPage() {
           <span>{user.login}</span>
           <div className="avatar-circle-nav">
             {user.avatar ? (
-              <Image src={user.avatar} alt="Avatar" width={40} height={40} className="nav-img" />
+              <Image src={user.avatar} alt="Avatar" width={40} height={40} className="knight.img" />
             ) : (
               <div className="avatar-letter">{user.login.charAt(0).toUpperCase()}</div>
             )}

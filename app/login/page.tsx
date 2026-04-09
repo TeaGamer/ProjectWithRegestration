@@ -1,8 +1,10 @@
+
 "use client";
 // Компонент сторінки логіну/реєстрації, що рендериться на клієнті
 import { useState, useEffect } from "react";
 import "../css/login.css";
-
+import "../constants/profileConfig";
+import { UKRAINIAN_REGIONS } from "../constants/profileConfig";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
 
 export default function LoginPage() {
@@ -92,6 +94,8 @@ export default function LoginPage() {
                 if (data.token) {
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
+                    // Set cookie for middleware
+                    document.cookie = `token=${data.token}; path=/; max-age=86400`; // 1 day
                 }
                 setTimeout(() => {
                     window.location.href = "/Kalendar";
@@ -178,25 +182,49 @@ export default function LoginPage() {
     };
 
     const termsAndConditionsText = `
-TERMS OF SERVICE
-By using the Alex service, you agree to these terms. The service is provided "as is". We do not guarantee 100% accuracy of AI responses. It is prohibited to use the service for unlawful activities.
-Prohibited:
-- spam
-- harassment
-- illegal activity
-- exploitation of AI
+ПРАВИЛА КОРИСТУВАННЯ СЕРВІСОМ ALEX
 
-USER RIGHTS
-User has the right to:
-- Obtain access to your data
-- Delete your account
-- Change your personal data
-- Refrain from using the service at any time
-- Edit their profile
-- Export data
-- Know what data is stored and for what purpose
+1. ЗАГАЛЬНІ ПОЛОЖЕННЯ
+Використовуючи сервіс Alex, ви погоджуєтеся з цими правилами. Сервіс надається "як є". Ми не гарантуємо 100% точності відповідей ШІ. Заборонено використовувати сервіс для незаконних дій.
 
-By agreeing to these terms and conditions, you acknowledge and accept all of the above.
+2. ЗАБОРОНЕНО:
+- Спам та масові розсилки
+- Переслідування та залякування інших користувачів
+- Незаконна діяльність будь-якого виду
+- Зловживання можливостями ШІ для шкідливих цілей
+- Поширення шкідливого програмного забезпечення
+- Порушення авторських прав
+
+3. ПРАВА КОРИСТУВАЧА
+Користувач має право:
+- Отримувати доступ до своїх даних
+- Видаляти свій обліковий запис
+- Змінювати свої персональні дані
+- Припинити використання сервісу в будь-який час
+- Редагувати свій профіль
+- Експортувати свої дані
+- Знати, які дані зберігаються та з якою метою
+
+4. ОБОВ'ЯЗКИ КОРИСТУВАЧА
+Користувач зобов'язаний:
+- Надавати достовірну інформацію при реєстрації
+- Не поширювати конфіденційну інформацію
+- Повідомляти про порушення безпеки
+- Дотримуватися етичних норм використання ШІ
+
+5. КОНФІДЕНЦІЙНІСТЬ
+Ми збираємо та обробляємо ваші дані відповідно до політики конфіденційності. Ваші дані захищені та не передаються третім сторонам без вашої згоди.
+
+6. ВІДПОВІДАЛЬНІСТЬ
+Сервіс Alex не несе відповідальності за:
+- Неправильні відповіді ШІ
+- Втрату даних через технічні проблеми
+- Дії інших користувачів
+
+7. ЗМІНИ ПРАВИЛ
+Ми можемо змінювати ці правила в будь-який час. Продовження використання сервісу після змін означає вашу згоду з новими правилами.
+
+Погоджуючись з цими правилами та умовами, ви підтверджуєте та приймаєте всі вищезазначені положення.
     `.trim();
 
     return (
@@ -275,7 +303,35 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                 {" "}Remember me
                             </label>
 
-                            <button type="submit" className="submit-btn">
+                            <button 
+                                type="submit" 
+                                className="submit-btn"
+                                onMouseMove={(e) => {
+                                    if (!loginData.email.trim() || !loginData.password.trim()) {
+                                        const btn = e.currentTarget;
+                                        const rect = btn.getBoundingClientRect();
+                                        const centerX = rect.left + rect.width / 2;
+                                        const centerY = rect.top + rect.height / 2;
+                                        const mouseX = e.clientX;
+                                        const mouseY = e.clientY;
+                                        
+                                        const deltaX = mouseX - centerX;
+                                        const deltaY = mouseY - centerY;
+                                        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                                        
+                                        if (distance < 100) { // Зона втечі
+                                            const moveX = (deltaX / distance) * 50;
+                                            const moveY = (deltaY / distance) * 50;
+                                            btn.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                                        } else {
+                                            btn.style.transform = 'translate(0, 0)';
+                                        }
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translate(0, 0)';
+                                }}
+                            >
                                 Log In
                             </button>
                         </form>
@@ -356,29 +412,11 @@ By agreeing to these terms and conditions, you acknowledge and accept all of the
                                 value={registerData.region}
                                 onChange={handleRegisterChange}
                             >
-                                <option value="">Select a region</option>
-                                <option value="Ukraine">All Ukraine</option>
-                                <option value="Kyiv">Kyiv</option>
-                                <option value="Kharkiv">Kharkiv</option>
-                                <option value="Odesa">Odesa</option>
-                                <option value="Dnipropetrovsk">Dnipropetrovsk</option>
-                                <option value="Lviv">Lviv</option>
-                                <option value="Zaporizhzhia">Zaporizhzhia</option>
-                                <option value="Mykolaiv">Mykolaiv</option>
-                                <option value="Donetsk">Donetsk</option>
-                                <option value="Luhansk">Luhansk</option>
-                                <option value="Kherson">Kherson</option>
-                                <option value="Chernihiv">Chernihiv</option>
-                                <option value="Cherkasy">Cherkasy</option>
-                                <option value="Poltava">Poltava</option>
-                                <option value="Sumy">Sumy</option>
-                                <option value="Vinnytsia">Vinnytsia</option>
-                                <option value="Rivne">Rivne</option>
-                                <option value="Zhytomyr">Zhytomyr</option>
-                                <option value="Khmelnytskyi">Khmelnytskyi</option>
-                                <option value="Ternopil">Ternopil</option>
-                                <option value="Ivano-Frankivsk">Ivano-Frankivsk</option>
-                                <option value="Volyn">Volyn</option>
+                                {UKRAINIAN_REGIONS.map((region) => (
+                                    <option key={region} value={region}>
+                                        {region}
+                                    </option>
+                                ))}
                             </select>
 
                             <label className="checkbox-label">
