@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import './globals.css';
 
+// Головна сторінка додатку з презентацією проекту
 export default function Home() {
   return (
+    // Основний контейнер героїчної секції
     <main className="hero-container">
       <div className="container hero-section">
         
-        {/* Left Side: Project Info */}
+        {/* Ліва сторона: Інформація про проект */}
         <div className="hero-text">
           <p className="subtitle">Our Startup Project</p>
           <h1>AI Planner & <br />Smart Alarms</h1>
@@ -16,7 +18,9 @@ export default function Home() {
           </p>
         </div>
 
+        // Права сторона: Профіль AI
         <div className="hero-profile">
+          // Обгортка для аватара
           <div className="avatar-wrapper">
             <img 
               src="/knight.png" 
@@ -25,6 +29,7 @@ export default function Home() {
             />
           </div>
           <h2 className="ai-name">Alex</h2>
+          // Посилання на сторінку логіну
           <Link href="/login" className="login-bubble-btn">
             Login
           </Link>

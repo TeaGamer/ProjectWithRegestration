@@ -8,9 +8,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Заголовок сторінки з логотипом та бульбашкою користувача -->
     <div class="container">
         <header>
             <div class="logo-box">Calendar with Alex</div>
+            <!-- Бульбашка користувача з аватаром та ім'ям -->
             <div class="user-bubble" onclick="editProfile()">
                 <span id="userName">Олександр</span>
                 <div class="avatar" id="userAvatar" style="background-image: url('/knight.png')"></div>
@@ -25,6 +27,7 @@
             <button class="btn-text green-t" onclick="openModal('note')">Add Note</button>
         </div>
 
+        <!-- Основний вміст: бокова панель та календарна сітка -->
         <main class="main-content">
             <!-- Бокова панель з фільтрацією категорій нотаток -->
             <aside class="sidebar">
@@ -36,6 +39,7 @@
                 <button class="cat-btn" onclick="filterCategory('Event')">Event</button>
             </aside>
 
+            <!-- Секція календаря з навігацією та сіткою -->
             <section class="calendar-section">
                 <div class="calendar-nav">
                     <button class="nav-arrow" onclick="changeMonth(-1)">&lt;</button>
@@ -46,6 +50,7 @@
                     </div>
             </section>
 
+            <!-- Профіль AI Alex -->
             <div class="alex-profile">
                 <span>ALEX</span>
                 <div class="circle purple"></div>

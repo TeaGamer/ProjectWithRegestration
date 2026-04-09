@@ -41,11 +41,12 @@ export default function LoginPage() {
         region: "",
         agreedToTerms: false,
     });
+    // Стан для повідомлень про помилки та успіх
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
     // Оновлюємо стан полів форми логіну або реєстрації при зміні значень
-    // Оновлюємо значення полів логіну при введенні користувачем
+    // Функція для обробки змін у полях логіну
     const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, checked, value } = e.target as HTMLInputElement;
         setLoginData((prev) => ({
@@ -54,7 +55,7 @@ export default function LoginPage() {
         }));
     };
 
-    // Оновлюємо значення полів реєстрації при введенні користувачем
+    // Функція для обробки змін у полях реєстрації
     const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, checked, value } = e.target as HTMLInputElement;
         setRegisterData((prev) => ({
@@ -182,53 +183,58 @@ export default function LoginPage() {
     };
 
     const termsAndConditionsText = `
-ПРАВИЛА КОРИСТУВАННЯ СЕРВІСОМ ALEX
+TERMS OF USE FOR THE ALEX SERVICE
 
-1. ЗАГАЛЬНІ ПОЛОЖЕННЯ
-Використовуючи сервіс Alex, ви погоджуєтеся з цими правилами. Сервіс надається "як є". Ми не гарантуємо 100% точності відповідей ШІ. Заборонено використовувати сервіс для незаконних дій.
+1. GENERAL PROVISIONS
+By using the Alex service, you agree to these terms. The service is provided ‘as is’. We do not guarantee 100% accuracy of AI responses. It is prohibited to use the service for illegal activities.
 
-2. ЗАБОРОНЕНО:
-- Спам та масові розсилки
-- Переслідування та залякування інших користувачів
-- Незаконна діяльність будь-якого виду
-- Зловживання можливостями ШІ для шкідливих цілей
-- Поширення шкідливого програмного забезпечення
-- Порушення авторських прав
+2. PROHIBITED:
+- Spam and mass mailings
+- Harassment and intimidation of other users
+- Illegal activities of any kind
+- Misuse of AI capabilities for malicious purposes
+- Distribution of malicious software
+- Copyright infringement
 
-3. ПРАВА КОРИСТУВАЧА
-Користувач має право:
-- Отримувати доступ до своїх даних
-- Видаляти свій обліковий запис
-- Змінювати свої персональні дані
-- Припинити використання сервісу в будь-який час
-- Редагувати свій профіль
-- Експортувати свої дані
-- Знати, які дані зберігаються та з якою метою
+3. USER RIGHTS
+The user has the right to:
+- Access their data
+- Delete their account
+- Change their personal details
+- Stop using the service at any time
+- Edit their profile
+- Export their data
+- Know what data is stored and for what purpose
 
-4. ОБОВ'ЯЗКИ КОРИСТУВАЧА
-Користувач зобов'язаний:
-- Надавати достовірну інформацію при реєстрації
-- Не поширювати конфіденційну інформацію
-- Повідомляти про порушення безпеки
-- Дотримуватися етичних норм використання ШІ
+4. USER OBLIGATIONS
+The user is obliged to:
+- Provide accurate information upon registration
+- Not disclose confidential information
+- Report security breaches
+- Adhere to ethical standards for the use of AI
 
-5. КОНФІДЕНЦІЙНІСТЬ
-Ми збираємо та обробляємо ваші дані відповідно до політики конфіденційності. Ваші дані захищені та не передаються третім сторонам без вашої згоди.
+5. PRIVACY
+We collect and process your data in accordance with our privacy policy. Your data is protected and will not be shared with third parties without your consent.
 
-6. ВІДПОВІДАЛЬНІСТЬ
-Сервіс Alex не несе відповідальності за:
-- Неправильні відповіді ШІ
-- Втрату даних через технічні проблеми
-- Дії інших користувачів
+6. LIABILITY
+The Alex service is not liable for:
+- Incorrect AI responses
+- Data loss due to technical issues
+- The actions of other users
 
-7. ЗМІНИ ПРАВИЛ
-Ми можемо змінювати ці правила в будь-який час. Продовження використання сервісу після змін означає вашу згоду з новими правилами.
+7. CHANGES TO THE TERMS
+We may amend these terms at any time. Continued use of the service following such changes constitutes your acceptance of the new terms.
 
-Погоджуючись з цими правилами та умовами, ви підтверджуєте та приймаєте всі вищезазначені положення.
+By agreeing to these terms and conditions, you confirm and accept all the above provisions.
+
+Translated with DeepL.com (free version)
     `.trim();
 
+    // Повернення JSX елемента для рендерингу компонента
     return (
+        // Основний контейнер сторінки логіну
         <div className="login-container">
+            // Форма логіну з вкладками
             <div className="login-form-wrapper">
                 {/* Tabs */}
                 <div className="tabs">
@@ -303,8 +309,8 @@ export default function LoginPage() {
                                 {" "}Remember me
                             </label>
 
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 className="submit-btn"
                                 onMouseMove={(e) => {
                                     if (!loginData.email.trim() || !loginData.password.trim()) {
@@ -392,7 +398,7 @@ export default function LoginPage() {
                                     type="button"
                                     onClick={() => setShowRegisterPassword(!showRegisterPassword)}
                                     className="password-toggle-btn"
-                                    aria-label="Toggle password visibility"
+                                    aria-label="Перемкнути видимість пароля"
                                 >
                                     {showRegisterPassword ? "1" : "0"}
                                 </button>

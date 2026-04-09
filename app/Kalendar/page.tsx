@@ -1,5 +1,6 @@
 
 "use client";
+// Імпорт необхідних хуків та компонентів для сторінки календаря
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -8,6 +9,7 @@ import "../css/dashboard.css";
 import Profile from "../components/Profile";
 import { User } from "../constants/profileConfig";
 
+// Інтерфейс для нотатки в календарі
 interface Note {
   id: number;
   text: string;
@@ -16,37 +18,59 @@ interface Note {
   category: string;
 }
 
+// Константи для категорій та днів тижня
 const CATEGORY_OPTIONS = ["Meeting", "Birthday", "Holiday", "Event"];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+// Головний компонент сторінки календаря
 export default function KalendarPage() {
+  // Ініціалізація роутера для навігації
   const router = useRouter();
+  // Стан для зберігання даних користувача
   const [user, setUser] = useState<User | null>(null);
+  // Стан для індикатора завантаження
   const [loading, setLoading] = useState(true);
+  // Стан для модального вікна редагування профілю
   const [showEditModal, setShowEditModal] = useState(false);
+  // Стан для відкриття чату ШІ
   const [isChatOpen, setIsChatOpen] = useState(false);
+  // Стан для режиму видалення нотаток
   const [isDeleteMode, setIsDeleteMode] = useState(false);
+  // Стан для модального вікна нотатки
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+  // Тип нотатки: нотатка або свято
   const [noteType, setNoteType] = useState<"note" | "holiday">("note");
+  // Текст нотатки
   const [noteText, setNoteText] = useState("");
+  // Дата нотатки
   const [noteDate, setNoteDate] = useState("");
+  // Час нотатки
   const [noteTime, setNoteTime] = useState("");
+  // Категорія нотатки
   const [noteCategory, setNoteCategory] = useState(CATEGORY_OPTIONS[0]);
+  // Вибрана категорія для фільтрації
   const [selectedCategory, setSelectedCategory] = useState("all");
+  // Масив нотаток
   const [notes, setNotes] = useState<Note[]>([]);
+  // ID вибраної нотатки
   const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
+  // Поточна дата для календаря
   const [currentDate, setCurrentDate] = useState(new Date());
 
+  // useEffect для перевірки авторизації при завантаженні сторінки
   useEffect(() => {
+    // Отримання даних користувача та токена з localStorage
     const userStr = localStorage.getItem("user");
     const token = localStorage.getItem("token");
 
+    // Якщо немає токена або даних користувача, перенаправлення на логін
     if (!token || !userStr) {
       router.push("/login");
       return;
     }
 
     try {
+      // Парсинг даних користувача
       const userData = JSON.parse(userStr);
       setUser(userData);
     } catch (error) {
