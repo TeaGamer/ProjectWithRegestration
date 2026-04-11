@@ -148,10 +148,6 @@ export default function KalendarPage() {
     return { day: index - shift - daysInMonth + 1, offset: 1 };
   });
 
-  const dayHasNotes = (day: number, offset: number) => {
-    return cellNotes(day, offset).length > 0;
-  };
-
   const openModal = (type: "note" | "holiday") => {
     setNoteType(type);
     setNoteCategory(type === "holiday" ? "Holiday" : "Meeting");
@@ -234,7 +230,7 @@ export default function KalendarPage() {
       {/* Верхня панель з логотипом і користувачем */}
       <div className="topbar-cal">
         <div className="logo-section">Calendar with Alex</div>
-        <button className="user-bubble-nav" onClick={() => setShowEditModal(true)}>
+        <button className="user-bubble-nav" onClick={() => router.push("/Dashboard")}> 
           <span>{user.login}</span>
           <div className="avatar-circle-nav">
             {user.avatar ? (

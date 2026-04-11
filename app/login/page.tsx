@@ -2,6 +2,7 @@
 "use client";
 // Компонент сторінки логіну/реєстрації, що рендериться на клієнті
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "../css/login.css";
 import "../constants/profileConfig";
 import { UKRAINIAN_REGIONS } from "../constants/profileConfig";
@@ -44,6 +45,7 @@ export default function LoginPage() {
     // Стан для повідомлень про помилки та успіх
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const router = useRouter();
 
     // Оновлюємо стан полів форми логіну або реєстрації при зміні значень
     // Функція для обробки змін у полях логіну
@@ -95,16 +97,15 @@ export default function LoginPage() {
                 if (data.token) {
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
-                    // Set cookie for middleware
                     document.cookie = `token=${data.token}; path=/; max-age=86400`; // 1 day
                 }
                 setTimeout(() => {
-                    window.location.href = "/Kalendar";
-                }, 1500);
+                    router.push("/Kalendar");
+                }, 700);
             } else {
                 setError(data.error || "Invalid email or password!");
             }
-        } catch (err) {
+        } catch {
             setError("Connection error. Please try again.");
         }
     };
@@ -177,7 +178,7 @@ export default function LoginPage() {
             } else {
                 setError(data.error || "Registration error. This email may already be registered.");
             }
-        } catch (err) {
+        } catch {
             setError("Connection error. Please check if the backend is running at http://localhost:8000");
         }
     };
@@ -234,10 +235,14 @@ Translated with DeepL.com (free version)
     return (
         // Основний контейнер сторінки логіну
         <div className="login-container">
-            // Форма логіну з вкладками
+            {/* Форма логіну з вкладками */}
             <div className="login-form-wrapper">
-                {/* Tabs */}
-                <div className="tabs">
+            <div className="login-form-header">
+                <h1>{isLogin ? "Welcome Back" : "Create Your Account"}</h1>
+                <p>{isLogin ? "Sign in to access your calendar and dashboard." : "Register to manage your calendar and profile."}</p>
+            </div>
+            {/* Tabs */}
+            <div className="tabs">
                     <button
                         className={`tab-btn ${isLogin ? "active" : ""}`}
                         onClick={() => {
