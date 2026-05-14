@@ -4,7 +4,6 @@
 // Модальний компонент для редагування профілю користувача
 import { useState, useEffect } from "react";
 import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
-import Modal from "./Modal";
 import "../css/Profile.css";
 
 {/* Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки */}
@@ -32,7 +31,8 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
     }, [onClose]);
 
     // Обробник змін полів форми редагування профілю
-    const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {// Оновлюємо локальний стан editData при зміні будь-якого поля форми */}
+    const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        // Оновлюємо локальний стан editData при зміні будь-якого поля форми
         const { name, value } = e.target;
         setEditData({
             ...editData,
@@ -89,14 +89,14 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
     };
 
     return (
-        // Фонова накладка модального вікна викликає onClose при натисканні поза вікном
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay" onClick={handleClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2>Edit Profile</h2>
-                    <button 
+                    <button
+                        type="button"
                         className="modal-close"
-                        onClick={onClose}
+                        onClick={handleClose}
                     >
                         ✕
                     </button>
@@ -158,89 +158,16 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                         <button type="submit" className="modal-submit-btn">
                             Save
                         </button>
-                        <button 
+                        <button
+                            type="button"
                             className="modal-cancel-btn"
                             onClick={handleClose}
                         >
                             Close
                         </button>
                     </div>
-                </div>
-            ) : (
-                // Форма редагування
-                <>
-                    {editError && <div className="error-message">{editError}</div>}
-                    {editSuccess && <div className="success-message">{editSuccess}</div>}
-
-                    <form onSubmit={handleEditSubmit} className="edit-profile-form">
-                        <div className="form-group">
-                            <label>First Name</label>
-                            <input
-                                type="text"
-                                name="first_name"
-                                value={editData.first_name || ""}
-                                onChange={handleEditChange}
-                                placeholder="First Name"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Last Name</label>
-                            <input
-                                type="text"
-                                name="last_name"
-                                value={editData.last_name || ""}
-                                onChange={handleEditChange}
-                                placeholder="Last Name"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Region</label>
-                            <select
-                                name="region"
-                                value={editData.region || ""}
-                                onChange={handleEditChange}
-                            >
-                                <option value="">Select Region</option>
-                                {UKRAINIAN_REGIONS.map((region) => (
-                                    <option key={region} value={region}>
-                                        {region}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Date of birth</label>
-                            <input
-                                type="date"
-                                name="date_of_birth"
-                                value={editData.date_of_birth || ""}
-                                onChange={handleEditChange}
-                                max={new Date().toISOString().split('T')[0]}
-                            />
-                        </div>
-
-                        <div className="modal-buttons">
-                            <button type="submit" className="modal-submit-btn">
-                                Save
-                            </button>
-                            <button 
-                                type="button" 
-                                className="modal-cancel-btn"
-                                onClick={() => {
-                                    setIsEditing(false);
-                                    setEditData(user);
-                                    setEditError("");
-                                }}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </>
-            )}
-        </Modal>
+                </form>
+            </div>
+        </div>
     );
 }

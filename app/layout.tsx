@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../globals.css";
+import "./css/global.css";
 
 // Метадані для сторінки
 export const metadata: Metadata = {
