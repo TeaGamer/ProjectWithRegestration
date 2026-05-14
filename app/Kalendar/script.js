@@ -3,7 +3,7 @@
 // Компонент календаря на основі React / Next.js, що використовує локальний роутинг і стан користувача
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import "../css/dashboard.css";
+import "../css/Dashboard.css";
 import Profile from "../components/Profile";
 import { User } from "../constants/profileConfig";
 
@@ -26,7 +26,7 @@ export default function Dashboard( ) {
         const token = localStorage.getItem("token");
 
         if (!token || !userStr) {
-            router.push("/login");
+            router.push("/Login");
             return;
         }
 
@@ -35,7 +35,7 @@ export default function Dashboard( ) {
             setUser(userData);
         } catch (e) {
             console.error("Error parsing user data:", e);
-            router.push("/login");
+            router.push("/Login");
         } finally {
             setLoading(false);
         }
@@ -44,7 +44,7 @@ export default function Dashboard( ) {
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        router.push("/login");
+        router.push("/Login");
     };
 
     if (loading) return <div className="dashboard-container"><p>Loading...</p></div>;
@@ -171,6 +171,7 @@ export default function Dashboard( ) {
                     padding: 25px;
                     font-family: 'Arial', sans-serif;
                 }
+                
                 .dashboard-header {
                     display: flex;
                     justify-content: space-between;
@@ -309,9 +310,9 @@ export default function Dashboard( ) {
                 }
                 
                 .current-month-name {
-                text-transform: capitalize;
-                border-bottom: 2px solid white;
-                padding: 0 10px;
+                    text-transform: capitalize;
+                    border-bottom: 2px solid white;
+                    padding: 0 10px;
                 }
 
                 
@@ -406,10 +407,10 @@ export default function Dashboard( ) {
                     border-bottom: 1px solid rgba(255,255,255,0.3);}
                 
                 .chat-body {
-                flex: 1;
-                padding: 20px;
-                display: flex;
-                align-items: flex-start;
+                    flex: 1;
+                    padding: 20px;
+                    display: flex;
+                    align-items: flex-start;
                 }
                 
                 .ai-message {
@@ -428,16 +429,16 @@ export default function Dashboard( ) {
                 }
                 
                 .ai-input-field {
-                background: transparent;
-                border: none;
-                color: white;
-                width: 100%;
-                outline: none;
-                font-size: 16px;
+                    background: transparent;
+                    border: none;
+                    color: white;
+                    width: 100%;
+                    outline: none;
+                    font-size: 16px;
                 }
                 
                 .ai-input-field::placeholder {
-                color: rgba(255,255,255,0.6);
+                    color: rgba(255,255,255,0.6);
                 }
 
             `}</style>
