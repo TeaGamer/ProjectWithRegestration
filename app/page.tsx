@@ -7,7 +7,7 @@ export default function Home() {
     // Основний контейнер героїчної секції
     <main className="hero-container">
       <div className="container hero-section">
-        
+
         {/* Ліва сторона: Інформація про проект */}
         <div className="hero-text">
           <p className="subtitle">Our Startup Project</p>

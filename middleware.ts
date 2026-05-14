@@ -1,25 +1,69 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+// Базова валідація токена: перевіряємо, що це не тривіальний рядок
+function isValidTokenFormat(token: string): boolean {
+  // Токен повинен мати розумну довжину (не менше 10 символів)
+  // щоб запобігти проходженню тривіальних значень на кшталт "abc"
+  if (!token || token.length < 10) {
+    return false;
+  }
+
+  // Перевіряємо, що токен не лише цифри або однакові символи
+  if (/^\d+$/.test(token)) {
+    return false;
+  }
+
+  return true;
+}
+
+export async function middleware(request: NextRequest) {
   // Захищені маршрути
   const protectedPaths = ['/Kalendar', '/Dashboard'];
-  const isProtectedPath = protectedPaths.some(path => 
+  const isProtectedPath = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   );
 
   if (isProtectedPath) {
     // Перевіряємо токен в cookies або headers
-    const token = request.cookies.get('token')?.value || 
+    const token = request.cookies.get('token')?.value ||
                   request.headers.get('authorization')?.replace('Bearer ', '');
 
     if (!token) {
-      // Перенаправляємо на логін
+      // Перенаправляємо на логін, якщо токена немає
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // Тут можна додати перевірку валідності токена, якщо потрібно
-    // Наприклад, декодувати JWT або перевірити з API
+    // Перевіряємо валідність формату токена
+    if (!isValidTokenFormat(token)) {
+      // Видаляємо невалідний токен та перенаправляємо на логін
+      const response = NextResponse.redirect(new URL('/login', request.url));
+      response.cookies.delete('token');
+      return response;
+    }
+
+    // Верифікуємо токен з бекенд API
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:10000';
+      const verifyResponse = await fetch(`${apiBase}/api/verify-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!verifyResponse.ok) {
+        // Токен невалідний на бекенді
+        const response = NextResponse.redirect(new URL('/login', request.url));
+        response.cookies.delete('token');
+        return response;
+      }
+    } catch (error) {
+      // Якщо не можна з'єднатися з бекенд API, дозволяємо запит
+      // але логуємо помилку для діагностики
+      console.error('Failed to verify token with backend:', error);
+    }
   }
 
   return NextResponse.next();

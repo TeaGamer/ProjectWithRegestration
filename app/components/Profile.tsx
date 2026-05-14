@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
 import "../css/Profile.css";
 
-{/* Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки */}
+// Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки
 interface ProfileProps {
     user: User;
     isOpen: boolean;
@@ -26,7 +26,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                 onClose();
             }
         };
-        window.addEventListener("keydown", handleEsc);{/*// Додаємо обробник події для клавіші Escape */}
+        window.addEventListener("keydown", handleEsc);
         return () => window.removeEventListener("keydown", handleEsc);
     }, [onClose]);
 
@@ -52,8 +52,11 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    // ВАЖЛИВО: Токен повинен передаватися через HttpOnly cookie,
+                    // встановлену на бекенді, а не через Authorization header з localStorage!
+                    // credentials: "include" дозволяє браузеру відправляти cookie автоматично
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     first_name: editData.first_name,
                     last_name: editData.last_name,
@@ -76,7 +79,9 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                 setEditError(data.error || "Error updating profile. Please try again later.");
             }
         } catch {
-            setEditError("Connection error. Please check if the backend is running at http://localhost:10000");
+            setEditError("Connection error. Please try again later.");
+            // Логування деталей тільки в консоль для розробників
+            console.error("Failed to update profile. Backend connection error.");
         }
     };
 
@@ -105,7 +110,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                 {editError && <div className="error-message">{editError}</div>}
                 {editSuccess && <div className="success-message">{editSuccess}</div>}
 
-                <form onSubmit={handleEditSubmit} className="edit-profile-form">{/*// Форма редагування профілю */}
+                <form onSubmit={handleEditSubmit} className="edit-profile-form">
                     <div className="form-group">
                         <label>First Name</label>
                         <input
@@ -117,7 +122,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                         />
                     </div>
 
-                    <div className="form-group">{/*// Додано поле для прізвища */}
+                    <div className="form-group">
                         <label>Last Name</label>
                         <input
                             type="text"
@@ -128,14 +133,14 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                         />
                     </div>
 
-                    <div className="form-group"> {/*// Додано поле для вибору регіону */}
+                    <div className="form-group">
                         <label>Region</label>
                         <select
                             name="region"
                             value={editData.region || ""}
                             onChange={handleEditChange}
                         >
-                            <option value="">Select Region</option>{/*// Генеруємо меню для вибору регіону з константи UKRAINIAN_REGIONS */}
+                            <option value="">Select Region</option>
                             {UKRAINIAN_REGIONS.map((region) => (
                                 <option key={region} value={region}>
                                     {region}
@@ -144,17 +149,18 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                         </select>
                     </div>
 
-                    <div className="form-group">{/*// Додано поле для дати народження */}
+                    <div className="form-group">
                         <label>Date of birth</label>
                         <input
                             type="date"
                             name="date_of_birth"
                             value={editData.date_of_birth || ""}
                             onChange={handleEditChange}
+                            max={new Date().toISOString().split('T')[0]}
                         />
                     </div>
 
-                    <div className="modal-buttons"> {/*// Кнопки збереження та скасування редагування */}
+                    <div className="modal-buttons">
                         <button type="submit" className="modal-submit-btn">
                             Save
                         </button>
@@ -163,7 +169,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                             className="modal-cancel-btn"
                             onClick={handleClose}
                         >
-                            Close
+                            Cancel
                         </button>
                     </div>
                 </form>

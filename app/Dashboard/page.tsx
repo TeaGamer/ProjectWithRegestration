@@ -14,9 +14,9 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
     const [showEditModal, setShowEditModal] = useState(false);
 
     useEffect(() => {
-        // При першому рендері читаємо дані користувача та токен з localStorage
-        const userStr = localStorage.getItem("user");
+        // При першому рендері читаємо дані користувача з localStorage
         const token = localStorage.getItem("token");
+        const userStr = localStorage.getItem("user");
 
         if (!token || !userStr) {
             // Якщо немає авторизаційних даних, то переходимо на сторінку входу
@@ -37,8 +37,8 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
     }, []);
 
     const handleLogout = () => {
-        // Видаляємо збережений токен і дані користувача при виході
-        localStorage.removeItem("token");
+        // Видаляємо дані користувача при виході
+        // Токен видаляється на бекенді через HttpOnly cookie
         localStorage.removeItem("user");
         window.location.href = "/Login";
     };

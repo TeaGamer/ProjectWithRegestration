@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "../css/Login.css";
-import "../constants/profileConfig";
 import { UKRAINIAN_REGIONS } from "../constants/profileConfig";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
 
@@ -39,7 +38,7 @@ export default function LoginPage() {
         confirmPassword: "",
         first_name: "",
         last_name: "",
-        region: "",
+        region: UKRAINIAN_REGIONS[0] || "",
         agreedToTerms: false,
     });
     // Стан для повідомлень про помилки та успіх
@@ -93,11 +92,12 @@ export default function LoginPage() {
 
             if (response.ok) {
                 setSuccess("Successfully logged in! Redirecting...");
-                // Save token
-                if (data.token) {
-                    localStorage.setItem("token", data.token);
+                // ВАЖЛИВО: Токен повинен встановлюватися на бекенді як HttpOnly cookie
+                // Не встановлюємо cookie з фронтенду (XSS вразливість)
+                // Не зберігаємо токен в localStorage (доступна JS-кодам)
+                if (data.user && loginData.remember) {
+                    // Зберігаємо тільки non-sensitive дані користувача, якщо обрана опція "Remember me"
                     localStorage.setItem("user", JSON.stringify(data.user));
-                    document.cookie = `token=${data.token}; path=/; max-age=86400`; // 1 day
                 }
                 setTimeout(() => {
                     router.push("/Kalendar");
@@ -153,7 +153,7 @@ export default function LoginPage() {
                     password: registerData.password,
                     first_name: registerData.first_name || registerData.login,
                     last_name: registerData.last_name || "",
-                    region: registerData.region || "Ukraine",
+                    region: registerData.region || UKRAINIAN_REGIONS[0] || "Ukraine",
                 }),
             });
 
@@ -161,15 +161,15 @@ export default function LoginPage() {
 
             if (response.ok) {
                 setSuccess("Registration successful! Redirecting to login...");
-                setRegisterData({ 
-                    login: "", 
-                    email: "", 
-                    password: "", 
-                    confirmPassword: "", 
+                setRegisterData({
+                    login: "",
+                    email: "",
+                    password: "",
+                    confirmPassword: "",
                     first_name: "",
                     last_name: "",
-                    region: "Ukraine",
-                    agreedToTerms: false 
+                    region: UKRAINIAN_REGIONS[0] || "",
+                    agreedToTerms: false,
                 });
                 setTimeout(() => {
                     setIsLogin(true);
@@ -179,7 +179,9 @@ export default function LoginPage() {
                 setError(data.error || "Registration error. This email may already be registered.");
             }
         } catch {
-            setError("Connection error. Please check if the backend is running at http://localhost:8000");
+            setError("Connection error. Please try again later.");
+            // Логування деталей тільки в консоль для розробників
+            console.error("Backend connection failed. Check if API server is running.");
         }
     };
 
@@ -187,49 +189,51 @@ export default function LoginPage() {
 
     TERMS OF USE FOR THE ALEX SERVICE
 
-    1. GENERAL PROVISIONS
-By using the Alex service, you agree to these terms. The service is provided ‘as is’. We do not guarantee 100% accuracy of AI responses. It is prohibited to use the service for illegal activities.
+        1. GENERAL PROVISIONS
+    By using the Alex service, you agree to these terms. The service is provided ‘as is’. We do not guarantee 100% accuracy of AI responses. It is prohibited to use the service for illegal activities.
 
-    2. PROHIBITED:
-- Spam and mass mailings
-- Harassment and intimidation of other users
-- Illegal activities of any kind
-- Misuse of AI capabilities for malicious purposes
-- Distribution of malicious software
-- Copyright infringement
+        2. PROHIBITED:
+    - Spam and mass mailings
+    - Harassment and intimidation of other users
+    - Illegal activities of any kind
+    - Misuse of AI capabilities for malicious purposes
+    - Distribution of malicious software
+    - Copyright infringement
 
-    3. USER RIGHTS
-The user has the right to:
-- Access their data
-- Delete their account
-- Change their personal details
-- Stop using the service at any time
-- Edit their profile
-- Export their data
-- Know what data is stored and for what purpose
+        3. USER RIGHTS
+    The user has the right to:
+    - Access their data
+    - Delete their account
+    - Change their personal details
+    - Stop using the service at any time
+    - Edit their profile
+    - Export their data
+    - Know what data is stored and for what purpose
 
-    4. USER OBLIGATIONS
-The user is obliged to:
-- Provide accurate information upon registration
-- Not disclose confidential information
-- Report security breaches
-- Adhere to ethical standards for the use of AI
+        4. USER OBLIGATIONS
+    The user is obliged to:
+    - Provide accurate information upon registration
+    - Not disclose confidential information
+    - Report security breaches
+    - Adhere to ethical standards for the use of AI
 
-    5. PRIVACY
-We collect and process your data in accordance with our privacy policy. Your data is protected and will not be shared with third parties without your consent.
+        5. PRIVACY
+    We collect and process your data in accordance with our privacy policy.
+    Your data is protected and will not be shared with third parties without your consent.
 
-    6. LIABILITY
-The Alex service is not liable for:
-- Incorrect AI responses
-- Data loss due to technical issues
-- The actions of other users
+        6. LIABILITY
+    The Alex service is not liable for:
+    - Incorrect AI responses
+    - Data loss due to technical issues
+    - The actions of other users
 
-    7. CHANGES TO THE TERMS
-We may amend these terms at any time. Continued use of the service following such changes constitutes your acceptance of the new terms.
+        7. CHANGES TO THE TERMS
+    We may amend these terms at any time.
+    Continued use of the service following such changes constitutes your acceptance of the new terms.
 
-By agreeing to these terms and conditions, you confirm and accept all the above provisions.
+    By agreeing to these terms and conditions, you confirm and accept all the above provisions.
 
-Translated with DeepL.com (free version)
+    Translated with DeepL.com (free version)
 
     `.trim();
 
@@ -319,7 +323,7 @@ Translated with DeepL.com (free version)
                             <button
                                 type="submit"
                                 className="submit-btn"
-                                onMouseMove={(e) => { {/* Якщо поля email або пароль порожні, кнопка буде "втікати" від курсора, створюючи веселу інтерактивність для користувача. *\/ */}
+                                onMouseMove={(e) => {
                                     if (!loginData.email.trim() || !loginData.password.trim()) {
                                         const btn = e.currentTarget;
                                         const rect = btn.getBoundingClientRect();
