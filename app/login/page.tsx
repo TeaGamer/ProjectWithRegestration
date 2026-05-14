@@ -4,9 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "../css/login.css";
-import "../constants/profileConfig";
-import { UKRAINIAN_REGIONS } from "../constants/profileConfig";
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
+import { UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
 
 export default function LoginPage() {
     // Прапорці, які керують формою та її станом
@@ -93,11 +91,12 @@ export default function LoginPage() {
 
             if (response.ok) {
                 setSuccess("Successfully logged in! Redirecting...");
-                // Save token
-                if (data.token) {
-                    localStorage.setItem("token", data.token);
+                // ВАЖЛИВО: Токен повинен встановлюватися на бекенді як HttpOnly cookie
+                // Не встановлюємо cookie з фронтенду (XSS вразливість)
+                // Не зберігаємо токен в localStorage (доступна JS-кодам)
+                if (data.user && loginData.remember) {
+                    // Зберігаємо тільки non-sensitive дані користувача, якщо обрана опція "Remember me"
                     localStorage.setItem("user", JSON.stringify(data.user));
-                    document.cookie = `token=${data.token}; path=/; max-age=86400`; // 1 day
                 }
                 setTimeout(() => {
                     router.push("/Kalendar");
@@ -179,7 +178,9 @@ export default function LoginPage() {
                 setError(data.error || "Registration error. This email may already be registered.");
             }
         } catch {
-            setError("Connection error. Please check if the backend is running at http://localhost:8000");
+            setError("Connection error. Please try again later.");
+            // Логування деталей тільки в консоль для розробників
+            console.error("Backend connection failed. Check if API server is running.");
         }
     };
 

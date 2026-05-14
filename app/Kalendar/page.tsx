@@ -59,12 +59,12 @@ export default function KalendarPage() {
 
   // useEffect для перевірки авторизації при завантаженні сторінки
   useEffect(() => {
-    // Отримання даних користувача та токена з localStorage
+    // Отримання даних користувача з localStorage
     const userStr = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
 
-    // Якщо немає токена або даних користувача, перенаправлення на логін
-    if (!token || !userStr) {
+    // Авторизація перевіряється в middleware.ts через HttpOnly cookie
+    // Якщо немає даних користувача, перенаправлення на логін
+    if (!userStr) {
       router.push("/login");
       return;
     }
@@ -127,8 +127,8 @@ export default function KalendarPage() {
   };
 
   const noteMatchesCell = (note: Note, day: number, offset: number) => {
-    const noteDate = new Date(note.date);
-    return noteDate.getDate() === day && noteDate.getMonth() === normalizeMonth(offset);
+    const noteDateObj = new Date(note.date);
+    return noteDateObj.getDate() === day && noteDateObj.getMonth() === normalizeMonth(offset);
   };
 
   const cellNotes = (day: number, offset: number) => {
@@ -230,7 +230,7 @@ export default function KalendarPage() {
       {/* Верхня панель з логотипом і користувачем */}
       <div className="topbar-cal">
         <div className="logo-section">Calendar with Alex</div>
-        <button className="user-bubble-nav" onClick={() => router.push("/Dashboard")}> 
+        <button className="user-bubble-nav" onClick={() => setShowEditModal(true)}>
           <span>{user.login}</span>
           <div className="avatar-circle-nav">
             {user.avatar ? (
