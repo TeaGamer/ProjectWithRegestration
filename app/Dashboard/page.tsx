@@ -135,8 +135,9 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
 
             {/* Edit Profile Modal: показує компонент редагування профілю */}
             {showEditModal && user && (
-                <Profile 
+                <Profile
                     user={user}
+                    isOpen={showEditModal}
                     onClose={() => {
                         setShowEditModal(false);
                         // Оновити користувача з localStorage після редагування

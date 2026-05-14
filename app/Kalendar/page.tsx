@@ -451,6 +451,7 @@ export default function KalendarPage() {
               setUser(JSON.parse(userStr));
             }
           }}
+          isOpen={showEditModal}
         />
       )}
     </div>

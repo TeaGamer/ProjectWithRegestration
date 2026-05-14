@@ -4,15 +4,18 @@
 // Модальний компонент для редагування профілю користувача
 import { useState, useEffect } from "react";
 import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
+import Modal from "./Modal";
+import "../css/Profile.css";
 
 {/* Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки */}
 interface ProfileProps {
     user: User;
+    isOpen: boolean;
     onClose: () => void;
 }
 
-export default function Profile({ user, onClose }: ProfileProps) {
-    // Локальний стан редагованого профілю, помилок та повідомлень успіху
+export default function Profile({ user, isOpen, onClose }: ProfileProps) {
+    const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState<User>(user);
     const [editError, setEditError] = useState("");
     const [editSuccess, setEditSuccess] = useState("");
@@ -66,7 +69,7 @@ export default function Profile({ user, onClose }: ProfileProps) {
                 // Оновлюємо дані користувача у localStorage, щоб інші сторінки побачили зміни
                 localStorage.setItem("user", JSON.stringify(data.user));
                 setTimeout(() => {
-                    onClose();
+                    setIsEditing(false);
                     setEditSuccess("");
                 }, 1500);
             } else {
@@ -75,6 +78,14 @@ export default function Profile({ user, onClose }: ProfileProps) {
         } catch {
             setEditError("Connection error. Please check if the backend is running at http://localhost:10000");
         }
+    };
+
+    const handleClose = () => {
+        setIsEditing(false);
+        setEditError("");
+        setEditSuccess("");
+        setEditData(user);
+        onClose();
     };
 
     return (
@@ -148,15 +159,88 @@ export default function Profile({ user, onClose }: ProfileProps) {
                             Save
                         </button>
                         <button 
-                            type="button" 
                             className="modal-cancel-btn"
-                            onClick={onClose}
+                            onClick={handleClose}
                         >
-                            Cancel
+                            Close
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
+                </div>
+            ) : (
+                // Форма редагування
+                <>
+                    {editError && <div className="error-message">{editError}</div>}
+                    {editSuccess && <div className="success-message">{editSuccess}</div>}
+
+                    <form onSubmit={handleEditSubmit} className="edit-profile-form">
+                        <div className="form-group">
+                            <label>First Name</label>
+                            <input
+                                type="text"
+                                name="first_name"
+                                value={editData.first_name || ""}
+                                onChange={handleEditChange}
+                                placeholder="First Name"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Last Name</label>
+                            <input
+                                type="text"
+                                name="last_name"
+                                value={editData.last_name || ""}
+                                onChange={handleEditChange}
+                                placeholder="Last Name"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Region</label>
+                            <select
+                                name="region"
+                                value={editData.region || ""}
+                                onChange={handleEditChange}
+                            >
+                                <option value="">Select Region</option>
+                                {UKRAINIAN_REGIONS.map((region) => (
+                                    <option key={region} value={region}>
+                                        {region}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Date of birth</label>
+                            <input
+                                type="date"
+                                name="date_of_birth"
+                                value={editData.date_of_birth || ""}
+                                onChange={handleEditChange}
+                                max={new Date().toISOString().split('T')[0]}
+                            />
+                        </div>
+
+                        <div className="modal-buttons">
+                            <button type="submit" className="modal-submit-btn">
+                                Save
+                            </button>
+                            <button 
+                                type="button" 
+                                className="modal-cancel-btn"
+                                onClick={() => {
+                                    setIsEditing(false);
+                                    setEditData(user);
+                                    setEditError("");
+                                }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </>
+            )}
+        </Modal>
     );
 }
