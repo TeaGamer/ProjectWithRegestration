@@ -177,5 +177,3 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
         </div>
     );
 }
-    );
-}
