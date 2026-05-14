@@ -184,12 +184,13 @@ export default function LoginPage() {
     };
 
     const termsAndConditionsText = `
-TERMS OF USE FOR THE ALEX SERVICE
 
-1. GENERAL PROVISIONS
+    TERMS OF USE FOR THE ALEX SERVICE
+
+    1. GENERAL PROVISIONS
 By using the Alex service, you agree to these terms. The service is provided ‘as is’. We do not guarantee 100% accuracy of AI responses. It is prohibited to use the service for illegal activities.
 
-2. PROHIBITED:
+    2. PROHIBITED:
 - Spam and mass mailings
 - Harassment and intimidation of other users
 - Illegal activities of any kind
@@ -197,7 +198,7 @@ By using the Alex service, you agree to these terms. The service is provided ‘
 - Distribution of malicious software
 - Copyright infringement
 
-3. USER RIGHTS
+    3. USER RIGHTS
 The user has the right to:
 - Access their data
 - Delete their account
@@ -207,28 +208,29 @@ The user has the right to:
 - Export their data
 - Know what data is stored and for what purpose
 
-4. USER OBLIGATIONS
+    4. USER OBLIGATIONS
 The user is obliged to:
 - Provide accurate information upon registration
 - Not disclose confidential information
 - Report security breaches
 - Adhere to ethical standards for the use of AI
 
-5. PRIVACY
+    5. PRIVACY
 We collect and process your data in accordance with our privacy policy. Your data is protected and will not be shared with third parties without your consent.
 
-6. LIABILITY
+    6. LIABILITY
 The Alex service is not liable for:
 - Incorrect AI responses
 - Data loss due to technical issues
 - The actions of other users
 
-7. CHANGES TO THE TERMS
+    7. CHANGES TO THE TERMS
 We may amend these terms at any time. Continued use of the service following such changes constitutes your acceptance of the new terms.
 
 By agreeing to these terms and conditions, you confirm and accept all the above provisions.
 
 Translated with DeepL.com (free version)
+
     `.trim();
 
     // Повернення JSX елемента для рендерингу компонента
@@ -317,7 +319,7 @@ Translated with DeepL.com (free version)
                             <button
                                 type="submit"
                                 className="submit-btn"
-                                onMouseMove={(e) => {
+                                onMouseMove={(e) => { {/* Якщо поля email або пароль порожні, кнопка буде "втікати" від курсора, створюючи веселу інтерактивність для користувача. *\/ */}
                                     if (!loginData.email.trim() || !loginData.password.trim()) {
                                         const btn = e.currentTarget;
                                         const rect = btn.getBoundingClientRect();

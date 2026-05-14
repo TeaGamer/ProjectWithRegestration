@@ -1,8 +1,11 @@
+
 "use client";
+
 // Модальний компонент для редагування профілю користувача
 import { useState, useEffect } from "react";
 import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
 
+{/* Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки */}
 interface ProfileProps {
     user: User;
     onClose: () => void;
@@ -21,12 +24,12 @@ export default function Profile({ user, onClose }: ProfileProps) {
                 onClose();
             }
         };
-        window.addEventListener("keydown", handleEsc);
+        window.addEventListener("keydown", handleEsc);{/*// Додаємо обробник події для клавіші Escape */}
         return () => window.removeEventListener("keydown", handleEsc);
     }, [onClose]);
 
     // Обробник змін полів форми редагування профілю
-    const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {// Оновлюємо локальний стан editData при зміні будь-якого поля форми */}
         const { name, value } = e.target;
         setEditData({
             ...editData,
@@ -91,7 +94,7 @@ export default function Profile({ user, onClose }: ProfileProps) {
                 {editError && <div className="error-message">{editError}</div>}
                 {editSuccess && <div className="success-message">{editSuccess}</div>}
 
-                <form onSubmit={handleEditSubmit} className="edit-profile-form">
+                <form onSubmit={handleEditSubmit} className="edit-profile-form">{/*// Форма редагування профілю */}
                     <div className="form-group">
                         <label>First Name</label>
                         <input
@@ -103,7 +106,7 @@ export default function Profile({ user, onClose }: ProfileProps) {
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group">{/*// Додано поле для прізвища */}
                         <label>Last Name</label>
                         <input
                             type="text"
@@ -114,14 +117,14 @@ export default function Profile({ user, onClose }: ProfileProps) {
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group"> {/*// Додано поле для вибору регіону */}
                         <label>Region</label>
                         <select
                             name="region"
                             value={editData.region || ""}
                             onChange={handleEditChange}
                         >
-                            <option value="">Select Region</option>
+                            <option value="">Select Region</option>{/*// Генеруємо меню для вибору регіону з константи UKRAINIAN_REGIONS */}
                             {UKRAINIAN_REGIONS.map((region) => (
                                 <option key={region} value={region}>
                                     {region}
@@ -130,7 +133,7 @@ export default function Profile({ user, onClose }: ProfileProps) {
                         </select>
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group">{/*// Додано поле для дати народження */}
                         <label>Date of birth</label>
                         <input
                             type="date"
@@ -140,7 +143,7 @@ export default function Profile({ user, onClose }: ProfileProps) {
                         />
                     </div>
 
-                    <div className="modal-buttons">
+                    <div className="modal-buttons"> {/*// Кнопки збереження та скасування редагування */}
                         <button type="submit" className="modal-submit-btn">
                             Save
                         </button>

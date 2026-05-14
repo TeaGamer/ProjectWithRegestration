@@ -22,7 +22,7 @@ export default function Dashboard( ) {
 
     // Guard: якщо немає авторизованого користувача, переходимо на сторінку логіну
     useEffect(() => {
-        const userStr = localStorage.getItem("user");
+        const userStr = localStorage.getItem("user");{/* Отримання даних користувача та токен з localStorage для перевірки авторизації */}
         const token = localStorage.getItem("token");
 
         if (!token || !userStr) {
@@ -67,7 +67,7 @@ export default function Dashboard( ) {
                 
                 {/* Кнопка-бульбашка користувача */}
                 <div className="user-nav-bubble" onClick={() => router.push('/Dashboard')}>
-                    <span className="username-label"><strong>Username:</strong> {user.login}</span>
+                    <span className="username-label"><strong>Username:</strong> {user.login}</span>{/* Відображення аватарки або першої літери логіну */}
                     <div className="avatar-frame">
                         {user.avatar ? (
                             <img src={user.avatar} alt="Avatar" className="main-avatar-img" />
@@ -94,7 +94,7 @@ export default function Dashboard( ) {
             <main className="calendar-main">
                 {/* Категорії зліва */}
                 <aside className="calendar-sidebar">
-                    <div className="kategories-header">Kategories</div>
+                    <div className="kategories-header">Kategories</div>{/* Список категорій для нотаток, які можна буде використовувати при додаванні подій до календаря */}
                     {['Meetings', 'Birthday', 'Holiday', 'Event'].map(cat => (
                         <button key={cat} className="category-item-btn">{cat}</button>
                     ))}
@@ -153,7 +153,7 @@ export default function Dashboard( ) {
 
             {/* Edit Profile Modal (Твій оригінальний компонент) */}
             {showEditModal && (
-                <Profile 
+                <Profile
                     user={user}
                     onClose={() => {
                         setShowEditModal(false);
@@ -167,61 +167,279 @@ export default function Dashboard( ) {
                 .calendar-page-wrapper {
                     min-height: 100vh;
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white; 
-                    padding: 25px; 
+                    color: white;
+                    padding: 25px;
                     font-family: 'Arial', sans-serif;
                 }
-                .dashboard-header { display: flex; justify-content: space-between; align-items: center; }
-                .logo-frame { border: 2px solid #aaa; padding: 5px 20px; font-weight: bold; font-style: italic; background: rgba(255,255,255,0.1); }
-                
-                .user-nav-bubble { 
-                    display: flex; align-items: center; gap: 12px; background: rgba(116, 169, 207, 0.7); 
-                    padding: 4px 18px; border-radius: 40px; border: 2px solid white; cursor: pointer; transition: 0.3s;
+                .dashboard-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
                 }
-                .user-nav-bubble:hover { background: rgba(116, 169, 207, 0.9); }
-                .avatar-frame { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid white; background: #555; }
-                .main-avatar-img { width: 100%; height: 100%; object-fit: cover; }
-                .avatar-letter { display: flex; justify-content: center; align-items: center; height: 100%; font-weight: bold; }
 
-                .calendar-controls { display: flex; justify-content: center; gap: 20px; margin: 35px 0; }
-                .ctrl-btn-text { background: none; border: none; font-weight: bold; cursor: pointer; }
-                .ctrl-btn-rect { padding: 4px 15px; border: none; font-weight: bold; color: black; cursor: pointer; }
-                .delete-active { outline: 3px solid red; transform: scale(1.05); }
-
-                .calendar-main { display: grid; grid-template-columns: 180px 1fr 120px; gap: 30px; }
-                .kategories-header { background: #bbb; color: black; font-weight: bold; padding: 5px; text-align: center; border: 1px solid black; }
-                .category-item-btn { width: 100%; background: #ccc; border: 1px solid black; margin-top: 2px; padding: 5px; cursor: pointer; color: black; }
-
-                .month-navigation { display: flex; justify-content: center; align-items: center; gap: 50px; margin-bottom: 20px; }
-                .nav-arrow-btn { background: #f39c12; border: none; padding: 5px 20px; font-weight: bold; cursor: pointer; }
-                .current-month-name { text-transform: capitalize; border-bottom: 2px solid white; padding: 0 10px; }
-
-                .actual-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: black; border: 1px solid black; }
-                .grid-day-name { background: #ddd; color: black; text-align: center; padding: 10px; font-weight: bold; border: 1px solid #444; }
-                .day-cell { background: #fff; color: black; min-height: 100px; padding: 10px; border: 1px solid #444; position: relative; }
-                .cell-today { border: 6px solid black !important; z-index: 10; }
+                .logo-frame {
+                    border: 2px solid #aaa;
+                    padding: 5px 20px;
+                    font-weight: bold;
+                    font-style: italic;
+                    background: rgba(255,255,255,0.1);
+                }
                 
-                .alex-status-box { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 50px; gap: 10px; }
-                .alex-purple-circle { width: 70px; height: 70px; background: #5e35b1; border-radius: 50%; border: 2px solid #9575cd; }
+                .user-nav-bubble {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    background: rgba(116, 169, 207, 0.7);
+                    padding: 4px 18px;
+                    border-radius: 40px;
+                    border: 2px solid white;
+                    cursor: pointer;
+                    transition: 0.3s;
+                }
+                .user-nav-bubble:hover {
+                    background: rgba(116, 169, 207, 0.9);
+                }
+                
+                .avatar-frame {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    overflow: hidden;
+                    border: 2px solid white;
+                    background: #555;
+                }
+                
+                .main-avatar-img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+                
+                .avatar-letter {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100%;
+                    font-weight: bold;
+                }
+
+                .calendar-controls {
+                    display: flex;
+                    justify-content: center;
+                    gap: 20px;
+                    margin: 35px 0;
+                }
+                
+                .ctrl-btn-text {
+                    background: none;
+                    border: none;
+                    font-weight: bold;
+                    cursor: pointer;
+                    color: #f1c40f;
+                }
+                
+                .ctrl-btn-rect {
+                    padding: 4px 15px;
+                    border: none;
+                    font-weight: bold;
+                    color: black;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    transition: 0.3s;
+                }
+                .ctrl-btn-rect:hover {
+                    opacity: 0.8;
+                }
+                
+                .delete-active {
+                    outline: 3px solid red;
+                    transform: scale(1.05);
+                }
+
+                .calendar-main {
+                    display: grid;
+                    grid-template-columns: 180px 1fr 120px;
+                    gap: 30px;
+                }
+                
+                .kategories-header {
+                    background: #bbb;
+                    color: black;
+                    font-weight: bold;
+                    padding: 5px;
+                    text-align: center;
+                    border: 1px solid black;
+                }
+                
+                .category-item-btn {
+                    width: 100%;
+                    background: #ccc;
+                    border: 1px solid black;
+                    margin-top: 2px;
+                    padding: 5px;
+                    cursor: pointer;
+                    color: black;
+                    transition: 0.3s;
+                }
+                .category-item-btn:hover {
+                    background: #ddd;
+                }
+
+                .month-navigation {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 50px;
+                    margin-bottom: 20px;
+                }
+                
+                .nav-arrow-btn {
+                    background: #f39c12;
+                    border: none;
+                    padding: 5px 20px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    color: black;
+                    transition: 0.3s;
+                }
+                
+                .nav-arrow-btn:hover {
+                    background: #e67e22;
+                }
+                
+                .current-month-name {
+                text-transform: capitalize;
+                border-bottom: 2px solid white;
+                padding: 0 10px;
+                }
+
+                
+                .actual-calendar-grid {
+                    display: grid;
+                    grid-template-columns: repeat(7, 1fr);
+                    background: black;
+                    border: 1px solid black;
+                }
+                
+                .grid-day-name {
+                    background: #ddd;
+                    color: black;
+                    text-align: center;
+                    padding: 10px;
+                    font-weight: bold;
+                    border: 1px solid #444;
+                }
+                
+                .day-cell {
+                    background: #fff;
+                    color: black;
+                    min-height: 100px;
+                    padding: 10px;
+                    border: 1px solid #444;
+                    position: relative;
+                }
+                
+                .cell-today {
+                    border: 6px solid black !important;
+                    z-index: 10;
+                }
+                
+                .alex-status-box {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-end;
+                    padding-bottom: 50px;
+                    gap: 10px;
+                }
+
+                .alex-purple-circle {
+                    width: 70px;
+                    height: 70px;
+                    background: #5e35b1;
+                    border-radius: 50%;
+                    border: 2px solid #9575cd;
+                    box-shadow: 0 0 15px #5e35b1, 0 0 30px #9575cd;
+                }
 
                 .ai-neon-trigger {
-                    position: fixed; bottom: 35px; right: 35px; width: 75px; height: 75px;
-                    border-radius: 50%; border: 3px solid #bc13fe; cursor: pointer;
-                    box-shadow: 0 0 15px #bc13fe, 0 0 30px #bc13fe; overflow: hidden; z-index: 1000;
+                    position: fixed;
+                    bottom: 35px;
+                    right: 35px;
+                    width: 75px;
+                    height: 75px;
+                    border-radius: 50%;
+                    border: 3px solid #bc13fe;
+                    cursor: pointer;
+                    box-shadow: 0 0 15px #bc13fe, 0 0 30px #bc13fe;
+                    overflow: hidden;
+                    z-index: 1000;
                 }
-                .ai-avatar-icon { width: 100%; height: 100%; object-fit: cover; }
+                .ai-avatar-icon {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
 
                 .ai-chat-popup {
-                    position: fixed; bottom: 35px; right: 125px; width: 360px; height: 580px;
-                    background: rgba(102, 126, 234, 0.98); border-radius: 30px; 
-                    display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255,255,255,0.3); box-shadow: -10px 10px 40px rgba(0,0,0,0.5);
+                    position: fixed;
+                    bottom: 35px;
+                    right: 125px;
+                    width: 360px;
+                    height: 580px;
+                    background: rgba(102, 126, 234, 0.98);
+                    border-radius: 30px;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                    border: 1px solid rgba(255,255,255,0.3);
+                    box-shadow: -10px 10px 40px rgba(0,0,0,0.5);
                 }
-                .chat-head { padding: 25px; background: #5e35b1; text-align: center; font-weight: bold; font-size: 1.1rem; }
-                .chat-body { flex: 1; padding: 20px; display: flex; align-items: flex-start; }
-                .ai-message { background: rgba(0,0,0,0.2); padding: 12px 18px; border-radius: 20px 20px 20px 0; font-size: 14px; }
-                .chat-input-zone { height: 90px; background: #4a90e2; display: flex; align-items: center; padding: 0 25px; }
-                .ai-input-field { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 16px; }
-                .ai-input-field::placeholder { color: rgba(255,255,255,0.6); }
+
+                .chat-head {
+                    padding: 25px;
+                    background: #5e35b1;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.1rem;
+                    border-bottom: 1px solid rgba(255,255,255,0.3);}
+                
+                .chat-body {
+                flex: 1;
+                padding: 20px;
+                display: flex;
+                align-items: flex-start;
+                }
+                
+                .ai-message {
+                    background: rgba(0,0,0,0.2);
+                    padding: 12px 18px;
+                    border-radius: 20px 20px 20px 0;
+                    font-size: 14px;
+                }
+                
+                .chat-input-zone {
+                    height: 90px;
+                    background: #4a90e2;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 25px;
+                }
+                
+                .ai-input-field {
+                background: transparent;
+                border: none;
+                color: white;
+                width: 100%;
+                outline: none;
+                font-size: 16px;
+                }
+                
+                .ai-input-field::placeholder {
+                color: rgba(255,255,255,0.6);
+                }
+
             `}</style>
         </div>
     );
