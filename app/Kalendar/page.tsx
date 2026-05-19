@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Profile from "../components/Profile";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
 
@@ -53,36 +54,21 @@ export default function KalendarPage() {
   // Поточна дата для календаря
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const getCookie = (name: string) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
-  };
-
-  // useEffect для перевірки авторизації при завантаженні сторінки
+  // useEffect для завантаження збереженого користувача без примусової захищеної перевірки
   useEffect(() => {
-    // Отримання даних користувача з localStorage
     const userStr = localStorage.getItem("user");
 
-    // Якщо немає токена або даних користувача, перенаправлення на логін
-    const token = localStorage.getItem("token") || getCookie("token");
-    if (!token || !userStr) {
-      router.push("/Login");
-      return;
+    if (userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        setUser(userData);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
     }
 
-    try {
-      // Парсинг даних користувача
-      const userData = JSON.parse(userStr);
-      setUser(userData);
-    } catch (error) {
-      console.error("Error parsing user data:", error);
-      router.push("/Login");
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     const savedNotes = localStorage.getItem("calendarNotes");
@@ -224,9 +210,13 @@ export default function KalendarPage() {
     return <div className = "dashboard-container"><p> Loading... </p></div>;
   }
 
-  if (!user) {
-    return null;
-  }
+  const currentUser: User = user ?? {
+    id: 0,
+    login: "Guest",
+    email: "",
+    first_name: "Guest",
+    last_name: "",
+  };
 
   return (
     <div className = "dashboard-layout-calendar" style = {{ paddingRight: isChatOpen ? "calc(min(35vw, 520px) + 32px)" : "20px" }}>
@@ -234,12 +224,12 @@ export default function KalendarPage() {
       <div className = "topbar-cal">
         <div className = "logo-section"> Calendar with Alex </div>
         <button className = "user-bubble-nav" onClick = {() => router.push("/Dashboard")}> 
-          <span>{user.login}</span>
+          <span>{currentUser.login}</span>
           <div className = "avatar-circle-nav">
-            {user.avatar ? (
-              <Image src = {user.avatar} alt = "Avatar" width={40} height = {40} className = "knight.img" />
+            {currentUser.avatar ? (
+              <Image src = {currentUser.avatar} alt = "Avatar" width={40} height = {40} className = "knight.img" />
             ) : (
-              <div className = "avatar-letter">{user.login.charAt(0).toUpperCase()}</div>
+              <div className = "avatar-letter">{currentUser.login.charAt(0).toUpperCase()}</div>
             )}
           </div>
         </button>
@@ -431,7 +421,7 @@ export default function KalendarPage() {
           </div>
           <div className = "chat-mid">
             {chatMessages.length === 0 ? (
-              <div className = "ai-text"> Welcome, {user.login}! Ask something... </div>
+              <div className = "ai-text"> Welcome, {currentUser.login}! Ask something... </div>
             ) : (
               chatMessages.map((message) => (
                 <div key = {message.id} className = {`chat-message ${message.sender}`}>
@@ -479,7 +469,7 @@ export default function KalendarPage() {
       )}
 
       {/* Редагування профілю */}
-      {showEditModal && (
+      {showEditModal && user && (
         <Profile
           user = {user}
           onClose = {() => {

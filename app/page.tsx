@@ -10,10 +10,10 @@ export default function Home() {
 
         {/* Ліва сторона: Інформація про проект */}
         <div className = "hero-text">
-          <p className = "subtitle">Our Startup Project</p>
-          <h1>AI Planner & <br />Smart Alarms</h1>
+          <p className = "subtitle"> Our Startup Project </p>
+          <h1> AI Planner & <br />Smart Alarms</h1>
           <p className = "description">
-            Meet your new assistant, <strong>AI Alex</strong>.
+            Meet your new assistant, <strong> AI Alex </strong>.
             Designed to help you organize, schedule, and master your daily routine with ease.
           </p>
         </div>
@@ -28,7 +28,7 @@ export default function Home() {
               className = "avatar-img"
             />
           </div>
-          <h2 className = "ai-name">Alex</h2>
+          <h2 className = "ai-name"> Alex </h2>
           {/* Посилання на сторінку логіну */}
           <Link href = "/Login" className = "login-bubble-btn">
             Login

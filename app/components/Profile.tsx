@@ -97,7 +97,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
         <div className = "modal-overlay" onClick = {handleClose}>
             <div className = "modal-content" onClick = {(e) => e.stopPropagation()}>
                 <div className = "modal-header">
-                    <h2>Edit Profile</h2>
+                    <h2> Edit Profile </h2>
                     <button
                         type = "button"
                         className = "modal-close"

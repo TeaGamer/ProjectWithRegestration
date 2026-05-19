@@ -191,7 +191,10 @@ export default function LoginPage() {
     TERMS OF USE FOR THE ALEX SERVICE
 
         1. GENERAL PROVISIONS
-    By using the Alex service, you agree to these terms. The service is provided ‘as is’. We do not guarantee 100% accuracy of AI responses. It is prohibited to use the service for illegal activities.
+    By using the Alex service, you agree to these terms. 
+    The service is provided ‘as is’. 
+    We do not guarantee 100% accuracy of AI responses. 
+    It is prohibited to use the service for illegal activities.
 
         2. PROHIBITED:
     - Spam and mass mailings
@@ -219,8 +222,10 @@ export default function LoginPage() {
     - Adhere to ethical standards for the use of AI
 
         5. PRIVACY
-    We collect and process your data in accordance with our privacy policy.
-    Your data is protected and will not be shared with third parties without your consent.
+    We collect and process your data in accordance 
+    with our privacy policy.
+    Your data is protected and will not be shared with third 
+    parties without your consent.
 
         6. LIABILITY
     The Alex service is not liable for:
@@ -230,9 +235,11 @@ export default function LoginPage() {
 
         7. CHANGES TO THE TERMS
     We may amend these terms at any time.
-    Continued use of the service following such changes constitutes your acceptance of the new terms.
+    Continued use of the service following such changes 
+    constitutes your acceptance of the new terms.
 
-    By agreeing to these terms and conditions, you confirm and accept all the above provisions.
+    By agreeing to these terms and conditions, 
+    you confirm and accept all the above provisions.
 
     Translated with DeepL.com (free version)
 
