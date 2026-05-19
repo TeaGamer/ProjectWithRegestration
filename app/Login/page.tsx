@@ -92,14 +92,14 @@ export default function LoginPage() {
 
             if (response.ok) {
                 setSuccess("Successfully logged in! Redirecting...");
-                // ВАЖЛИВО: Токен повинен встановлюватися на бекенді як HttpOnly cookie
-                // Не встановлюємо cookie з фронтенду (XSS вразливість)
-                // Не зберігаємо токен в localStorage (доступна JS-кодам)
-                if (data.user && loginData.remember) {
-                    // Зберігаємо тільки non-sensitive дані користувача, якщо обрана опція "Remember me"
+
+                if (data.user) {
                     localStorage.setItem("user", JSON.stringify(data.user));
-                    document.cookie = `token=${data.token}; path=/; max-age=86400`; // 1 day
                 }
+
+                const maxAge = loginData.remember ? "; max-age=86400" : "";
+                document.cookie = `token=${data.token}; path=/${maxAge}`;
+
                 setTimeout(() => {
                     router.push("/Kalendar");
                 }, 700);

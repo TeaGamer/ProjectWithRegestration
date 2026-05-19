@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "../css/Kalendar.css";
-import Profile from "../components/Profile";
 import { User } from "../constants/profileConfig";
 
 // Інтерфейс для нотатки в календарі
@@ -29,8 +28,6 @@ export default function KalendarPage() {
   const [user, setUser] = useState<User | null>(null);
   // Стан для індикатора завантаження
   const [loading, setLoading] = useState(true);
-  // Стан для модального вікна редагування профілю
-  const [showEditModal, setShowEditModal] = useState(false);
   // Стан для відкриття чату ШІ
   const [isChatOpen, setIsChatOpen] = useState(false);
   // Стан для режиму видалення нотаток
@@ -56,13 +53,20 @@ export default function KalendarPage() {
   // Поточна дата для календаря
   const [currentDate, setCurrentDate] = useState(new Date());
 
+  const getCookie = (name: string) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+    return null;
+  };
+
   // useEffect для перевірки авторизації при завантаженні сторінки
   useEffect(() => {
     // Отримання даних користувача з localStorage
     const userStr = localStorage.getItem("user");
 
     // Якщо немає токена або даних користувача, перенаправлення на логін
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || getCookie("token");
     if (!token || !userStr) {
       router.push("/Login");
       return;
@@ -229,7 +233,7 @@ export default function KalendarPage() {
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
         <div className = "logo-section"> Calendar with Alex </div>
-        <button className = "user-bubble-nav" onClick =   {() => setShowEditModal(true)}>
+        <button className = "user-bubble-nav" onClick = {() => router.push("/Dashboard")}> 
           <span>{user.login}</span>
           <div className = "avatar-circle-nav">
             {user.avatar ? (
@@ -475,19 +479,6 @@ export default function KalendarPage() {
       )}
 
       {/* Редагування профілю */}
-      {showEditModal && (
-        <Profile
-          user = {user}
-          onClose = {() => {
-            setShowEditModal(false);
-            const userStr = localStorage.getItem("user");
-            if (userStr) {
-              setUser(JSON.parse(userStr));
-            }
-          }}
-          isOpen = {showEditModal}
-        />
-      )}
     </div>
   );
 }
