@@ -45,13 +45,17 @@ export async function middleware(request: NextRequest) {
     // Верифікуємо токен з бекенд API
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
       const verifyResponse = await fetch(`${apiBase}/api/verify-token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       if (!verifyResponse.ok) {
         // Токен невалідний на бекенді
