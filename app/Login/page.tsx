@@ -91,12 +91,15 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (response.ok) {
+                // Валідація: обидва поля мають бути присутні
+                if (!data.token || !data.user) {
+                    setError("Server error: invalid response. Please try again.");
+                    return;
+                }
+
                 setSuccess("Successfully logged in! Redirecting...");
 
-                if (data.user) {
-                    localStorage.setItem("user", JSON.stringify(data.user));
-                }
-                
+                localStorage.setItem("user", JSON.stringify(data.user));
                 localStorage.setItem("token", data.token);
 
                 const maxAge = loginData.remember ? "; max-age=86400" : "";
