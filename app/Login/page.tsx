@@ -103,7 +103,8 @@ export default function LoginPage() {
                 localStorage.setItem("token", data.token);
 
                 const maxAge = loginData.remember ? "; max-age=86400" : "";
-                document.cookie = `token=${data.token}; path=/${maxAge}`;
+                const isSecure = location.protocol === "https:" ? "; Secure" : "";
+                document.cookie = `token=${data.token}; path=/; SameSite=Strict${isSecure}${maxAge}`;
 
                 setTimeout(() => {
                     router.push("/Dashboard");
