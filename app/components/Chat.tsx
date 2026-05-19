@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { sendChatMessage, getChatHistory, deleteChatMessage } from '../services/chatService';
-import styles from '../css/Chat.css'; // Імпорт окремого файлу стилів
+import { sendChatMessage, getChatHistory, deleteChatMessage } from './services/chatService';
+import styles from './css/Chat.css'; // Імпорт окремого файлу стилів
 
 interface ChatMessage {
   id: number;
