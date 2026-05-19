@@ -57,15 +57,16 @@ export async function middleware(request: NextRequest) {
       });
       clearTimeout(timeoutId);
 
-      if (!verifyResponse.ok) {
-        // Токен невалідний на бекенді
+      if (verifyResponse.status === 401) {
+        // Токен явно відхилений бекендом (Unauthorized)
         const response = NextResponse.redirect(new URL('/Login', request.url));
         response.cookies.delete('token');
         return response;
       }
+      // Будь-який інший не-ok статус (404, 500, тощо) — endpoint може бути
+      // не реалізований, дозволяємо запит
     } catch (error) {
       // Якщо не можна з'єднатися з бекенд API, дозволяємо запит
-      // але логуємо помилку для діагностики
       console.error('Failed to verify token with backend:', error);
     }
   }
