@@ -71,7 +71,7 @@ export default function KalendarPage() {
     // Якщо немає токена або даних користувача, перенаправлення на логін
     const token = localStorage.getItem("token") || getCookie("token");
     if (!token || !userStr) {
-      router.push("/Login");
+      router.push("/login");
       return;
     }
 
@@ -81,7 +81,7 @@ export default function KalendarPage() {
       setUser(userData);
     } catch (error) {
       console.error("Error parsing user data:", error);
-      router.push("/Login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }
@@ -236,7 +236,7 @@ export default function KalendarPage() {
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
         <div className = "logo-section"> Calendar with Alex </div>
-        <button className = "user-bubble-nav" onClick = {() => router.push("/Dashboard")}> 
+        <button className = "user-bubble-nav" onClick = {() => router.push("/dashboard")}> 
           <span>{user.login}</span>
           <div className = "avatar-circle-nav">
             {user.avatar ? (
