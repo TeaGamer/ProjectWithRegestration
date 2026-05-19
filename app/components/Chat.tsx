@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { sendChatMessage, getChatHistory, deleteChatMessage } from '../services/chatService';
+import styles from '../css/Chat.css'; // Імпорт окремого файлу стилів
 
 interface ChatMessage {
   id: number;
@@ -30,7 +31,7 @@ export default function Chat({ token }: ChatProps) {
     }
   }, [token]);
 
-  // Автоматичний скрол до нижу
+  // Автоматичний скрол донизу
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -51,33 +52,46 @@ export default function Chat({ token }: ChatProps) {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!input.trim() || !token) {
-      setError('Повідомлення не може бути пустим');
-      return;
-    }
+    const trimmedInput = input.trim();
+    if (!trimmedInput || !token) return;
 
     setLoading(true);
     setError(null);
+    setInput('');
+
+    // Оптимістичний UI
+    const temporaryId = Date.now();
+    const optimisticMessage: ChatMessage = {
+      id: temporaryId,
+      user_id: 0,
+      message: trimmedInput,
+      response: '...',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, optimisticMessage]);
 
     try {
-      const response = await sendChatMessage(input, token);
+      const response = await sendChatMessage(trimmedInput, token);
 
-      // Додати нове повідомлення до списку
-      setMessages([
-        ...messages,
-        {
-          id: response.message_id,
-          user_id: 0,
-          message: response.user_message,
-          response: response.ai_response,
-          created_at: response.timestamp,
-          updated_at: response.timestamp
-        }
-      ]);
-
-      setInput('');
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === temporaryId
+            ? {
+                id: response.message_id,
+                user_id: 0,
+                message: response.user_message,
+                response: response.ai_response,
+                created_at: response.timestamp,
+                updated_at: response.timestamp,
+              }
+            : msg
+        )
+      );
     } catch (err) {
       setError((err as Error).message || 'Помилка при відправці повідомлення');
+      setMessages((prev) => prev.filter((msg) => msg.id !== temporaryId));
       console.error(err);
     } finally {
       setLoading(false);
@@ -89,7 +103,7 @@ export default function Chat({ token }: ChatProps) {
 
     try {
       await deleteChatMessage(messageId, token);
-      setMessages(messages.filter(msg => msg.id !== messageId));
+      setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
       setError(null);
     } catch (err) {
       setError('Помилка при видаленні повідомлення');
@@ -97,73 +111,80 @@ export default function Chat({ token }: ChatProps) {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    if (error) setError(null);
+  };
+
   if (!token) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <p>Будь ласка, увійдіть щоб використовувати чат</p>
+      <div className = {styles.unauthorizedContainer}>
+        <p> Log in to use the chat. </p>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className = {styles.chatContainer}>
       {/* Заголовок */}
-      <div style={{ padding: '1rem', borderBottom: '1px solid #ccc' }}>
-        <h2>💬 AI Чат</h2>
+      <div className = {styles.header}>
+        <h2> 💬 AI Chat </h2>
       </div>
 
       {/* Сповіщення про помилку */}
-      {error && (
-        <div
-          style={{
-            padding: '1rem',
-            backgroundColor: '#fee',
-            color: '#c00',
-            textAlign: 'center'
-          }}
-        >
-          {error}
-        </div>
-      )}
+      {error && <div className = {styles.errorNotification}>{error}</div>}
 
       {/* Повідомлення */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
+      <div className = {styles.messagesContainer}>
         {messages.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#999' }}>
-            Немає повідомлень. Почніть розмову!
-          </p>
+          <p className = {styles.emptyMessage}> There are no messages. Rozpocznij rozmowę! </p>
         ) : (
           messages.map((msg) => (
-            <div key={msg.id} style={{ marginBottom: '1.5rem' }}>
+            <div key={msg.id} className = {styles.messageWrapper}>
               {/* Повідомлення користувача */}
-              <div
-                style={{
-                  marginBottom: '0.5rem',
-                  backgroundColor: '#e3f2fd',
-                  padding: '0.75rem',
-                  borderRadius: '8px',
-                  textAlign: 'right'
-                }}
-              >
-                <strong>Ви:</strong> {msg.message}
+              <div className = {styles.userMessage}>
+                <strong> You: </strong> {msg.message}
               </div>
 
               {/* Відповідь AI */}
               {msg.response && (
-                <div
-                  style={{
-                    marginBottom: '0.5rem',
-                    backgroundColor: '#f5f5f5',
-                    padding: '0.75rem',
-                    borderRadius: '8px',
-                    textAlign: 'left'
-                  }}
-                >
-                  <strong>🤖 AI:</strong> {msg.response}
+                <div className = {styles.aiMessage}>
+                  <strong> Alex: </strong> {msg.response}
                 </div>
               )}
 
               {/* Кнопка видалення */}
               <button
-                onClick={() => handleDeleteMessage(msg.id)}\n                style={{
-                  fontSize: '0.75rem',\n                  padding: '0.25rem 0.5rem',\n                  cursor: 'pointer',\n                  backgroundColor: '#fee',\n                  border: 'none',\n                  borderRadius: '4px',\n                  color: '#c00'\n                }}\n              >\n                Видалити\n              </button>\n            </div>\n          ))\n        )}\n        <div ref={messagesEndRef} />\n      </div>\n\n      {/* Форма для відправки */}\n      <form\n        onSubmit={handleSendMessage}\n        style={{\n          display: 'flex',\n          gap: '0.5rem',\n          padding: '1rem',\n          borderTop: '1px solid #ccc'\n        }}\n      >\n        <input\n          type=\"text\"\n          value={input}\n          onChange={(e) => setInput(e.target.value)}\n          placeholder=\"Напишіть повідомлення...\"\n          disabled={loading}\n          style={{\n            flex: 1,\n            padding: '0.75rem',\n            border: '1px solid #ccc',\n            borderRadius: '4px',\n            fontSize: '1rem'\n          }}\n        />\n        <button\n          type=\"submit\"\n          disabled={loading || !input.trim()}\n          style={{\n            padding: '0.75rem 1.5rem',\n            backgroundColor: loading ? '#ccc' : '#007bff',\n            color: 'white',\n            border: 'none',\n            borderRadius: '4px',\n            cursor: loading ? 'not-allowed' : 'pointer',\n            fontSize: '1rem'\n          }}\n        >\n          {loading ? 'Надсилання...' : 'Надіслати'}\n        </button>\n      </form>\n    </div>\n  );\n}\n
+                onClick = {() => handleDeleteMessage(msg.id)}
+                className = {styles.deleteButton}
+              >
+                Remove
+              </button>
+            </div>
+          ))
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Форма для відправки */}
+      <form onSubmit={handleSendMessage} className = {styles.form}>
+        <input
+          type = "text"
+          value = {input}
+          onChange={handleInputChange}
+          placeholder=" Write a message...) "
+          disabled={loading}
+          className = {styles.input}
+        />
+
+        <button
+          type = "submit"
+          disabled={loading || !input.trim()}
+          className = {styles.submitButton}
+        >
+          {loading ? ' Sending... ' : ' Send '}
+        </button>
+      </form>
+    </div>
+  );
+}

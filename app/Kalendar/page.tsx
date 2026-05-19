@@ -4,8 +4,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import "../css/Kalendar.css";
-import "../css/Dashboard.css";
+import "./css/Kalendar.css";
+import "./css/Dashboard.css";
 import Profile from "../components/Profile";
 import { User } from "../constants/profileConfig";
 
@@ -218,7 +218,7 @@ export default function KalendarPage() {
   };
 
   if (loading) {
-    return <div className="dashboard-container"><p>Loading...</p></div>;
+    return <div className = "dashboard-container"><p> Loading... </p></div>;
   }
 
   if (!user) {
@@ -226,56 +226,56 @@ export default function KalendarPage() {
   }
 
   return (
-    <div className="dashboard-layout-calendar" style={{ paddingRight: isChatOpen ? "460px" : "20px" }}>
+    <div className = "dashboard-layout-calendar" style = {{ paddingRight: isChatOpen ? "calc(min(35vw, 520px) + 32px)" : "20px" }}>
       {/* Верхня панель з логотипом і користувачем */}
-      <div className="topbar-cal">
-        <div className="logo-section">Calendar with Alex</div>
-        <button className="user-bubble-nav" onClick={() => setShowEditModal(true)}>
+      <div className = "topbar-cal">
+        <div className = "logo-section"> Calendar with Alex </div>
+        <button className = "user-bubble-nav" onClick =   {() => setShowEditModal(true)}>
           <span>{user.login}</span>
-          <div className="avatar-circle-nav">
+          <div className = "avatar-circle-nav">
             {user.avatar ? (
-              <Image src={user.avatar} alt="Avatar" width={40} height={40} className="knight.img" />
+              <Image src = {user.avatar} alt = "Avatar" width={40} height = {40} className = "knight.img" />
             ) : (
-              <div className="avatar-letter">{user.login.charAt(0).toUpperCase()}</div>
+              <div className = "avatar-letter">{user.login.charAt(0).toUpperCase()}</div>
             )}
           </div>
         </button>
       </div>
 
       {/* Панель дій */}
-      <div className="controls-row">
-        <button className="ctrl-btn yellow" onClick={() => openModal("Holiday")}>Add Date</button>
-        <button className="ctrl-btn" onClick={openEditNote}>Edit Note</button>
-        <button className={`ctrl-btn pink ${isDeleteMode ? "active-del" : ""}`} onClick={() => setIsDeleteMode((prev) => !prev)}>
+      <div className = "controls-row">
+        <button className = "ctrl-btn yellow" onClick = {() => openModal("Holiday")}> Add Date </button>
+        <button className = "ctrl-btn" onClick = {openEditNote}> Edit Note </button>
+        <button className = {`ctrl-btn pink ${isDeleteMode ? "active-del" : ""}`} onClick = {() => setIsDeleteMode((prev) => !prev)}>
           Delete Note
         </button>
-        <button className="ctrl-btn green" onClick={() => openModal("Note")}>Add Note</button>
-        <button className="ctrl-btn" onClick={() => setIsChatOpen((prev) => !prev)}>{isChatOpen ? "Close Chat" : "AI Chat"}</button>
+        <button className = "ctrl-btn green" onClick = {() => openModal("Note")}> Add Note </button>
+        <button className = "ctrl-btn" onClick = {() => setIsChatOpen((prev) => !prev)}>{isChatOpen ? "Close Chat" : "AI Chat"}</button>
       </div>
 
-      <div className="main-grid-cal">
+      <div className = "main-grid-cal">
         {/* Колонка фільтрів категорій */}
-        <div className="category-panel">
-          <div className="kategories-header">Kategories</div>
-          <button className="side-cat-btn" onClick={() => setSelectedCategory("all")}>All</button>
+        <div className = "category-panel">
+          <div className = "kategories-header"> Kategories </div>
+          <button className = "side-cat-btn" onClick = {() => setSelectedCategory("all")}> All </button>
           {CATEGORY_OPTIONS.map((cat) => (
-            <button key={cat} className="side-cat-btn" onClick={() => setSelectedCategory(cat)}>
+            <button key={cat} className = "side-cat-btn" onClick = {() => setSelectedCategory(cat)}>
               {cat}
             </button>
           ))}
         </div>
 
         {/* Календар */}
-        <div className="calendar-block">
-          <div className="month-picker">
-            <button className="month-arrow" onClick={() => changeMonth(-1)}>&lt;</button>
-            <div className="month-pill">{monthName} {year}</div>
-            <button className="month-arrow" onClick={() => changeMonth(1)}>&gt;</button>
+        <div className = "calendar-block">
+          <div className = "month-picker">
+            <button className = "month-arrow" onClick = {() => changeMonth(-1)}>&lt;</button>
+            <div className = "month-pill">{monthName} {year}</div>
+            <button className = "month-arrow" onClick = {() => changeMonth(1)}>&gt;</button>
           </div>
 
-          <div className="days-grid">
+          <div className = "days-grid">
             {WEEKDAYS.map((day) => (
-              <div key={day} className="grid-head-cell">{day}</div>
+              <div key={day} className = "grid-head-cell">{day}</div>
             ))}
             {calendarCells.map((cell, index) => {
               const isCurrentMonth = cell.offset === 0;
@@ -284,16 +284,16 @@ export default function KalendarPage() {
 
               return (
                 <div
-                  key={`${index}-${cell.day}-${cell.offset}`}
-                  className={`grid-cell ${!isCurrentMonth ? "grid-cell-inactive" : ""} ${isToday ? "today-highlight" : ""}`}
+                  key = {`${index}-${cell.day}-${cell.offset}`}
+                  className = {`grid-cell ${!isCurrentMonth ? "grid-cell-inactive" : ""} ${isToday ? "today-highlight" : ""}`}
                 >
-                  <div className="cell-top-row">
-                    <span className="cell-day-number">{cell.day}</span>
-                    {notesInCell.length > 0 && <span className="note-marker">{notesInCell.length}</span>}
+                  <div className = "cell-top-row">
+                    <span className = "cell-day-number">{cell.day}</span>
+                    {notesInCell.length > 0 && <span className = "note-marker">{notesInCell.length}</span>}
                   </div>
-                  <div className="cell-notes">
+                  <div className = "cell-notes">
                     {notesInCell.slice(0, 2).map((note) => (
-                      <div key={note.id} className={`cell-note-badge ${note.category.toLowerCase()}`}>
+                      <div key = {note.id} className = {`cell-note-badge ${note.category.toLowerCase()}`}>
                         {note.category}: {note.text}
                       </div>
                     ))}
@@ -305,16 +305,16 @@ export default function KalendarPage() {
         </div>
 
         {/* Інформація про Alex і нотатки */}
-        <div className="alex-profile">
-          <span>ALEX</span>
-          <div className="circle purple"></div>
-          <div style={{ marginTop: "20px", color: "white" }}>
-            <strong>Notes ({filteredNotes.length})</strong>
+        <div className = "alex-profile">
+          <span> ALEX </span>
+          <div className = "circle purple"></div>
+          <div style = {{ marginTop: "20px", color: "white" }}>
+            <strong> Notes ({filteredNotes.length})</strong>
             {filteredNotes.map((note) => (
               <button
-                key={note.id}
-                type="button"
-                onClick={() => handleNoteClick(note)}
+                key = {note.id}
+                type = "button"
+                onClick = {() => handleNoteClick(note)}
                 style={{
                   display: "block",
                   width: "100%",
@@ -337,48 +337,83 @@ export default function KalendarPage() {
 
       {/* Модальне вікно для нотаток */}
       {isNoteModalOpen && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content note-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header note-modal">
+        <div className = "modal-overlay" onClick = {closeModal}>
+          <div className = "modal-content note-modal" onClick = {(e) => e.stopPropagation()}>
+            <div className = "modal-header note-modal">
               <h2>{noteType === "Holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
-              <button className="modal-close note-modal" onClick={closeModal}>✕</button>
+              <button className = "modal-close note-modal" onClick = {closeModal}>✕</button>
             </div>
-            <div className="modal-body">
-              <label style={{ display: "block", marginBottom: "10px" }}>Text</label>
+            <div className = "modal-body">
+              <label style = {{
+                 display: "block",
+                  marginBottom: "10px" 
+                  }} > Text </label>
               <input
-                type="text"
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-                style={{ width: "100%", padding: "10px", marginBottom: "15px", borderRadius: "8px", border: "1px solid #ccc" }}
+                type = "text"
+                value = {noteText}
+                onChange = {(e) => setNoteText(e.target.value)}
+                style = {{
+                  width: "100%", 
+                  padding: "10px", 
+                  marginBottom: "15px", 
+                  borderRadius: "8px", 
+                  border: "1px solid #ccc" 
+                }}
               />
-              <label style={{ display: "block", marginBottom: "10px" }}>Date</label>
+              <label style = {{ 
+                display: "block", 
+                marginBottom: "10px" 
+                }} > Date </label>
               <input
-                type="date"
-                value={noteDate}
-                onChange={(e) => setNoteDate(e.target.value)}
-                style={{ width: "100%", padding: "10px", marginBottom: "15px", borderRadius: "8px", border: "1px solid #ccc" }}
+                type = "date"
+                value = {noteDate}
+                onChange = {(e) => setNoteDate(e.target.value)}
+                style = {{ 
+                  width: "100%", 
+                  padding: "10px", 
+                  marginBottom: "15px", 
+                  borderRadius: "8px", 
+                  border: "1px solid #ccc" 
+                }}
               />
-              <label style={{ display: "block", marginBottom: "10px" }}>Time</label>
+              <label style = {{ 
+                display: "block", 
+                marginBottom: "10px" 
+                }}> Time </label>
               <input
-                type="time"
-                value={noteTime}
-                onChange={(e) => setNoteTime(e.target.value)}
-                style={{ width: "100%", padding: "10px", marginBottom: "15px", borderRadius: "8px", border: "1px solid #ccc" }}
+                type = "time"
+                value = {noteTime}
+                onChange = {(e) => setNoteTime(e.target.value)}
+                style = {{ 
+                  width: "100%", 
+                  padding: "10px", 
+                  marginBottom: "15px", 
+                  borderRadius: "8px", 
+                  border: "1px solid #ccc" 
+                }}
               />
-              <label style={{ display: "block", marginBottom: "10px" }}>Category</label>
+              <label style = {{ 
+                display: "block", 
+                marginBottom: "10px" 
+                }}> Category </label>
               <select
-                value={noteCategory}
-                onChange={(e) => setNoteCategory(e.target.value)}
-                style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }}
+                value = {noteCategory}
+                onChange = {(e) => setNoteCategory(e.target.value)}
+                style = {{ 
+                  width: "100%", 
+                  padding: "10px", 
+                  borderRadius: "8px", 
+                  border: "1px solid #ccc" 
+                }}
               >
                 {CATEGORY_OPTIONS.map((category) => (
-                  <option key={category} value={category}>{category}</option>
+                  <option key = {category} value = {category}>{category}</option>
                 ))}
               </select>
             </div>
-            <div className="modal-footer">
-              <button className="modal-btn save-btn" onClick={handleSaveNote}>Save</button>
-              <button className="modal-btn cancel-btn" onClick={closeModal}>Cancel</button>
+            <div className = "modal-footer">
+              <button className = "modal-btn save-btn" onClick = {handleSaveNote}> Save </button>
+              <button className = "modal-btn cancel-btn" onClick = {closeModal}> Cancel </button>
             </div>
           </div>
         </div>
@@ -386,30 +421,30 @@ export default function KalendarPage() {
 
       {/* Чат ШІ */}
       {isChatOpen && (
-        <div className="ai-chat-box">
-          <div className="chat-top">
-            <span>Chat with Alex</span>
-            <button className="chat-close-btn" onClick={() => setIsChatOpen(false)}>✕</button>
+        <div className = "ai-chat-box">
+          <div className = "chat-top">
+            <span> Chat with Alex </span>
+            <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
           </div>
-          <div className="chat-mid">
+          <div className = "chat-mid">
             {chatMessages.length === 0 ? (
-              <div className="ai-text">Welcome, {user.login}! Ask something...</div>
+              <div className = "ai-text"> Welcome, {user.login}! Ask something... </div>
             ) : (
               chatMessages.map((message) => (
-                <div key={message.id} className={`chat-message ${message.sender}`}>
-                  <span className="message-sender">{message.sender === "user" ? "You" : "Alex"}</span>
+                <div key = {message.id} className = {`chat-message ${message.sender}`}>
+                  <span className = "message-sender">{message.sender === "user" ? "You" : "Alex"}</span>
                   <p>{message.text}</p>
                 </div>
               ))
             )}
           </div>
-          <div className="chat-bottom">
+          <div className = "chat-bottom">
             <input
-              className="ai-input"
-              placeholder="Ask something..."
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => {
+              className = "ai-input"
+              placeholder = "Ask something..."
+              value = {chatInput}
+              onChange = {(e) => setChatInput(e.target.value)}
+              onKeyDown = {(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   if (chatInput.trim()) {
@@ -423,9 +458,9 @@ export default function KalendarPage() {
               }}
             />
             <button
-              className="send-message-btn"
-              type="button"
-              onClick={() => {
+              className = "send-message-btn"
+              type = "button"
+              onClick = {() => {
                 if (!chatInput.trim()) return;
                 setChatMessages((prev) => [
                   ...prev,
@@ -443,15 +478,15 @@ export default function KalendarPage() {
       {/* Редагування профілю */}
       {showEditModal && (
         <Profile
-          user={user}
-          onClose={() => {
+          user = {user}
+          onClose = {() => {
             setShowEditModal(false);
             const userStr = localStorage.getItem("user");
             if (userStr) {
               setUser(JSON.parse(userStr));
             }
           }}
-          isOpen={showEditModal}
+          isOpen = {showEditModal}
         />
       )}
     </div>

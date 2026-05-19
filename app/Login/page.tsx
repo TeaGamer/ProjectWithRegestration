@@ -3,8 +3,8 @@
 // Компонент сторінки логіну/реєстрації, що рендериться на клієнті
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import "../css/Login.css";
-import { UKRAINIAN_REGIONS } from "../constants/profileConfig";
+import ".../css/Login.css";
+import { UKRAINIAN_REGIONS } from ".../constants/profileConfig";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
 
 export default function LoginPage() {
@@ -241,18 +241,18 @@ export default function LoginPage() {
     // Повернення JSX елемента для рендерингу компонента
     return (
         // Основний контейнер сторінки логіну
-        <div className="login-container">
+        <div className = "login-container">
             {/* Форма логіну з вкладками */}
-            <div className="login-form-wrapper">
-            <div className="login-form-header">
+            <div className = "login-form-wrapper">
+            <div className = "login-form-header">
                 <h1>{isLogin ? "Welcome Back" : "Create Your Account"}</h1>
                 <p>{isLogin ? "Sign in to access your calendar and dashboard." : "Register to manage your calendar and profile."}</p>
             </div>
             {/* Tabs */}
-            <div className="tabs">
+            <div className = "tabs">
                     <button
-                        className={`tab-btn ${isLogin ? "active" : ""}`}
-                        onClick={() => {
+                        className = {`tab-btn ${isLogin ? "active" : ""}`}
+                        onClick = {() => {
                             setIsLogin(true);
                             setError("");
                             setSuccess("");
@@ -261,8 +261,8 @@ export default function LoginPage() {
                         Log In
                     </button>
                     <button
-                        className={`tab-btn ${!isLogin ? "active" : ""}`}
-                        onClick={() => {
+                        className = {`tab-btn ${!isLogin ? "active" : ""}`}
+                        onClick = {() => {
                             setIsLogin(false);
                             setError("");
                             setSuccess("");
@@ -272,58 +272,58 @@ export default function LoginPage() {
                     </button>
                 </div>
 
-                {error && <div className="error-message">{error}</div>}
-                {success && <div className="success-message">{success}</div>}
+                {error && <div className = "error-message">{error}</div>}
+                {success && <div className = "success-message">{success}</div>}
 
                 {/* Login Form */}
                 {isLogin && (
                     // Відображення форми логіну, якщо обрана вкладка Log In
-                    <div className="form-container">
+                    <div className = "form-container">
                         <h2>Log In</h2>
-                        <form className="login-form" onSubmit={handleLoginSubmit}>
+                        <form className = "login-form" onSubmit={handleLoginSubmit}>
                             <input
-                                name="email"
-                                placeholder="Email"
-                                type="email"
-                                value={loginData.email}
-                                onChange={handleLoginChange}
-                                autoComplete="email"
+                                name = "email"
+                                placeholder = "Email"
+                                type = "email"
+                                value = {loginData.email}
+                                onChange = {handleLoginChange}
+                                autoComplete = "email"
                                 required
                             />
 
-                            <div className="password-input-wrapper">
+                            <div className = "password-input-wrapper">
                                 <input
-                                    name="password"
-                                    type={showLoginPassword ? "text" : "password"}
-                                    placeholder="Password"
-                                    value={loginData.password}
-                                    onChange={handleLoginChange}
-                                    autoComplete="current-password"
+                                    name = "password"
+                                    type = {showLoginPassword ? "text" : "password"}
+                                    placeholder = "Password"
+                                    value = {loginData.password}
+                                    onChange = {handleLoginChange}
+                                    autoComplete = "current-password"
                                     required
                                 />
                                 <button
-                                    type="button"
-                                    onClick={() => setShowLoginPassword(!showLoginPassword)}
-                                    className="password-toggle-btn"
-                                    aria-label="Toggle password visibility"
+                                    type = "button"
+                                    onClick = {() => setShowLoginPassword(!showLoginPassword)}
+                                    className = "password-toggle-btn"
+                                    aria-label= "Toggle password visibility"
                                 >
                                     {showLoginPassword ? "1" : "0"}
                                 </button>
                             </div>
 
-                            <label className="checkbox-label">
+                            <label className = "checkbox-label">
                                 <input
-                                    type="checkbox"
-                                    name="remember"
-                                    checked={loginData.remember}
-                                    onChange={handleLoginChange}
+                                    type = "checkbox"
+                                    name = "remember"
+                                    checked = {loginData.remember}
+                                    onChange = {handleLoginChange}
                                 />
                                 {" "}Remember me
                             </label>
 
                             <button
-                                type="submit"
-                                className="submit-btn"
+                                type = "submit"
+                                className = "submit-btn"
                                 onMouseMove={(e) => {
                                     if (!loginData.email.trim() || !loginData.password.trim()) {
                                         const btn = e.currentTarget;
@@ -359,103 +359,103 @@ export default function LoginPage() {
                 {/* Register Form */}
                 {!isLogin && (
                     // Відображення форми реєстрації, якщо активна вкладка Register
-                    <div className="form-container">
+                    <div className = "form-container">
                         <h2>Create Account</h2>
-                        <form className="login-form" onSubmit={handleRegisterSubmit}>
+                        <form className = "login-form" onSubmit={handleRegisterSubmit}>
                             <input
-                                name="login"
-                                placeholder="Username"
-                                type="text"
-                                value={registerData.login}
-                                onChange={handleRegisterChange}
+                                name = "login"
+                                placeholder = "Username"
+                                type = "text"
+                                value = {registerData.login}
+                                onChange = {handleRegisterChange}
                                 required
                             />
 
                             <input
-                                name="email"
-                                placeholder="Email"
-                                type="email"
-                                value={registerData.email}
-                                onChange={handleRegisterChange}
+                                name = "email"
+                                placeholder = "Email"
+                                type = "email"
+                                value = {registerData.email}
+                                onChange = {handleRegisterChange}
                                 required
                             />
 
                             <input
-                                name="first_name"
-                                placeholder="First Name"
-                                type="text"
-                                value={registerData.first_name}
-                                onChange={handleRegisterChange}
+                                name = "first_name"
+                                placeholder = "First Name"
+                                type = "text"
+                                value = {registerData.first_name}
+                                onChange = {handleRegisterChange}
                             />
 
                             <input
-                                name="last_name"
-                                placeholder="Last Name"
-                                type="text"
-                                value={registerData.last_name}
-                                onChange={handleRegisterChange}
+                                name = "last_name"
+                                placeholder = "Last Name"
+                                type = "text"
+                                value = {registerData.last_name}
+                                onChange = {handleRegisterChange}
                             />
 
-                            <div className="password-input-wrapper">
+                            <div className = "password-input-wrapper">
                                 <input
                                     name="password"
-                                    type={showRegisterPassword ? "text" : "password"}
+                                    type = {showRegisterPassword ? "text" : "password"}
                                     placeholder="Password"
-                                    value={registerData.password}
-                                    onChange={handleRegisterChange}
-                                    id="pwd"
+                                    value = {registerData.password}
+                                    onChange = {handleRegisterChange}
+                                    id = "pwd"
                                     required
                                 />
                                 <button
-                                    type="button"
-                                    onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                                    className="password-toggle-btn"
-                                    aria-label="Перемкнути видимість пароля"
+                                    type = "button"
+                                    onClick = {() => setShowRegisterPassword(!showRegisterPassword)}
+                                    className = "password-toggle-btn"
+                                    aria-label = "Перемкнути видимість пароля"
                                 >
                                     {showRegisterPassword ? "1" : "0"}
                                 </button>
                             </div>
 
                             <input
-                                name="confirmPassword"
-                                type="password"
-                                placeholder="Confirm Password"
-                                value={registerData.confirmPassword}
-                                onChange={handleRegisterChange}
+                                name = "confirmPassword"
+                                type = "password"
+                                placeholder = "Confirm Password"
+                                value = {registerData.confirmPassword}
+                                onChange = {handleRegisterChange}
                                 required
                             />
 
                             <select
-                                name="region"
-                                value={registerData.region}
-                                onChange={handleRegisterChange}
+                                name = "region"
+                                value = {registerData.region}
+                                onChange = {handleRegisterChange}
                             >
                                 {UKRAINIAN_REGIONS.map((region) => (
-                                    <option key={region} value={region}>
+                                    <option key = {region} value = {region}>
                                         {region}
                                     </option>
                                 ))}
                             </select>
 
-                            <label className="checkbox-label">
+                            <label className = "checkbox-label">
                                 {/* Прапорець згоди з умовами використання перед реєстрацією */}
                                 <input
-                                    type="checkbox"
-                                    name="agreedToTerms"
-                                    checked={registerData.agreedToTerms}
-                                    onChange={handleRegisterChange}
+                                    type = "checkbox"
+                                    name = "agreedToTerms"
+                                    checked = {registerData.agreedToTerms}
+                                    onChange = {handleRegisterChange}
                                 />
                                 {" "}I agree to the{" "}
                                 <button
-                                    type="button"
-                                    className="terms-link"
-                                    onClick={() => setShowTermsModal(true)}
+                                    type = "button"
+                                    className = "terms-link"
+                                    onClick = {() => setShowTermsModal(true)}
                                 >
                                     Terms of Service
                                 </button>
                             </label>
 
-                            <button type="submit" className="submit-btn">
+                            <button type = "submit" className = "submit-btn">
                                 Register
                             </button>
                         </form>
@@ -465,18 +465,18 @@ export default function LoginPage() {
                 {/* Terms Modal */}
                 {showTermsModal && (
                     // Модальне вікно з текстом умов використання
-                    <div className="modal-overlay" onClick={() => setShowTermsModal(false)}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <div className="modal-header">
+                    <div className = "modal-overlay" onClick = {() => setShowTermsModal(false)}>
+                        <div className = "modal-content" onClick = {(e) => e.stopPropagation()}>
+                            <div className = "modal-header">
                                 <h3>Terms of Service</h3>
                             </div>
-                            <div className="modal-body">
+                            <div className = "modal-body">
                                 <pre>{termsAndConditionsText}</pre>
                             </div>
-                            <div className="modal-footer">
+                            <div className = "modal-footer">
                                 <button
-                                    className="modal-btn"
-                                    onClick={() => setShowTermsModal(false)}
+                                    className = "modal-btn"
+                                    onClick = {() => setShowTermsModal(false)}
                                 >
                                     Close
                                 </button>
