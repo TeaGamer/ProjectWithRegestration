@@ -104,7 +104,7 @@ export default function LoginPage() {
 
                 setTimeout(() => {
                     router.push("/Dashboard");
-                }, 700);
+                }, 300);
             } else {
                 setError(data.error || "Invalid email or password!");
             }
