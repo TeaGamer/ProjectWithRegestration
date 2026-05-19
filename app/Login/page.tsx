@@ -96,6 +96,8 @@ export default function LoginPage() {
                 if (data.user) {
                     localStorage.setItem("user", JSON.stringify(data.user));
                 }
+                
+                localStorage.setItem("token", data.token);
 
                 const maxAge = loginData.remember ? "; max-age=86400" : "";
                 document.cookie = `token=${data.token}; path=/${maxAge}`;
