@@ -1,5 +1,5 @@
-
 "use client";
+
 // Імпорт необхідних хуків та компонентів для сторінки календаря
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";

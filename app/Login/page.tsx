@@ -103,7 +103,7 @@ export default function LoginPage() {
                 document.cookie = `token=${data.token}; path=/${maxAge}`;
 
                 setTimeout(() => {
-                    router.push("/kalendar");
+                    router.push("/dashboard");
                 }, 700);
             } else {
                 setError(data.error || "Invalid email or password!");
