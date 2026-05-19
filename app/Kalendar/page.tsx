@@ -479,6 +479,19 @@ export default function KalendarPage() {
       )}
 
       {/* Редагування профілю */}
+      {showEditModal && (
+        <Profile
+          user = {user}
+          onClose = {() => {
+            setShowEditModal(false);
+            const userStr = localStorage.getItem("user");
+            if (userStr) {
+              setUser(JSON.parse(userStr));
+            }
+          }}
+          isOpen = {showEditModal}
+        />
+      )}
     </div>
   );
 }
