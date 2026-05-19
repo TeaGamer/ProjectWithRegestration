@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
 
     // Верифікуємо токен з бекенд API
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:10000';
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
       const verifyResponse = await fetch(`${apiBase}/api/verify-token`, {
         method: 'POST',
         headers: {

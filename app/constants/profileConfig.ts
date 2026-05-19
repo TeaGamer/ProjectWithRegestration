@@ -38,4 +38,4 @@ export const UKRAINIAN_REGIONS = [
     "Zhytomyr",
 ];
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:10000";
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";

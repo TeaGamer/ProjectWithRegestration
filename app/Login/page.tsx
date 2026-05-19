@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "../css/Login.css";
 import { UKRAINIAN_REGIONS } from "../constants/profileConfig";
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 export default function LoginPage() {
     // Прапорці, які керують формою та її станом
