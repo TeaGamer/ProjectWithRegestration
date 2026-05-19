@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import Profile from "../components/Profile";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
-import Profile from "../components/Profile";
 
 // Інтерфейс для нотатки в календарі
 interface Note {
