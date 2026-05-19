@@ -1,5 +1,5 @@
-
 "use client";
+
 // Імпорт необхідних хуків та компонентів для сторінки календаря
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Profile from "../components/Profile";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
+import Profile from "../components/Profile";
 
 // Інтерфейс для нотатки в календарі
 interface Note {
@@ -53,6 +54,8 @@ export default function KalendarPage() {
   const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
   // Поточна дата для календаря
   const [currentDate, setCurrentDate] = useState(new Date());
+  // Стан для відкриття модального вікна редагування профілю
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // useEffect для завантаження збереженого користувача без примусової захищеної перевірки
   useEffect(() => {
@@ -243,6 +246,7 @@ export default function KalendarPage() {
           Delete Note
         </button>
         <button className = "ctrl-btn green" onClick = {() => openModal("Note")}> Add Note </button>
+        <button className = "ctrl-btn" onClick = {() => setShowEditModal(true)}> Edit Profile </button>
         <button className = "ctrl-btn" onClick = {() => setIsChatOpen((prev) => !prev)}>{isChatOpen ? "Close Chat" : "AI Chat"}</button>
       </div>
 

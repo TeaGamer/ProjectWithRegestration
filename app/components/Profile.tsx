@@ -3,8 +3,8 @@
 
 // Модальний компонент для редагування профілю користувача
 import { useState, useEffect } from "react";
-import { User, UKRAINIAN_REGIONS, API_BASE } from "./constants/profileConfig";
-import style from "./css/Profile.css";
+import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
+import style from "../css/Profile.css";
 
 // Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки
 interface ProfileProps {

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "../css/Login.css";
 import { UKRAINIAN_REGIONS } from "../constants/profileConfig";
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 export default function LoginPage() {
     // Прапорці, які керують формою та її станом
@@ -15,7 +15,7 @@ export default function LoginPage() {
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
     useEffect(() => {
-        // Закриваємо модалку з правилами при натисканні Escape
+        // Закриваємо при натисканні Escape
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === "Escape" && showTermsModal) {
                 setShowTermsModal(false);
@@ -91,18 +91,23 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (response.ok) {
+                // Валідація: обидва поля мають бути присутні
+                if (!data.token || !data.user) {
+                    setError("Server error: invalid response. Please try again.");
+                    return;
+                }
+
                 setSuccess("Successfully logged in! Redirecting...");
 
-                if (data.user) {
-                    localStorage.setItem("user", JSON.stringify(data.user));
-                }
+                localStorage.setItem("user", JSON.stringify(data.user));
+                localStorage.setItem("token", data.token);
 
                 const maxAge = loginData.remember ? "; max-age=86400" : "";
                 document.cookie = `token=${data.token}; path=/${maxAge}`;
 
                 setTimeout(() => {
-                    router.push("/Kalendar");
-                }, 700);
+                    router.push("/Dashboard");
+                }, 300);
             } else {
                 setError(data.error || "Invalid email or password!");
             }
