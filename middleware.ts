@@ -53,12 +53,13 @@ export async function middleware(request: NextRequest) {
         },
       });
 
-      if (!verifyResponse.ok) {
-        // Токен невалідний на бекенді
+      if (verifyResponse.status === 401 || verifyResponse.status === 403) {
+        // Токен явно відхилений бекендом
         const response = NextResponse.redirect(new URL('/Login', request.url));
         response.cookies.delete('token');
         return response;
       }
+      // При 404 або інших помилках (endpoint недоступний) — пропускаємо запит
     } catch (error) {
       // Якщо не можна з'єднатися з бекенд API, дозволяємо запит
       // але логуємо помилку для діагностики
