@@ -3,12 +3,8 @@
 // Компонент сторінки логіну/реєстрації, що рендериться на клієнті
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import "./css/Login.css";
-<<<<<<< HEAD
-import { UKRAINIAN_REGIONS } from "./constants/profileConfig";
-=======
+import "../css/Login.css";
 import { UKRAINIAN_REGIONS } from "../constants/profileConfig";
->>>>>>> c0f6cad751f7247f728fc021133f4c8e95c82afb
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:100000";
 
 export default function LoginPage() {

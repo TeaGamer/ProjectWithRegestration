@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import './css/Global.css';
+import '../css/Global.css';
 
 // Головна сторінка додатку з презентацією проекту
 export default function Home() {
@@ -30,7 +30,7 @@ export default function Home() {
           </div>
           <h2 className = "ai-name">Alex</h2>
           {/* Посилання на сторінку логіну */}
-          <Link href="/Login" className = "login-bubble-btn">
+          <Link href = "/Login" className = "login-bubble-btn">
             Login
           </Link>
         </div>

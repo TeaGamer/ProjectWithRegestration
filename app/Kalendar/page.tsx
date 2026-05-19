@@ -4,8 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import "./css/Kalendar.css";
-import "./css/Dashboard.css";
+import "../css/Kalendar.css";
 import Profile from "../components/Profile";
 import { User } from "../constants/profileConfig";
 

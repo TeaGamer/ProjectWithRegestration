@@ -2,9 +2,9 @@
 
 // Цей компонент виконується на клієнтській стороні і взаємодіє з localStorage
 import { useState, useEffect } from "react";
-import "./css/Dashboard.css";
-import Profile from "./components/Profile";
-import { User } from "./constants/profileConfig";
+import "../css/Dashboard.css";
+import Profile from "../components/Profile";
+import { User } from "../constants/profileConfig";
 
 export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
     // Стан користувача і додаткові прапорці для інтерфейсу
