@@ -15,7 +15,7 @@ export default function LoginPage() {
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
     useEffect(() => {
-        // Закриваємо модалку з правилами при натисканні Escape
+        // Закриваємо при натисканні Escape
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === "Escape" && showTermsModal) {
                 setShowTermsModal(false);
