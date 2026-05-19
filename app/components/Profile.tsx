@@ -4,7 +4,6 @@
 // Модальний компонент для редагування профілю користувача
 import { useState, useEffect } from "react";
 import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
-import Modal from "./Modal";
 import "../css/Profile.css";
 
 // Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки
@@ -33,6 +32,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
 
     // Обробник змін полів форми редагування профілю
     const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        // Оновлюємо локальний стан editData при зміні будь-якого поля форми
         const { name, value } = e.target;
         setEditData({
             ...editData,
@@ -94,14 +94,14 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
     };
 
     return (
-        // Фонова накладка модального вікна викликає onClose при натисканні поза вікном
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay" onClick={handleClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2>Edit Profile</h2>
-                    <button 
+                    <button
+                        type="button"
                         className="modal-close"
-                        onClick={onClose}
+                        onClick={handleClose}
                     >
                         ✕
                     </button>

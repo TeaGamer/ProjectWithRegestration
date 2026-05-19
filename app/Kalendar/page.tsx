@@ -4,8 +4,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import "../css/kalendar.css";
-import "../css/dashboard.css";
+import "../css/Kalendar.css";
+import "../css/Dashboard.css";
 import Profile from "../components/Profile";
 import { User } from "../constants/profileConfig";
 
@@ -39,7 +39,7 @@ export default function KalendarPage() {
   // Стан для модального вікна нотатки
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   // Тип нотатки: нотатка або свято
-  const [noteType, setNoteType] = useState<"note" | "holiday">("note");
+  const [noteType, setNoteType] = useState<"Note" | "Holiday">("Note");
   // Текст нотатки
   const [noteText, setNoteText] = useState("");
   // Дата нотатки
@@ -62,10 +62,10 @@ export default function KalendarPage() {
     // Отримання даних користувача з localStorage
     const userStr = localStorage.getItem("user");
 
-    // Авторизація перевіряється в middleware.ts через HttpOnly cookie
-    // Якщо немає даних користувача, перенаправлення на логін
-    if (!userStr) {
-      router.push("/login");
+    // Якщо немає токена або даних користувача, перенаправлення на логін
+    const token = localStorage.getItem("token");
+    if (!token || !userStr) {
+      router.push("/Login");
       return;
     }
 
@@ -75,7 +75,7 @@ export default function KalendarPage() {
       setUser(userData);
     } catch (error) {
       console.error("Error parsing user data:", error);
-      router.push("/login");
+      router.push("/Login");
     } finally {
       setLoading(false);
     }
@@ -148,9 +148,9 @@ export default function KalendarPage() {
     return { day: index - shift - daysInMonth + 1, offset: 1 };
   });
 
-  const openModal = (type: "note" | "holiday") => {
+  const openModal = (type: "Note" | "Holiday") => {
     setNoteType(type);
-    setNoteCategory(type === "holiday" ? "Holiday" : "Meeting");
+    setNoteCategory(type === "Holiday" ? "Holiday" : "Meeting");
     setNoteText("");
     setNoteDate("");
     setNoteTime("");
@@ -160,14 +160,14 @@ export default function KalendarPage() {
 
   const openEditNote = () => {
     if (selectedNote) {
-      setNoteType("note");
+      setNoteType("Note");
       setNoteCategory(selectedNote.category);
       setNoteDate(selectedNote.date);
       setNoteTime(selectedNote.time);
       setNoteText(selectedNote.text);
       setIsNoteModalOpen(true);
     } else {
-      openModal("note");
+      openModal("Note");
     }
   };
 
@@ -244,12 +244,12 @@ export default function KalendarPage() {
 
       {/* Панель дій */}
       <div className="controls-row">
-        <button className="ctrl-btn yellow" onClick={() => openModal("holiday")}>Add Date</button>
+        <button className="ctrl-btn yellow" onClick={() => openModal("Holiday")}>Add Date</button>
         <button className="ctrl-btn" onClick={openEditNote}>Edit Note</button>
         <button className={`ctrl-btn pink ${isDeleteMode ? "active-del" : ""}`} onClick={() => setIsDeleteMode((prev) => !prev)}>
           Delete Note
         </button>
-        <button className="ctrl-btn green" onClick={() => openModal("note")}>Add Note</button>
+        <button className="ctrl-btn green" onClick={() => openModal("Note")}>Add Note</button>
         <button className="ctrl-btn" onClick={() => setIsChatOpen((prev) => !prev)}>{isChatOpen ? "Close Chat" : "AI Chat"}</button>
       </div>
 
@@ -340,7 +340,7 @@ export default function KalendarPage() {
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content note-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header note-modal">
-              <h2>{noteType === "holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
+              <h2>{noteType === "Holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
               <button className="modal-close note-modal" onClick={closeModal}>✕</button>
             </div>
             <div className="modal-body">

@@ -7,7 +7,7 @@
     justify-content: center;
     align-items: center;
     padding: 30px;
-    background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+    background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #f8fafc;
     position: relative;
@@ -86,6 +86,7 @@
     display: flex;
     gap: 12px;
     padding: 24px 32px 20px;
+    justify-content: center;
 }
 
 .tab-btn {
@@ -98,6 +99,7 @@
     font-weight: 700;
     cursor: pointer;
     transition: all 0.25s ease;
+    text-align: center;
 }
 
 .tab-btn.active {
@@ -116,6 +118,16 @@
 .form-container {
     padding: 0 32px 32px;
     animation: slideIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-container h2 {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 18px;
+    color: #f8fafc;
 }
 
 @keyframes slideIn {
@@ -133,11 +145,16 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
+    max-width: 520px;
 }
 
 .login-form input[type="text"],
+
 .login-form input[type="password"],
+
 .login-form input[type="email"],
+
 .login-form select {
     width: 100%;
     padding: 14px 16px;
@@ -160,6 +177,17 @@
     border-color: #ff1493;
     background: rgba(255, 255, 255, 0.12);
     box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+}
+
+.login-form select {
+    background: #ffffff;
+    color: #111111;
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+.login-form option {
+    background: #ffffff;
+    color: #111111;
 }
 
 .password-input-wrapper {
@@ -194,10 +222,12 @@
 .checkbox-label {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     color: rgba(241, 245, 249, 0.9);
     font-size: 0.95rem;
     margin-top: 4px;
+    text-align: center;
 }
 
 .checkbox-label input {
@@ -321,4 +351,3 @@
         gap: 8px;
     }
 }
-

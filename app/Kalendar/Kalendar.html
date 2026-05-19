@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<!-- HTML сторінка для календаря Alex: головна розмітка, кнопки та модальні вікна -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendar with Alex</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Заголовок сторінки з логотипом та бульбашкою користувача -->
+    <div class="container">
+        <header>
+            <div class="logo-box">Calendar with Alex</div>
+            <!-- Бульбашка користувача з аватаром та ім'ям -->
+            <div class="user-bubble" onclick="editProfile()">
+                <span id="userName">Олександр</span>
+                <div class="avatar" id="userAvatar" style="background-image: url('/knight.png')"></div>
+            </div>
+        </header>
+
+        <!-- Панель керування: додавання, редагування та видалення нотаток -->
+        <div class="controls">
+            <button class="btn-text blue-t" onclick="openModal('Holiday')">Add Date</button>
+            <button class="btn-text yellow-t" onclick="openModal('Note')">Edit Note</button>
+            <button class="btn-text pink-t" onclick="toggleDeleteMode()">Delete Note</button>
+            <button class="btn-text green-t" onclick="openModal('Note')">Add Note</button>
+        </div>
+
+        <!-- Основний вміст: бокова панель та календарна сітка -->
+        <main class="main-content">
+            <!-- Бокова панель з фільтрацією категорій нотаток -->
+            <aside class="sidebar">
+                <div class="category-header">Kategories</div>
+                <button class="cat-btn" onclick="filterCategory('all')">All</button>
+                <button class="cat-btn" onclick="filterCategory('Meeting')">Meeting</button>
+                <button class="cat-btn" onclick="filterCategory('Birthday')">Birthday</button>
+                <button class="cat-btn" onclick="filterCategory('Holiday')">Holiday</button>
+                <button class="cat-btn" onclick="filterCategory('Event')">Event</button>
+            </aside>
+
+            <!-- Секція календаря з навігацією та сіткою -->
+            <section class="calendar-section">
+                <div class="calendar-nav">
+                    <button class="nav-arrow" onclick="changeMonth(-1)">&lt;</button>
+                    <h2 id="monthDisplay">January 2024</h2>
+                    <button class="nav-arrow" onclick="changeMonth(1)">&gt;</button>
+                </div>
+                <div id="calendarGrid" class="calendar-grid">
+                    </div>
+            </section>
+
+            <!-- Профіль AI Alex -->
+            <div class="alex-profile">
+                <span>ALEX</span>
+                <div class="circle purple"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Модальне вікно для створення або редагування нотатки -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">New Note</h3>
+            <input type="text" id="noteText" placeholder="Note text">
+            <input type="date" id="noteDate">
+            <input type="time" id="noteTime">
+            <select id="noteCategory">
+                <option value="Meeting">Meeting</option>
+                <option value="Birthday">Birthday</option>
+                <option value="Holiday">Holiday</option>
+                <option value="Event">Event</option>
+            </select>
+            <div class="modal-buttons">
+                <button onclick="saveNote()">OK</button>
+                <button onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Скрипт, що читає логін користувача з localStorage і вставляє його у заголовок -->
+    <script>
+        // Завантаження імені користувача з localStorage для відображення в календарі
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                const userNameElement = document.getElementById('userName');
+                if (userNameElement) {
+                    userNameElement.textContent = user.login || 'User';
+                }
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+            }
+        }
+    </script>
+
+    <!-- Підключення JS-коду, який відповідає за логіку календаря та обробку подій -->
+    <script src="script.js"></script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 // Цей компонент виконується на клієнтській стороні і взаємодіє з localStorage
 import { useState, useEffect } from "react";
-import "../css/dashboard.css";
+import "../css/Dashboard.css";
 import Profile from "../components/Profile";
 import { User } from "../constants/profileConfig";
 
@@ -15,12 +15,12 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
 
     useEffect(() => {
         // При першому рендері читаємо дані користувача з localStorage
+        const token = localStorage.getItem("token");
         const userStr = localStorage.getItem("user");
 
-        if (!userStr) {
-            // Якщо немає даних користувача, переходимо на сторінку входу
-            // ПРИМІТКА: Авторизація перевіряється в middleware.ts через cookie
-            window.location.href = "/login";
+        if (!token || !userStr) {
+            // Якщо немає авторизаційних даних, то переходимо на сторінку входу
+            window.location.href = "/Login";
             return;
         }
 
@@ -30,7 +30,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
         } catch (e) {
             // Якщо дані пошкоджені, видаляємо їх і повертаємось на логін
             console.error("Error parsing user data:", e);
-            window.location.href = "/login";
+            window.location.href = "/Login";
         } finally {
             setLoading(false);
         }
@@ -40,7 +40,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
         // Видаляємо дані користувача при виході
         // Токен видаляється на бекенді через HttpOnly cookie
         localStorage.removeItem("user");
-        window.location.href = "/login";
+        window.location.href = "/Login";
     };
 
     if (loading) {
@@ -52,7 +52,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
     }
 
     return (
-        <div className="dashboard-layout">
+        <div className="Dashboard-layout">
             {/* Topbar: верхня панель з назвою та інформацією про користувача */}
             <div className="topbar">
                 <div className="topbar-left">
@@ -150,7 +150,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
             )}
 
             {/* Main Content */}
-            <div className="dashboard-container">
+            <div className="Dashboard-container">
                 <div className="welcome-message">
                     <h2>Welcome, {user.first_name || user.login}!</h2>
                     <p>You have successfully logged in.</p>
