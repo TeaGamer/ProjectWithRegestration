@@ -93,11 +93,11 @@ export default function LoginPage() {
             if (response.ok) {
                 // Валідація: обидва поля мають бути присутні
                 if (!data.token || !data.user) {
-                    setError("Server error: invalid response. Please try again.");
+                    setError(" Server error: invalid response. Please try again.");
                     return;
                 }
 
-                setSuccess("Successfully logged in! Redirecting...");
+                setSuccess(" Successfully logged in! Redirecting...");
 
                 localStorage.setItem("user", JSON.stringify(data.user));
                 localStorage.setItem("token", data.token);
@@ -106,14 +106,12 @@ export default function LoginPage() {
                 const isSecure = location.protocol === "https:" ? "; Secure" : "";
                 document.cookie = `token=${data.token}; path=/; SameSite=Strict${isSecure}${maxAge}`;
 
-                setTimeout(() => {
-                    router.push("/Kalendar");
-                }, 300);
+                setTimeout((): void => {router.push("/Kalendar")}, 200);
             } else {
                 setError(data.error || "Invalid email or password!");
             }
         } catch {
-            setError("Connection error. Please try again.");
+            setError(" Connection error. Please try again. ");
         }
     };
 
@@ -124,12 +122,12 @@ export default function LoginPage() {
 
         // Перевіряємо, що користувач погодився з правилами перед реєстрацією
         if (!registerData.agreedToTerms) {
-            setError("You must accept the Terms of Service!");
+            setError(" You must accept the Terms of Service! ");
             return;
         }
 
         if (!registerData.email || !registerData.email.includes("@")) {
-            setError("Enter a valid email!");
+            setError(" Enter a valid email! ");
             return;
         }
 
@@ -139,12 +137,12 @@ export default function LoginPage() {
         }
 
         if (registerData.password.length < 6) {
-            setError("Password must be at least 6 characters long!");
+            setError(" Password must be at least 6 characters long! ");
             return;
         }
 
         if (!registerData.login.trim()) {
-            setError("Enter a username!");
+            setError(" Enter a username! ");
             return;
         }
 
@@ -167,7 +165,7 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (response.ok) {
-                setSuccess("Registration successful! Redirecting to login...");
+                setSuccess(" Registration successful! Redirecting to login... ");
                 setRegisterData({
                     login: "",
                     email: "",
@@ -183,16 +181,18 @@ export default function LoginPage() {
                     setSuccess("");
                 }, 1500);
             } else {
-                setError(data.error || "Registration error. This email may already be registered.");
+                setError(data.error || " Registration error. This email may already be registered. ");
             }
         } catch {
-            setError("Connection error. Please try again later.");
+            setError(" Connection error. Please try again later. ");
             // Логування деталей тільки в консоль для розробників
-            console.error("Backend connection failed. Check if API server is running.");
+            console.error(" Backend connection failed. Check if API server is running. ");
         }
     };
 
     const termsAndConditionsText = `
+
+
 
     TERMS OF USE FOR THE ALEX SERVICE
 
@@ -249,6 +249,7 @@ export default function LoginPage() {
 
     Translated with DeepL.com (free version)
 
+
     `.trim();
 
     // Повернення JSX елемента для рендерингу компонента
@@ -259,7 +260,7 @@ export default function LoginPage() {
             <div className = "login-form-wrapper">
             <div className = "login-form-header">
                 <h1>{isLogin ? "Welcome Back" : "Create Your Account"}</h1>
-                <p>{isLogin ? "Sign in to access your calendar and dashboard." : "Register to manage your calendar and profile."}</p>
+                <p>{isLogin ? " Sign in to access your calendar and dashboard. " : " Register to manage your calendar and profile. "}</p>
             </div>
             {/* Tabs */}
             <div className = "tabs">
@@ -285,13 +286,13 @@ export default function LoginPage() {
                     </button>
                 </div>
 
-                {error && <div className = "error-message">{error}</div>}
-                {success && <div className = "success-message">{success}</div>}
+                {error && <div className = " error-message ">{error}</div>}
+                {success && <div className = " success-message ">{success}</div>}
 
                 {/* Login Form */}
                 {isLogin && (
                     // Відображення форми логіну, якщо обрана вкладка Log In
-                    <div className = "form-container">
+                    <div className = " form-container ">
                         <h2>Log In</h2>
                         <form className = "login-form" onSubmit={handleLoginSubmit}>
                             <input
@@ -350,9 +351,9 @@ export default function LoginPage() {
                                         const deltaY = mouseY - centerY;
                                         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
                                         
-                                        if (distance < 100) { // Зона втечі
-                                            const moveX = (deltaX / distance) * 50;
-                                            const moveY = (deltaY / distance) * 50;
+                                        if (distance < 200) { // Зона втечі
+                                            const moveX = (deltaX / distance) * 100;
+                                            const moveY = (deltaY / distance) * 100;
                                             btn.style.transform = `translate(${moveX}px, ${moveY}px)`;
                                         } else {
                                             btn.style.transform = 'translate(0, 0)';
@@ -372,9 +373,9 @@ export default function LoginPage() {
                 {/* Register Form */}
                 {!isLogin && (
                     // Відображення форми реєстрації, якщо активна вкладка Register
-                    <div className = "form-container">
-                        <h2>Create Account</h2>
-                        <form className = "login-form" onSubmit={handleRegisterSubmit}>
+                    <div className = " form-container ">
+                        <h2> Create Account </h2>
+                        <form className = " login-form " onSubmit={handleRegisterSubmit}>
                             <input
                                 name = "login"
                                 placeholder = "Username"
@@ -423,7 +424,7 @@ export default function LoginPage() {
                                     type = "button"
                                     onClick = {() => setShowRegisterPassword(!showRegisterPassword)}
                                     className = "password-toggle-btn"
-                                    aria-label = "Перемкнути видимість пароля"
+                                    aria-label = "Toggle password visibility"
                                 >
                                     {showRegisterPassword ? "1" : "0"}
                                 </button>

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Profile from "../components/Profile";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
+import timeout = require("timers/promises").setTimeout;
 
 // Інтерфейс для нотатки в календарі
 interface Note {
