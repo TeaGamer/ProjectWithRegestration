@@ -37,11 +37,11 @@ export async function middleware(request: NextRequest) {
     // Перевіряємо валідність формату токена
     if (!isValidTokenFormat(token)) {
       // Видаляємо невалідний токен та перенаправляємо на логін
-      const response = NextResponse.redirect(new URL('/login', request.url));
+      const response = NextResponse.redirect(new URL('/Login', request.url));
       response.cookies.delete('token');
       return response;
     }
-
+    
     // Верифікуємо токен з бекенд API
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
