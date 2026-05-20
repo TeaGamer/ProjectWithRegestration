@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import '../css/Prymary.css';
+import '../css/Primary.css';
 
 // Головна сторінка додатку з презентацією проекту
 export default function Home() {
