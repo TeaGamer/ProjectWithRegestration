@@ -29,7 +29,7 @@ body {
 
 /* Контейнер героїчної секції: повна висота, центрування */
 .hero-container {
-  min-height: 100vh;
+  min-height: 150vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,19 +38,19 @@ body {
 
 /* Основний контейнер: максимальна ширина, відступи, центрування */
 .container {
-  max-width: 1180px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
+  max-width: 1180px;      /* Максимальна ширина плашки */
+  width: 100%;            /* Займає всю доступну ширину, якщо екран менший за 1180px */
+  margin: 0 auto;         /* Центрує плашку на екрані */
+  padding: 40px 40px;        /* Внутрішні відступи зліва та справа */
+  display: flex;          /* Вишиковує текст і фото в один ряд */
   justify-content: space-between;
   align-items: center;
-  gap: 30px;
-  background: rgba(15, 23, 42, 0.76);
+  gap: 30px;              /* Відстань між лівою (текст) і правою (фото) частинами */
+  background: rgba(15, 23, 42, 0.76); /* Темний напівпрозорий фон */
   border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 38px;
+  border-radius: 38px;    /* Закруглення кутів плашки */
   box-shadow: 0 40px 90px rgba(0,0,0,0.18);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px); /* Ефект матового скла */
   position: relative;
   overflow: hidden;
 }
