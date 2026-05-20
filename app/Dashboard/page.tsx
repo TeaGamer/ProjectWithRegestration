@@ -105,8 +105,6 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
                                     {currentUser.date_of_birth && <p><strong> Date of Birth: </strong> {currentUser.date_of_birth}</p>}
                                 </div>
 
-                                <div className = "profile-menu-divider"></div>
-
                                 <button 
                                     className = "profile-menu-edit"
                                     onClick = {() => {

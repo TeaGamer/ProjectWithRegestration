@@ -342,10 +342,7 @@ export default function KalendarPage() {
               <button className = "modal-close note-modal" onClick = {closeModal}>✕</button>
             </div>
             <div className = "modal-body">
-              <label style = {{
-                 display: "block",
-                  marginBottom: "10px" 
-                  }} > Text </label>
+              <label style = {{display: "block", marginBottom: "10px"}} > Text </label>
               <input
                 type = "text"
                 value = {noteText}
@@ -358,10 +355,7 @@ export default function KalendarPage() {
                   border: "1px solid #ccc" 
                 }}
               />
-              <label style = {{ 
-                display: "block", 
-                marginBottom: "10px" 
-                }} > Date </label>
+              <label style = {{display: "block", marginBottom: "10px"}} > Date </label>
               <input
                 type = "date"
                 value = {noteDate}
@@ -374,10 +368,7 @@ export default function KalendarPage() {
                   border: "1px solid #ccc" 
                 }}
               />
-              <label style = {{ 
-                display: "block", 
-                marginBottom: "10px" 
-                }}> Time </label>
+              <label style = {{display: "block", marginBottom: "10px"}}> Time </label>
               <input
                 type = "time"
                 value = {noteTime}
@@ -390,10 +381,7 @@ export default function KalendarPage() {
                   border: "1px solid #ccc" 
                 }}
               />
-              <label style = {{ 
-                display: "block", 
-                marginBottom: "10px" 
-                }}> Category </label>
+              <label style = {{display: "block", marginBottom: "10px"}}> Category </label>
               <select
                 value = {noteCategory}
                 onChange = {(e) => setNoteCategory(e.target.value)}
