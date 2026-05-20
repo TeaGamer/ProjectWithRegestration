@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import './css/Global.css';
+import '../css/Prymary.css';
 
 // Головна сторінка додатку з презентацією проекту
 export default function Home() {
@@ -24,11 +24,7 @@ export default function Home() {
         <div className = "hero-profile">
           {/* Обгортка для аватара */}
           <div className = "avatar-wrapper">
-            <img
-              src = "public/avatar.png"
-              alt = "AI Alex Avatar"
-              className = "avatar-img"
-            />
+            <img src = "public/avatar.png" alt = "AI Alex Avatar" className = "avatar-img"/>
           </div>
           <h2 className = "ai-name"> Alex </h2>
           {/* Посилання на сторінку логіну */}
