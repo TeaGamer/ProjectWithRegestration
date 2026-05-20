@@ -22,7 +22,6 @@ export default function Home() {
               Welcome here!
             </p>
           </div>
-        </div>
 
         {/* Права сторона: Профіль AI */}
         <div className = "hero-profile">
@@ -39,7 +38,7 @@ export default function Home() {
           <Link href = "/Login" className = "login-bubble-btn">
             Login
           </Link>
-          </div>
+        </div>
       </div>
     </main>
   );
