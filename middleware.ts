@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
 
     if (!token) {
       // Перенаправляємо на логін, якщо токена немає
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL('/Login', request.url));
     }
 
     // Перевіряємо валідність формату токена
@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
       response.cookies.delete('token');
       return response;
     }
-    
+
     // Верифікуємо токен з бекенд API
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';

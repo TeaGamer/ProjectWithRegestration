@@ -2,12 +2,14 @@
 
 // Цей компонент виконується на клієнтській стороні і взаємодіє з localStorage
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "../css/Dashboard.css";
 import Profile from "../components/Profile";
 import { User } from "../constants/profileConfig";
 
 export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
     // Стан користувача і додаткові прапорці для інтерфейсу
+    const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -54,6 +56,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
             <div className = "topbar">
                 <div className = "topbar-left">
                     <h1> Dashboard </h1>
+                    <button className="dashboard-action-btn" onClick={() => router.push("/Kalendar")}>Open Kalendar</button>
                 </div>
                 <div className = "topbar-right">
                     <div className = "user-info-display">

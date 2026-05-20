@@ -47,6 +47,23 @@ html, body {
     font-weight: 700;
 }
 
+.dashboard-action-btn {
+    margin-top: 12px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 999px;
+    background: #667eea;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-action-btn:hover {
+    background: #5568d3;
+    transform: translateY(-1px);
+}
+
 .topbar-right {
     display: flex;
     align-items: center;
