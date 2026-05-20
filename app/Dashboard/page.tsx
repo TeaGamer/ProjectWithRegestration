@@ -83,11 +83,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
                             <div className = "profile-menu-dropdown">
                                 <div className = "profile-menu-header">
                                     {currentUser.avatar ? (
-                                        <img
-                                            src = {currentUser.avatar}
-                                            alt = "User Avatar"
-                                            className = "menu-avatar"
-                                        />
+                                        <img src = {currentUser.avatar} alt = "Avatar" className = "avatar.png" />
                                     ) : (
                                         <div className = "menu-avatar menu-avatar-placeholder">
                                             {currentUser.first_name?.charAt(0).toUpperCase() || currentUser.login?.charAt(0).toUpperCase() || "?"}

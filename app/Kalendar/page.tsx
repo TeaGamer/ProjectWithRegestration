@@ -230,7 +230,7 @@ export default function KalendarPage() {
           <span>{currentUser.login}</span>
           <div className = "Avatar-img">
             {currentUser.avatar ? (
-              <Image src = {currentUser.avatar} alt = "Avatar" width={39} height = {39} className = "dragon.png" />
+              <Image src = {currentUser.avatar} alt = "Avatar" width={39} height = {39} className = "avatar.png" />
             ) : (
               <div className = "avatar-letter">{currentUser.login.charAt(0).toUpperCase()}</div>
             )}
