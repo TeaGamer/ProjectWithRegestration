@@ -225,6 +225,7 @@ export default function KalendarPage() {
     <div className = "dashboard-layout-calendar" style = {{ paddingRight: isChatOpen ? "calc(min(35vw, 520px) + 32px)" : "20px" }}>
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
+        <button className = "back-button" onClick = {() => router.push("/Dashboard")}>← Dashboard</button>
         <div className = "logo-section"> Calendar with Alex </div>
         <button className = "user-bubble-nav" onClick = {() => router.push("/Dashboard")}> 
           <span>{currentUser.login}</span>
@@ -265,7 +266,7 @@ export default function KalendarPage() {
         {/* Календар */}
         <div className = "calendar-block">
           <div className = "month-picker">
-            <button className = "month-arrow" onClick = {() => changeMonth(1)}>&lt;</button>
+            <button className = "month-arrow" onClick = {() => changeMonth(-1)}>&lt;</button>
             <div className = "month-pill">{monthName} {year}</div>
             <button className = "month-arrow" onClick = {() => changeMonth(1)}>&gt;</button>
           </div>

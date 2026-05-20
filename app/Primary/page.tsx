@@ -24,7 +24,7 @@ export default function Home() {
         <div className = "hero-profile">
           {/* Обгортка для аватара */}
           <div className = "avatar-wrapper">
-            <img src = "public/avatar.png" alt = "AI Alex Avatar" className = "avatar-img"/>
+            <img src = "avatar.png" alt = "AI Alex Avatar" className = "avatar-img"/>
           </div>
           <h2 className = "ai-name"> Alex </h2>
           {/* Посилання на сторінку логіну */}
