@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import Profile from "../components/Profile";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
-import timeout = require("timers/promises").setTimeout;
 
 // Інтерфейс для нотатки в календарі
 interface Note {
@@ -130,14 +129,14 @@ export default function KalendarPage() {
   const prevMonthDays = new Date(year, month, 0).getDate();
   const totalCells = 42;
 
-  const calendarCells = Array.from({ length: totalCells }, (_, index) => {
+  const calendarCells = Array.from({length: totalCells}, (_, index) => {
     if (index < shift) {
-      return { day: prevMonthDays - shift + 1 + index, offset: -1 };
+      return {day: prevMonthDays - shift + 1 + index, offset: -1};
     }
     if (index < shift + daysInMonth) {
-      return { day: index - shift + 1, offset: 0 };
+      return {day: index - shift + 1, offset: 0};
     }
-    return { day: index - shift - daysInMonth + 1, offset: 1 };
+    return {day: index - shift - daysInMonth + 1, offset: 1};
   });
 
   const openModal = (type: "Note" | "Holiday") => {
@@ -228,9 +227,9 @@ export default function KalendarPage() {
         <div className = "logo-section"> Calendar with Alex </div>
         <button className = "user-bubble-nav" onClick = {() => router.push("/Dashboard")}> 
           <span>{currentUser.login}</span>
-          <div className = "avatar-circle-nav">
+          <div className = "Avatar-img">
             {currentUser.avatar ? (
-              <Image src = {currentUser.avatar} alt = "Avatar" width={40} height = {40} className = "knight.img" />
+              <Image src = {currentUser.avatar} alt = "Avatar" width={39} height = {39} className = "dragon.png" />
             ) : (
               <div className = "avatar-letter">{currentUser.login.charAt(0).toUpperCase()}</div>
             )}
@@ -265,7 +264,7 @@ export default function KalendarPage() {
         {/* Календар */}
         <div className = "calendar-block">
           <div className = "month-picker">
-            <button className = "month-arrow" onClick = {() => changeMonth(-1)}>&lt;</button>
+            <button className = "month-arrow" onClick = {() => changeMonth(1)}>&lt;</button>
             <div className = "month-pill">{monthName} {year}</div>
             <button className = "month-arrow" onClick = {() => changeMonth(1)}>&gt;</button>
           </div>

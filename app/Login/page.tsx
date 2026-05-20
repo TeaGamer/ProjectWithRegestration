@@ -346,7 +346,6 @@ export default function LoginPage() {
                                         const centerY = rect.top + rect.height / 2;
                                         const mouseX = e.clientX;
                                         const mouseY = e.clientY;
-                                        
                                         const deltaX = mouseX - centerX;
                                         const deltaY = mouseY - centerY;
                                         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -378,7 +377,7 @@ export default function LoginPage() {
                         <form className = " login-form " onSubmit={handleRegisterSubmit}>
                             <input
                                 name = "login"
-                                placeholder = "Username"
+                                placeholder = "Username*"
                                 type = "text"
                                 value = {registerData.login}
                                 onChange = {handleRegisterChange}
@@ -387,7 +386,7 @@ export default function LoginPage() {
 
                             <input
                                 name = "email"
-                                placeholder = "Email"
+                                placeholder = "Email*"
                                 type = "email"
                                 value = {registerData.email}
                                 onChange = {handleRegisterChange}
@@ -414,7 +413,7 @@ export default function LoginPage() {
                                 <input
                                     name="password"
                                     type = {showRegisterPassword ? "text" : "password"}
-                                    placeholder="Password"
+                                    placeholder="Password*"
                                     value = {registerData.password}
                                     onChange = {handleRegisterChange}
                                     id = "pwd"
@@ -433,7 +432,7 @@ export default function LoginPage() {
                             <input
                                 name = "confirmPassword"
                                 type = "password"
-                                placeholder = "Confirm Password"
+                                placeholder = "Confirm Password*"
                                 value = {registerData.confirmPassword}
                                 onChange = {handleRegisterChange}
                                 required

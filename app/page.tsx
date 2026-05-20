@@ -28,7 +28,7 @@ export default function Home() {
           {/* Обгортка для аватара */}
           <div className = "avatar-wrapper">
             <img
-              src = "/knight.png"
+              src = "/dragon.png"
               alt = "AI Alex Avatar"
               className = "avatar-img"
             />
