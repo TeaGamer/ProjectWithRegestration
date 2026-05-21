@@ -27,9 +27,9 @@ body {
   box-sizing: border-box;
 }
 
-/* Контейнер героїчної секції: повна висота, центрування */
+/* Контейнер героїчної секції: повна висота екрану, центрування */
 .hero-container {
-  min-height: 150vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,10 +1,8 @@
-'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { sendChatMessage, getChatHistory, deleteChatMessage } from '../services/chatService';
-import styles from '../css/Chat.css'; // Імпорт окремого файлу стилів
+import React, { useState, useEffect, useRef } from 'react';
+import { getChatHistory, sendChatMessage, deleteChatMessage } from '../services/chatService';
 
-interface ChatMessage {
+interface Message {
   id: number;
   user_id: number;
   message: string;
@@ -13,12 +11,8 @@ interface ChatMessage {
   updated_at: string;
 }
 
-interface ChatProps {
-  token?: string;
-}
-
-export default function Chat({ token }: ChatProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+const ChatWidget: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,139 +20,95 @@ export default function Chat({ token }: ChatProps) {
 
   // Завантажити історію при монтуванні компонента
   useEffect(() => {
-    if (token) {
-      loadChatHistory();
-    }
-  }, [token]);
+    loadChatHistory();
+  }, []);
 
-  // Автоматичний скрол донизу
+  // Автоскрол до останнього повідомлення
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const loadChatHistory = async () => {
-    if (!token) return;
-
     try {
-      const history = await getChatHistory(token, 50);
-      setMessages(history.messages);
       setError(null);
+      const history = await getChatHistory('', 50);
+      setMessages(history.messages);
     } catch (err) {
-      setError('Помилка при завантаженні історії');
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Помилка завантаження історії');
+      console.error('Помилка:', err);
     }
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const trimmedInput = input.trim();
-    if (!trimmedInput || !token) return;
+    if (!input.trim()) return;
 
     setLoading(true);
     setError(null);
+    const userMessage = input;
     setInput('');
 
-    // Оптимістичний UI
-    const temporaryId = Date.now();
-    const optimisticMessage: ChatMessage = {
-      id: temporaryId,
-      user_id: 0,
-      message: trimmedInput,
-      response: '...',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    setMessages((prev) => [...prev, optimisticMessage]);
-
     try {
-      const response = await sendChatMessage(trimmedInput, token);
+      const response = await sendChatMessage(userMessage, '');
 
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === temporaryId
-            ? {
-                id: response.message_id,
-                user_id: 0,
-                message: response.user_message,
-                response: response.ai_response,
-                created_at: response.timestamp,
-                updated_at: response.timestamp,
-              }
-            : msg
-        )
-      );
+      setMessages(prev => [...prev, {
+        id: response.message_id,
+        user_id: 0,
+        message: response.user_message,
+        response: response.ai_response,
+        created_at: response.timestamp,
+        updated_at: response.timestamp
+      }]);
     } catch (err) {
-      setError((err as Error).message || 'Помилка при відправці повідомлення');
-      setMessages((prev) => prev.filter((msg) => msg.id !== temporaryId));
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Помилка відправки повідомлення');
+      setInput(userMessage); // Повернути текст у поле вводу
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteMessage = async (messageId: number) => {
-    if (!token) return;
-
     try {
-      await deleteChatMessage(messageId, token);
-      setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
-      setError(null);
+      await deleteChatMessage(messageId, '');
+      setMessages(prev => prev.filter(msg => msg.id !== messageId));
     } catch (err) {
-      setError('Помилка при видаленні повідомлення');
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Помилка видалення');
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-    if (error) setError(null);
-  };
-
-  if (!token) {
-    return (
-      <div className = {styles.unauthorizedContainer}>
-        <p> Log in to use the chat. </p>
-      </div>
-    );
-  }
-
   return (
-    <div className = {styles.chatContainer}>
-      {/* Заголовок */}
-      <div className = {styles.header}>
-        <h2> 💬 AI Chat </h2>
-      </div>
-
-      {/* Сповіщення про помилку */}
-      {error && <div className = {styles.errorNotification}>{error}</div>}
-
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Повідомлення */}
-      <div className = {styles.messagesContainer}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
         {messages.length === 0 ? (
-          <p className = {styles.emptyMessage}> There are no messages. Rozpocznij rozmowę! </p>
+          <p>Немає повідомлень. Почніть розмову!</p>
         ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className = {styles.messageWrapper}>
-              {/* Повідомлення користувача */}
-              <div className = {styles.userMessage}>
-                <strong> You: </strong> {msg.message}
+          messages.map(msg => (
+            <div key={msg.id} style={{ marginBottom: '15px' }}>
+              <div style={{ 
+                backgroundColor: '#e3f2fd', 
+                padding: '8px', 
+                borderRadius: '8px',
+                marginBottom: '5px'
+              }}>
+                <strong>Ви:</strong> {msg.message}
               </div>
-
-              {/* Відповідь AI */}
               {msg.response && (
-                <div className = {styles.aiMessage}>
-                  <strong> Alex: </strong> {msg.response}
+                <div style={{ 
+                  backgroundColor: '#f5f5f5', 
+                  padding: '8px', 
+                  borderRadius: '8px',
+                  marginBottom: '5px'
+                }}>
+                  <strong>ШІ:</strong> {msg.response}
                 </div>
               )}
-
-              {/* Кнопка видалення */}
-              <button
-                onClick = {() => handleDeleteMessage(msg.id)}
-                className = {styles.deleteButton}
+              <button 
+                onClick={() => handleDeleteMessage(msg.id)}
+                style={{ fontSize: '12px', color: 'red' }}
               >
-                Remove
+                Видалити
               </button>
             </div>
           ))
@@ -166,25 +116,49 @@ export default function Chat({ token }: ChatProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Форма для відправки */}
-      <form onSubmit={handleSendMessage} className = {styles.form}>
+      {/* Помилка */}
+      {error && (
+        <div style={{ 
+          backgroundColor: '#ffebee', 
+          color: '#c62828', 
+          padding: '10px',
+          marginBottom: '10px'
+        }}>
+          ❌ {error}
+        </div>
+      )}
+{/* Форма вводу */}
+      <form onSubmit={handleSendMessage} style={{ padding: '10px', display: 'flex', gap: '5px' }}>
         <input
-          type = "text"
-          value = {input}
-          onChange={handleInputChange}
-          placeholder=" Write a message...) "
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Напишіть повідомлення..."
           disabled={loading}
-          className = {styles.input}
+          style={{ 
+            flex: 1, 
+            padding: '8px',
+            border: '1px solid #ddd',
+            borderRadius: '4px'
+          }}
         />
-
-        <button
-          type = "submit"
+        <button 
+          type="submit" 
           disabled={loading || !input.trim()}
-          className = {styles.submitButton}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: loading ? '#ccc' : '#2196F3',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: loading ? 'not-allowed' : 'pointer'
+          }}
         >
-          {loading ? ' Sending... ' : ' Send '}
+          {loading ? '⏳...' : 'Відправити'}
         </button>
       </form>
     </div>
   );
-}
+};
+
+export default ChatWidget;

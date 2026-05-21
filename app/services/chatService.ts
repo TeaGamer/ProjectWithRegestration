@@ -4,7 +4,9 @@
  */
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
-
+/**
+ * Типи даних для повідомлень чату та відповідей
+ */
 interface ChatMessage {
   id: number;
   user_id: number;
@@ -45,7 +47,7 @@ export async function sendChatMessage(
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Помилка при відправці повідомлення');
+      throw new Error(error.error || 'Error sending message');
     }
 
     return await response.json();
@@ -63,7 +65,7 @@ export async function getChatHistory(
   limit: number = 50
 ): Promise<ChatHistoryResponse> {
   try {
-    const url = new URL(`${API_BASE_URL}/api/chat/history`);
+    const url = new URL(`${API_BASE_URL}/api/chat/history`); // Використовуємо URL для зручного додавання параметрів
     url.searchParams.append('limit', limit.toString());
 
     const response = await fetch(url.toString(), {
@@ -74,7 +76,7 @@ export async function getChatHistory(
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Помилка при отриманні історії');
+      throw new Error(error.error || 'Error fetching history');
     }
 
     return await response.json();
@@ -101,7 +103,7 @@ export async function deleteChatMessage(
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Помилка при видаленні повідомлення');
+      throw new Error(error.error || 'Error deleting message');
     }
 
     return await response.json();
@@ -110,3 +112,9 @@ export async function deleteChatMessage(
     throw error;
   }
 }
+
+export default {
+  sendMessage: sendChatMessage,
+  getHistory: getChatHistory,
+  deleteMessage: deleteChatMessage,
+};

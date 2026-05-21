@@ -106,6 +106,64 @@ export default function KalendarPage() {
   }[]>([]);
   const [chatInput, setChatInput] = useState("");
 
+  const detectChatLanguage = (text: string) => {
+    if (/[А-Яа-яЁёЇїІіЄєҐґ]/.test(text)) {
+      return "uk";
+    }
+    if (/[ąćęłńóśżźĄĆĘŁŃÓŚŻŹ]/.test(text)) {
+      return "pl";
+    }
+    return "en";
+  };
+
+  const generateAiReply = (message: string, language: "uk" | "pl" | "en") => {
+    const normalized = message.toLowerCase();
+
+    if (language === "uk") {
+      if (/(привіт|вітаю|доброго|здоров)/.test(normalized)) {
+        return "Привіт! Я готовий допомогти з твоїм календарем українською.";
+      }
+      if (/(додай|добав|заплан|зустріч|поді|нотатк)/.test(normalized)) {
+        return "Звісно, розкажи мені більше про подію, яку хочеш додати.";
+      }
+      return "Я відповідаю українською. Що ще бажаєш дізнатися або запланувати?";
+    }
+
+    if (language === "pl") {
+      if (/(cześć|witaj|dzień dobry|hej)/.test(normalized)) {
+        return "Cześć! Jestem tutaj, aby pomóc Ci z kalendarzem po polsku.";
+      }
+      if (/(dodaj|zaplan|spotkanie|wydarzenie|notatkę)/.test(normalized)) {
+        return "Pewnie, powiedz mi więcej o wydarzeniu, które chcesz dodać.";
+      }
+      return "Odpowiadam po polsku. Co chciałbyś teraz zrobić?";
+    }
+
+    if (/(hello|hi|hey|good morning|good afternoon)/.test(normalized)) {
+      return "Hello! I'm ready to help with your calendar in English.";
+    }
+    if (/(add|plan|meeting|event|note)/.test(normalized)) {
+      return "Sure, tell me more about the event you want to add.";
+    }
+    return "I respond in English. What would you like to do next?";
+  };
+
+  const handleSendChatMessage = () => {
+    const trimmed = chatInput.trim();
+    if (!trimmed) return;
+
+    const language = detectChatLanguage(trimmed) as "uk" | "pl" | "en";
+    const aiReply = generateAiReply(trimmed, language);
+    const userId = Date.now();
+
+    setChatMessages((prev) => [
+      ...prev,
+      { id: userId, sender: "user", text: trimmed },
+      { id: userId + 1, sender: "ai", text: aiReply },
+    ]);
+    setChatInput("");
+  };
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const monthName = currentDate.toLocaleString("en-US", { month: "long" });
@@ -225,7 +283,6 @@ export default function KalendarPage() {
     <div className = "dashboard-layout-calendar" style = {{ paddingRight: isChatOpen ? "calc(min(35vw, 520px) + 32px)" : "20px" }}>
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
-        <button className = "back-button" onClick = {() => router.push("/Dashboard")}>← Dashboard</button>
         <div className = "logo-section"> Calendar with Alex </div>
         <button className = "user-bubble-nav" onClick = {() => router.push("/Dashboard")}> 
           <span>{currentUser.login}</span>
@@ -433,27 +490,14 @@ export default function KalendarPage() {
               onKeyDown = {(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  if (chatInput.trim()) {
-                    setChatMessages((prev) => [
-                      ...prev,
-                      { id: Date.now(), sender: "user", text: chatInput.trim() },
-                    ]);
-                    setChatInput("");
-                  }
+                  handleSendChatMessage();
                 }
               }}
             />
             <button
               className = "send-message-btn"
               type = "button"
-              onClick = {() => {
-                if (!chatInput.trim()) return;
-                setChatMessages((prev) => [
-                  ...prev,
-                  { id: Date.now(), sender: "user", text: chatInput.trim() },
-                ]);
-                setChatInput("");
-              }}
+              onClick = {handleSendChatMessage}
             >
               Send
             </button>
