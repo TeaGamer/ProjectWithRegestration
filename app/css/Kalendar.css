@@ -27,9 +27,7 @@
   transition: transform 0.2s;
 }
 
-.user-bubble:hover { 
-    transform: scale(1.05); 
-}
+.user-bubble:hover {transform: scale(1.05);}
 
 .user-avatar-img {
   width: 45px;
@@ -231,9 +229,7 @@
   transform: translateY(-1px) scale(1.03);
 }
 
-.active-del {
-  outline: 4px solid rgba(255, 99, 71, 0.6); 
-}
+.active-del {outline: 4px solid rgba(255, 99, 71, 0.6);}
 
 /* Основні стилі для календарної сітки та розташування колонок */
 .main-grid-cal {
@@ -261,9 +257,7 @@
   transition: background 0.2s ease;
 }
 
-.side-cat-btn:hover {
-  background: rgba(255,255,255,0.2);
-}
+.side-cat-btn:hover {background: rgba(255,255,255,0.2);}
 
 .month-picker {
   display: flex;
@@ -337,9 +331,7 @@
   align-items: flex-start;
 }
 
-.cell-day-number {
-  font-weight: 700;
-}
+.cell-day-number {font-weight: 700;}
 
 .note-marker {
   background: #7c3aed;
@@ -442,29 +434,13 @@
 .message-sender,
 .ai-text,
 .ai-input,
-.send-message-btn {
-  font-size: 0.9rem;
-}
+.send-message-btn {font-size: 0.9rem;}
+.chat-message {padding: 10px 12px;}
+.chat-top {padding: 14px 18px;}
+.chat-bottom {padding: 14px 16px;}
 
-.chat-message {
-  padding: 10px 12px;
-}
-
-.chat-top {
-  padding: 14px 18px;
-}
-
-.chat-bottom {
-  padding: 14px 16px;
-}
-
-.ai-input {
-  padding: 10px 12px;
-}
-
-.send-message-btn {
-  padding: 10px 14px;
-}
+.ai-input {padding: 10px 12px;}
+.send-message-btn {padding: 10px 14px;}
 
 .chat-top {
   padding: 20px 24px;
@@ -556,4 +532,127 @@
   padding: 12px 16px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.chat-bottom {
+  padding: 18px;
+  background: rgba(15,23,42,0.95);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.file-upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.file-list-box {
+  margin-top: 16px;
+  padding: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 18px;
+  min-height: 120px;
+}
+
+.file-list-title {
+  margin-bottom: 10px;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.file-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.file-chip button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.14);
+  color: white;
+  cursor: pointer;
+}
+
+.file-list-empty {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.dashboard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1100;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 24px;
+}
+
+.dashboard-panel {
+  width: min(340px, 100%);
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: -10px 20px 80px rgba(0,0,0,0.35);
+}
+
+.dashboard-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: white;
+}
+
+.dashboard-panel-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.dashboard-panel-header p {
+  margin: 2px 0 0;
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+
+.dashboard-panel-body {
+  padding: 20px;
+  color: #f8fafc;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.dashboard-panel-body p {
+  margin: 10px 0;
+}
+
+.ai-neon-circle span {
+  font-size: 1.6rem;
 }

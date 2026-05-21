@@ -23,9 +23,7 @@ body {
   color: var(--text-light);
 }
 
-* {
-  box-sizing: border-box;
-}
+* {box-sizing: border-box;}
 
 /* Контейнер героїчної секції: повна висота екрану, центрування */
 .hero-container {
@@ -215,17 +213,8 @@ body {
 }
 
 @media (max-width: 640px) {
-  .container {
-    padding: 24px;
-  }
-  .hero-text h1 {
-    font-size: 2.6rem;
-  }
-  .description {
-    font-size: 1rem;
-  }
-  .login-bubble-btn {
-    width: 100%;
-    padding: 16px 24px;
-  }
+  .container {padding: 24px;}
+  .hero-text h1 {font-size: 2.6rem;}
+  .description {font-size: 1rem;}
+  .login-bubble-btn {width: 100%; padding: 16px 24px;}
 }

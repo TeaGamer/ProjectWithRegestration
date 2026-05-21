@@ -1,9 +1,8 @@
 "use client";
 
 // Імпорт необхідних хуків та компонентів для сторінки календаря
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import Profile from "../components/Profile";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
@@ -23,8 +22,6 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // Головний компонент сторінки календаря
 export default function KalendarPage() {
-  // Ініціалізація роутера для навігації
-  const router = useRouter();
   // Стан для зберігання даних користувача
   const [user, setUser] = useState<User | null>(null);
   // Стан для індикатора завантаження
@@ -63,6 +60,8 @@ export default function KalendarPage() {
   const [smsRemindersSent, setSmsRemindersSent] = useState<number[]>([]);
   // Стан для відкриття модального вікна редагування профілю
   const [showEditModal, setShowEditModal] = useState(false);
+  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
 
   // useEffect для завантаження збереженого користувача без примусової захищеної перевірки
@@ -213,18 +212,47 @@ export default function KalendarPage() {
   const shouldCreateNote = (message: string) => {
     const normalized = message.toLowerCase();
     return /(додай|добав|заплан|плануй|запланувати|додати|add|plan|create|створи|запиши|напиши|zaplan|dodaj|utwórz|zapisz)/.test(normalized) &&
-      /(note|meeting|event|birthday|holiday|зустріч|подія|нотатк|замітку|день народження|свято|wydarzenie|spotkanie|urodziny|notatkę)/.test(normalized);
+      /(note|meeting|event|birthday|holiday|зустріч|подія|нотатка|замітку|день народження|свято|wydarzenie|spotkanie|urodziny|notatkę)/.test(normalized);
   };
 
-  const generateAiReply = (message: string, language: "uk" | "pl" | "en", createdNote?: boolean, noteDate?: string, category?: string) => {
+  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+    setAttachedFiles((prev) => [...prev, ...Array.from(files)]);
+    event.target.value = "";
+  };
+
+  const removeAttachedFile = (index: number) => {
+    setAttachedFiles((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const generateAiReply = (
+    message: string,
+    language: "uk" | "pl" | "en",
+    createdNote?: boolean,
+    noteDate?: string,
+    category?: string,
+    files: File[] = []
+  ) => {
     const normalized = message.toLowerCase();
+
+    if (files.length > 0) {
+      const names = files.map((file) => file.name).join(", ");
+      if (language === "uk") {
+        return `Я переглянув файли: ${names}. Що бажаєш запитати далі?`;
+      }
+      if (language === "pl") {
+        return `Przejrzałem pliki: ${names}. O co chcesz zapytać dalej?`;
+      }
+      return `I reviewed the files: ${names}. What would you like to ask next?`;
+    }
 
     if (createdNote && noteDate && category) {
       if (language === "uk") {
         return `Готово! Я додав ${category.toLowerCase()} на ${noteDate}.`;
       }
       if (language === "pl") {
-        return `Gotowe! Dodałem ${category.toLowerCase()} na ${noteDate}.`;
+        return `Gotowe! Dodałem ${category.toLowerCase()} на ${noteDate}.`;
       }
       return `Done! I added the ${category.toLowerCase()} for ${noteDate}.`;
     }
@@ -272,7 +300,7 @@ export default function KalendarPage() {
     setChatMessages((prev) => [
       ...prev,
       { id: userId, sender: "user", text: trimmed },
-      { id: userId + 1, sender: "ai", text: generateAiReply(trimmed, language, createNote, noteDate, category) },
+      { id: userId + 1, sender: "ai", text: generateAiReply(trimmed, language, createNote, noteDate, category, attachedFiles) },
     ]);
 
     if (createNote && category) {
@@ -409,7 +437,7 @@ export default function KalendarPage() {
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
         <div className = "logo-section"> Calendar with Alex </div>
-        <button className = "user-bubble-nav" onClick = {() => router.push("/Dashboard")}> 
+        <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
           <span>{currentUser.login}</span>
           <div className = "Avatar-img">
             {currentUser.avatar ? (
@@ -429,7 +457,6 @@ export default function KalendarPage() {
           Delete Note
         </button>
         <button className = "ctrl-btn green" onClick = {() => openModal("Note")}> Add Note </button>
-        <button className = "ctrl-btn" onClick = {() => setIsChatOpen((prev) => !prev)}>{isChatOpen ? "Close Chat" : "AI Chat"}</button>
       </div>
 
       <div className = "main-grid-cal">
@@ -442,6 +469,19 @@ export default function KalendarPage() {
               {cat}
             </button>
           ))}
+          <div className="file-list-box">
+            <div className="file-list-title">AI files for RAG</div>
+            {attachedFiles.length > 0 ? (
+              attachedFiles.map((file, index) => (
+                <div key={`${file.name}-${index}`} className="file-chip">
+                  <span>{file.name}</span>
+                  <button type="button" onClick={() => removeAttachedFile(index)}>×</button>
+                </div>
+              ))
+            ) : (
+              <div className="file-list-empty">No files attached yet.</div>
+            )}
+          </div>
         </div>
 
         {/* Календар */}
@@ -606,6 +646,8 @@ export default function KalendarPage() {
             )}
           </div>
           <div className = "chat-bottom">
+            <label htmlFor="file-upload" className="file-upload-button" title="Attach file">📎</label>
+            <input id="file-upload" type="file" multiple onChange={handleFileInputChange} hidden />
             <input
               className = "ai-input"
               placeholder = "Ask something..."
@@ -628,6 +670,31 @@ export default function KalendarPage() {
           </div>
         </div>
       )}
+
+      {isDashboardOpen && (
+        <div className="dashboard-overlay" onClick={() => setIsDashboardOpen(false)}>
+          <div className="dashboard-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="dashboard-panel-header">
+              <div>
+                <h3>Dashboard</h3>
+                <p>Quick info panel</p>
+              </div>
+              <button className="close-info-btn" type="button" onClick={() => setIsDashboardOpen(false)}>✕</button>
+            </div>
+            <div className="dashboard-panel-body">
+              <p><strong>User:</strong> {currentUser.first_name || currentUser.login}</p>
+              <p><strong>Login:</strong> {currentUser.login}</p>
+              <p><strong>Email:</strong> {currentUser.email || "Not set"}</p>
+              {currentUser.region && <p><strong>Region:</strong> {currentUser.region}</p>}
+              {currentUser.date_of_birth && <p><strong>Date of Birth:</strong> {currentUser.date_of_birth}</p>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <button className="ai-neon-circle" onClick={() => setIsChatOpen((prev) => !prev)} aria-label="Open AI chat">
+        <span>💬</span>
+      </button>
 
       {/* Редагування профілю */}
       {showEditModal && user && (

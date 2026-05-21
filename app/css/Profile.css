@@ -13,9 +13,7 @@
     border-radius: 5px;
 }
 
-.profile-info-field strong {
-    color: #333;
-}
+.profile-info-field strong {color: #333;}
 
 .profile-info-field p {
     color: #666;
@@ -23,13 +21,9 @@
 }
 
 /* Edit Profile Form */
-.edit-profile-form {
-    padding: 20px;
-}
+.edit-profile-form {padding: 20px;}
 
-.form-group {
-    margin-bottom: 15px;
-}
+.form-group {margin-bottom: 15px;}
 
 .form-group label {
     display: block;
@@ -56,9 +50,7 @@
 }
 
 /* Modal Buttons Container */
-.profile-buttons-container {
-    margin-top: 20px;
-}
+.profile-buttons-container {margin-top: 20px;}
 
 /* Error and Success Messages */
 .error-message {
@@ -97,9 +89,7 @@
     flex: 1;
 }
 
-.modal-submit-btn:hover {
-    background-color: #4a62c1;
-}
+.modal-submit-btn:hover {background-color: #4a62c1;}
 
 .modal-cancel-btn {
     padding: 10px 20px;
@@ -112,6 +102,4 @@
     flex: 1;
 }
 
-.modal-cancel-btn:hover {
-    background-color: #d0d0d0;
-}
+.modal-cancel-btn:hover {background-color: #d0d0d0;}

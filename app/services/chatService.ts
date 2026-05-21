@@ -69,9 +69,7 @@ export async function getChatHistory(
     url.searchParams.append('limit', limit.toString());
 
     const response = await fetch(url.toString(), {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: {'Authorization': `Bearer ${token}`}
     });
 
     if (!response.ok) {
@@ -96,9 +94,7 @@ export async function deleteChatMessage(
   try {
     const response = await fetch(`${API_BASE_URL}/api/chat/${messageId}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: {'Authorization': `Bearer ${token}`}
     });
 
     if (!response.ok) {

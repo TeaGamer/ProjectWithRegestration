@@ -79,9 +79,7 @@ export default function LoginPage() {
         try {
             const response = await fetch(`${API_BASE}/api/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: {"Content-Type": "application/json",},
                 body: JSON.stringify({
                     login: loginData.email,
                     password: loginData.password,
@@ -110,9 +108,7 @@ export default function LoginPage() {
             } else {
                 setError(data.error || "Invalid email or password!");
             }
-        } catch {
-            setError(" Connection error. Please try again. ");
-        }
+        } catch {setError(" Connection error. Please try again. ");}
     };
 
     const handleRegisterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -125,22 +121,18 @@ export default function LoginPage() {
             setError(" You must accept the Terms of Service! ");
             return;
         }
-
         if (!registerData.email || !registerData.email.includes("@")) {
             setError(" Enter a valid email! ");
             return;
         }
-
         if (registerData.password !== registerData.confirmPassword) {
             setError("Passwords do not match!");
             return;
         }
-
         if (registerData.password.length < 6) {
             setError(" Password must be at least 6 characters long! ");
             return;
         }
-
         if (!registerData.login.trim()) {
             setError(" Enter a username! ");
             return;
@@ -354,14 +346,11 @@ export default function LoginPage() {
                                             const moveX = (deltaX / distance) * 100;
                                             const moveY = (deltaY / distance) * 100;
                                             btn.style.transform = `translate(${moveX}px, ${moveY}px)`;
-                                        } else {
-                                            btn.style.transform = 'translate(0, 0)';
-                                        }
+                                        } else {btn.style.transform = 'translate(0, 0)';}
                                     }
                                 }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translate(0, 0)';
-                                }}
+                                onMouseLeave={(e) => {e.currentTarget.style.transform = 'translate(0, 0)';}
+                            }
                             >
                                 Log In
                             </button>
@@ -383,7 +372,6 @@ export default function LoginPage() {
                                 onChange = {handleRegisterChange}
                                 required
                             />
-
                             <input
                                 name = "email"
                                 placeholder = "Email*"
@@ -392,7 +380,6 @@ export default function LoginPage() {
                                 onChange = {handleRegisterChange}
                                 required
                             />
-
                             <input
                                 name = "first_name"
                                 placeholder = "First Name"
@@ -400,7 +387,6 @@ export default function LoginPage() {
                                 value = {registerData.first_name}
                                 onChange = {handleRegisterChange}
                             />
-
                             <input
                                 name = "last_name"
                                 placeholder = "Last Name"
@@ -408,7 +394,6 @@ export default function LoginPage() {
                                 value = {registerData.last_name}
                                 onChange = {handleRegisterChange}
                             />
-
                             <div className = "password-input-wrapper">
                                 <input
                                     name="password"
