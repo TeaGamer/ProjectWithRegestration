@@ -36,9 +36,7 @@ html, body {
     margin: 0;
 }
 
-.topbar-left {
-    flex: 1;
-}
+.topbar-left {flex: 1;}
 
 .topbar-left h1 {
     color: white;
@@ -83,8 +81,8 @@ html, body {
 .profile-avatar-btn:hover {transform: scale(1.1);}
 
 .avatar-circle {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     border: 3px solid #667eea;
     object-fit: cover;
@@ -186,6 +184,7 @@ html, body {
 }
 
 .profile-menu-logout:hover {background: #ff5252;}
+.profile-menu-edit:hover {background: #5568d3;}
 
 /* Edit Button in Menu */
 .profile-menu-edit {
@@ -200,7 +199,6 @@ html, body {
     transition: all 0.3s ease;
 }
 
-.profile-menu-edit:hover {background: #5568d3;}
 
 /* User Info Display */
 .user-info-display {

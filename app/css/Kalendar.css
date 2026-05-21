@@ -152,9 +152,9 @@
   background: linear-gradient(135deg, #fbbf24, #f97316, #ec4899, #8b5cf6);
   background-size: 300% 300%;
   animation: logoGradient 3s ease infinite;
-  padding: 8px 18px; 
+  padding: 10px 20px; 
   font-weight: 800; 
-  font-size: 1.15rem;
+  font-size: 1.45rem;
   letter-spacing: 0.5px;
   background-clip: text;
   -webkit-background-clip: text;
@@ -644,7 +644,7 @@
 
 .dashboard-overlay {
   position: fixed;
-  top: 3px;
+  top: -2px;
   right: 3px;
   bottom: 0;
   left: 0;
