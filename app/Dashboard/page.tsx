@@ -42,7 +42,6 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
         <div className="Dashboard-layout">
             <div className="dashboard-info-popup">
                 <div className="info-popup-header">
-                    <div className="dashboard-avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
                     <div>
                         <h2>Quick Info</h2>
                         <p>Small info panel opened from the calendar.</p>

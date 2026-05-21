@@ -683,3 +683,75 @@
 .ai-neon-circle span {
   font-size: 1.6rem;
 }
+
+/* Modal overlay and modal styles (ensure Kalendar modal appears as overlay) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content.note-modal {
+  background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(79,70,229,0.95));
+  border: 1px solid rgba(255,255,255,0.12);
+  max-width: 560px;
+  width: min(560px, 92%);
+  min-height: 360px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 28px 80px rgba(0,0,0,0.35);
+  padding: 0;
+}
+
+.modal-header.note-modal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: white;
+}
+
+.modal-header.note-modal h2 { margin: 0; font-size: 1.05rem; }
+
+.modal-close.note-modal {
+  background: rgba(255,255,255,0.14);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.modal-content.note-modal .modal-body {
+  padding: 18px;
+  color: #f8fafc;
+}
+
+.modal-content.note-modal .modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 12px 18px;
+  background: rgba(0,0,0,0.03);
+}
+
+.modal-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-btn.save-btn { background: linear-gradient(135deg,#34d399,#059669); color: white; }
+.modal-btn.cancel-btn { background: rgba(255,255,255,0.12); color: white; }
+
