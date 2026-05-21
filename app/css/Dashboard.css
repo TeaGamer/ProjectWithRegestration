@@ -225,6 +225,56 @@ html, body {
     font-weight: 500;
 }
 
+.dashboard-info-popup {
+    width: min(420px, 92%);
+    max-width: 420px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 22px;
+    box-shadow: 0 28px 80px rgba(0,0,0,0.18);
+    margin: 48px auto;
+    overflow: hidden;
+    border: 1px solid rgba(102,126,234,0.25);
+}
+
+.info-popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.info-popup-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.info-popup-body {
+    padding: 20px;
+    color: #1f2937;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.info-popup-body p {
+    margin: 10px 0;
+}
+
+.close-info-btn {
+    border: none;
+    background: rgba(255,255,255,0.18);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.close-info-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
 /* Темна фонова накладка для модальних вікон */
 .modal-overlay {
     position: fixed;

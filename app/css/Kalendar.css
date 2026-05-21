@@ -422,8 +422,8 @@
   right: 30px;
   width: min(35vw, 520px);
   min-width: 320px;
-  height: min(45vh, 420px);
-  min-height: 320px;
+  height: 85vh;
+  max-height: 85vh;
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(18px);
   border-radius: 28px;
@@ -433,6 +433,37 @@
   border: 1px solid rgba(255,255,255,0.16);
   box-shadow: 0 32px 80px rgba(0,0,0,0.35);
   z-index: 1000;
+}
+
+.chat-top,
+.chat-bottom,
+.chat-mid,
+.chat-message,
+.message-sender,
+.ai-text,
+.ai-input,
+.send-message-btn {
+  font-size: 0.9rem;
+}
+
+.chat-message {
+  padding: 10px 12px;
+}
+
+.chat-top {
+  padding: 14px 18px;
+}
+
+.chat-bottom {
+  padding: 14px 16px;
+}
+
+.ai-input {
+  padding: 10px 12px;
+}
+
+.send-message-btn {
+  padding: 10px 14px;
 }
 
 .chat-top {
