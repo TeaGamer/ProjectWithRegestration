@@ -79,6 +79,16 @@ export default function KalendarPage() {
   }, []);
 
   useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isDashboardOpen) {
+        setIsDashboardOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleEscKey);
+    return () => window.removeEventListener("keydown", handleEscKey);
+  }, [isDashboardOpen]);
+
+  useEffect(() => {
     const savedNotes = localStorage.getItem("calendarNotes");
     if (savedNotes) {
       try {

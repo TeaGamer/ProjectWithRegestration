@@ -114,7 +114,8 @@
 
 /* Фоновий градієнт для всієї сторінки */
 .dashboard-layout-calendar {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: auto;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 20px;
@@ -148,11 +149,24 @@
 }
 
 .logo-section { 
-  border: 2px solid #ccc; 
-  padding: 5px 15px; 
-  font-weight: bold; 
-  font-style: italic; 
-  background: rgba(255,255,255,0.1); 
+  background: linear-gradient(135deg, #fbbf24, #f97316, #ec4899, #8b5cf6);
+  background-size: 300% 300%;
+  animation: logoGradient 3s ease infinite;
+  padding: 8px 18px; 
+  font-weight: 800; 
+  font-size: 1.15rem;
+  letter-spacing: 0.5px;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.25);
+}
+
+@keyframes logoGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Бульбашка користувача */
@@ -630,7 +644,10 @@
 
 .dashboard-overlay {
   position: fixed;
-  inset: 0;
+  top: 3px;
+  right: 3px;
+  bottom: 0;
+  left: 0;
   background: rgba(0, 0, 0, 0.35);
   z-index: 1100;
   display: flex;
