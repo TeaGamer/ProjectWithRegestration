@@ -1,10 +1,11 @@
 
 "use client";
 // Компонент сторінки логіну/реєстрації, що рендериться на клієнті
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import {useState, useEffect} from "react";
+import {useRouter} from "next/navigation";
 import "../css/Login.css";
-import { UKRAINIAN_REGIONS } from "../constants/profileConfig";
+import {UKRAINIAN_REGIONS} from "../constants/profileConfig";
+import {termsAndConditionsText} from "../constants/profileConfig";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 export default function LoginPage() {
@@ -182,68 +183,6 @@ export default function LoginPage() {
         }
     };
 
-    const termsAndConditionsText = `
-
-
-
-    TERMS OF USE FOR THE ALEX SERVICE
-
-        1. GENERAL PROVISIONS
-    By using the Alex service, you agree to these terms. 
-    The service is provided ‘as is’. 
-    We do not guarantee 100% accuracy of AI responses. 
-    It is prohibited to use the service for illegal activities.
-
-        2. PROHIBITED:
-    - Spam and mass mailings
-    - Harassment and intimidation of other users
-    - Illegal activities of any kind
-    - Misuse of AI capabilities for malicious purposes
-    - Distribution of malicious software
-    - Copyright infringement
-
-        3. USER RIGHTS
-    The user has the right to:
-    - Access their data
-    - Delete their account
-    - Change their personal details
-    - Stop using the service at any time
-    - Edit their profile
-    - Export their data
-    - Know what data is stored and for what purpose
-
-        4. USER OBLIGATIONS
-    The user is obliged to:
-    - Provide accurate information upon registration
-    - Not disclose confidential information
-    - Report security breaches
-    - Adhere to ethical standards for the use of AI
-
-        5. PRIVACY
-    We collect and process your data in accordance 
-    with our privacy policy.
-    Your data is protected and will not be shared with third 
-    parties without your consent.
-
-        6. LIABILITY
-    The Alex service is not liable for:
-    - Incorrect AI responses
-    - Data loss due to technical issues
-    - The actions of other users
-
-        7. CHANGES TO THE TERMS
-    We may amend these terms at any time.
-    Continued use of the service following such changes 
-    constitutes your acceptance of the new terms.
-
-    By agreeing to these terms and conditions, 
-    you confirm and accept all the above provisions.
-
-    Translated with DeepL.com (free version)
-
-
-    `.trim();
-
     // Повернення JSX елемента для рендерингу компонента
     return (
         // Основний контейнер сторінки логіну
@@ -366,7 +305,7 @@ export default function LoginPage() {
                         <form className = " login-form " onSubmit={handleRegisterSubmit}>
                             <input
                                 name = "login"
-                                placeholder = "Username*"
+                                placeholder = "Username *"
                                 type = "text"
                                 value = {registerData.login}
                                 onChange = {handleRegisterChange}
@@ -374,7 +313,7 @@ export default function LoginPage() {
                             />
                             <input
                                 name = "email"
-                                placeholder = "Email*"
+                                placeholder = "Email *"
                                 type = "email"
                                 value = {registerData.email}
                                 onChange = {handleRegisterChange}
@@ -398,7 +337,7 @@ export default function LoginPage() {
                                 <input
                                     name="password"
                                     type = {showRegisterPassword ? "text" : "password"}
-                                    placeholder="Password*"
+                                    placeholder="Password *"
                                     value = {registerData.password}
                                     onChange = {handleRegisterChange}
                                     id = "pwd"
@@ -417,7 +356,7 @@ export default function LoginPage() {
                             <input
                                 name = "confirmPassword"
                                 type = "password"
-                                placeholder = "Confirm Password*"
+                                placeholder = "Confirm Password *"
                                 value = {registerData.confirmPassword}
                                 onChange = {handleRegisterChange}
                                 required
@@ -466,7 +405,7 @@ export default function LoginPage() {
                     <div className = "modal-overlay" onClick = {() => setShowTermsModal(false)}>
                         <div className = "modal-content" onClick = {(e) => e.stopPropagation()}>
                             <div className = "modal-header">
-                                <h3>Terms of Service</h3>
+                                <h3 style={{ textAlign: 'center' }}>Terms of Service</h3>
                             </div>
                             <div className = "modal-body">
                                 <pre>{termsAndConditionsText}</pre>
