@@ -11,7 +11,7 @@ export interface User {
 }
 
 export const UKRAINIAN_REGIONS = [
-    " -- none -- ",
+    " -- none -- ", 
     " Autonomous Republic of Crimea",
     " Cherkasy",
     " Chernivtsi",

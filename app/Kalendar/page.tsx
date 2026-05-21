@@ -562,7 +562,7 @@ export default function KalendarPage() {
         <div className = "modal-overlay" onClick = {closeModal}>
           <div className = "modal-content note-modal" onClick = {(e) => e.stopPropagation()}>
             <div className = "modal-header note-modal">
-              <h2>{noteType === "Holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
+              <h2  style={{ textAlign: 'center' }}>{noteType === "Holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
               <button className = "modal-close note-modal" onClick = {closeModal}>✕</button>
             </div>
             <div className = "modal-body">
