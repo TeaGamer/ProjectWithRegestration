@@ -53,6 +53,14 @@ export default function KalendarPage() {
   const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
   // Поточна дата для календаря
   const [currentDate, setCurrentDate] = useState(new Date());
+  // Стан чату та SMS-нагадувань
+  const [chatMessages, setChatMessages] = useState<{
+    id: number;
+    sender: "user" | "ai";
+    text: string;
+  }[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [smsRemindersSent, setSmsRemindersSent] = useState<number[]>([]);
   // Стан для відкриття модального вікна редагування профілю
   const [showEditModal, setShowEditModal] = useState(false);
   //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
@@ -88,6 +96,40 @@ export default function KalendarPage() {
     localStorage.setItem("calendarNotes", JSON.stringify(notes));
   }, [notes]);
 
+  const sendSmsReminder = (note: Note) => {
+    const reminderText = `Нагадування: зустріч "${note.text}" починається о ${note.time} ${note.date}.`;
+    console.log("SMS reminder sent:", reminderText);
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        sender: "ai",
+        text: `SMS reminder sent: ${reminderText}`,
+      },
+    ]);
+  };
+
+  const checkMeetingReminders = () => {
+    const now = new Date();
+    notes.forEach((note) => {
+      if (note.category !== "Meeting" || !note.time || !note.date) return;
+
+      const reminderDate = new Date(`${note.date}T${note.time}`);
+      const diffMs = reminderDate.getTime() - now.getTime();
+
+      if (diffMs > 0 && diffMs <= 60 * 60 * 1000 && !smsRemindersSent.includes(note.id)) {
+        sendSmsReminder(note);
+        setSmsRemindersSent((prev) => [...prev, note.id]);
+      }
+    });
+  };
+
+  useEffect(() => {
+    checkMeetingReminders();
+    const interval = window.setInterval(checkMeetingReminders, 60 * 1000);
+    return () => window.clearInterval(interval);
+  }, [notes, smsRemindersSent]);
+
   const filteredNotes = useMemo(() => {
     return selectedCategory === "all"
       ? notes
@@ -99,13 +141,6 @@ export default function KalendarPage() {
     [notes, selectedNoteId]
   );
 
-  const [chatMessages, setChatMessages] = useState<{
-    id: number;
-    sender: "user" | "ai";
-    text: string;
-  }[]>([]);
-  const [chatInput, setChatInput] = useState("");
-
   const detectChatLanguage = (text: string) => {
     if (/[А-Яа-яЁёЇїІіЄєҐґ]/.test(text)) {
       return "uk";
@@ -116,8 +151,83 @@ export default function KalendarPage() {
     return "en";
   };
 
-  const generateAiReply = (message: string, language: "uk" | "pl" | "en") => {
+  const extractDateFromMessage = (message: string) => {
     const normalized = message.toLowerCase();
+    const today = new Date();
+
+    const parseIso = (value: string) => {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    };
+
+    const formatDate = (date: Date) => date.toISOString().slice(0, 10);
+
+    const explicitDate = message.match(/\b(\d{4}-\d{2}-\d{2})\b/);
+    if (explicitDate) {
+      return formatDate(parseIso(explicitDate[1]) ?? today);
+    }
+
+    const dotDate = message.match(/\b(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{2,4})\b/);
+    if (dotDate) {
+      const day = Number(dotDate[1]);
+      const month = Number(dotDate[2]) - 1;
+      const year = Number(dotDate[3].length === 2 ? `20${dotDate[3]}` : dotDate[3]);
+      const date = new Date(year, month, day);
+      if (!Number.isNaN(date.getTime())) {
+        return formatDate(date);
+      }
+    }
+
+    if (/(завтра|jutro|tomorrow)/.test(normalized)) {
+      return formatDate(new Date(today.getTime() + 24 * 60 * 60 * 1000));
+    }
+    if (/(післязавтра|pojutrze|day after tomorrow)/.test(normalized)) {
+      return formatDate(new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000));
+    }
+
+    return formatDate(today);
+  };
+
+  const extractTimeFromMessage = (message: string) => {
+    const match = message.match(/\b(\d{1,2}:\d{2})\b/);
+    return match ? match[1] : "";
+  };
+
+  const inferNoteCategoryFromMessage = (message: string) => {
+    const normalized = message.toLowerCase();
+    if (/(birthday|день народження|urodziny)/.test(normalized)) {
+      return "Birthday";
+    }
+    if (/(meeting|зустріч|spotkanie)/.test(normalized)) {
+      return "Meeting";
+    }
+    if (/(holiday|відпустка|свято|wydarzenie|święto)/.test(normalized)) {
+      return "Holiday";
+    }
+    if (/(event|подія|wydarzenie)/.test(normalized)) {
+      return "Event";
+    }
+    return /(note|нотатк|notatkę|замітку)/.test(normalized) ? "Event" : "Meeting";
+  };
+
+  const shouldCreateNote = (message: string) => {
+    const normalized = message.toLowerCase();
+    return /(додай|добав|заплан|плануй|запланувати|додати|add|plan|create|створи|запиши|напиши|zaplan|dodaj|utwórz|zapisz)/.test(normalized) &&
+      /(note|meeting|event|birthday|holiday|зустріч|подія|нотатк|замітку|день народження|свято|wydarzenie|spotkanie|urodziny|notatkę)/.test(normalized);
+  };
+
+  const generateAiReply = (message: string, language: "uk" | "pl" | "en", createdNote?: boolean, noteDate?: string, category?: string) => {
+    const normalized = message.toLowerCase();
+
+    if (createdNote && noteDate && category) {
+      if (language === "uk") {
+        return `Готово! Я додав ${category.toLowerCase()} на ${noteDate}.`;
+      }
+      if (language === "pl") {
+        return `Gotowe! Dodałem ${category.toLowerCase()} na ${noteDate}.`;
+      }
+      return `Done! I added the ${category.toLowerCase()} for ${noteDate}.`;
+    }
 
     if (language === "uk") {
       if (/(привіт|вітаю|доброго|здоров)/.test(normalized)) {
@@ -153,14 +263,29 @@ export default function KalendarPage() {
     if (!trimmed) return;
 
     const language = detectChatLanguage(trimmed) as "uk" | "pl" | "en";
-    const aiReply = generateAiReply(trimmed, language);
+    const createNote = shouldCreateNote(trimmed);
+    const noteDate = createNote ? extractDateFromMessage(trimmed) : undefined;
+    const noteTime = createNote ? extractTimeFromMessage(trimmed) : "";
+    const category = createNote ? inferNoteCategoryFromMessage(trimmed) : undefined;
     const userId = Date.now();
 
     setChatMessages((prev) => [
       ...prev,
       { id: userId, sender: "user", text: trimmed },
-      { id: userId + 1, sender: "ai", text: aiReply },
+      { id: userId + 1, sender: "ai", text: generateAiReply(trimmed, language, createNote, noteDate, category) },
     ]);
+
+    if (createNote && category) {
+      const newNote: Note = {
+        id: Date.now() + 1,
+        text: trimmed,
+        date: noteDate ?? new Date().toISOString().slice(0, 10),
+        time: noteTime,
+        category,
+      };
+      setNotes((prev) => [...prev, newNote]);
+    }
+
     setChatInput("");
   };
 
@@ -304,7 +429,6 @@ export default function KalendarPage() {
           Delete Note
         </button>
         <button className = "ctrl-btn green" onClick = {() => openModal("Note")}> Add Note </button>
-        <button className = "ctrl-btn" onClick = {() => setShowEditModal(true)}> Edit Profile </button>
         <button className = "ctrl-btn" onClick = {() => setIsChatOpen((prev) => !prev)}>{isChatOpen ? "Close Chat" : "AI Chat"}</button>
       </div>
 
