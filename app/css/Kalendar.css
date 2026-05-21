@@ -157,14 +157,35 @@
 
 /* Бульбашка користувача */
 .user-bubble-nav {
-    display: flex; 
-    align-items: center; 
-    gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     background: rgba(116, 169, 207, 0.6);
-    padding: 5px 20px; 
-    border-radius: 40px; 
-    border: 2px solid white; 
+    padding: 8px 18px;
+    border-radius: 40px;
+    border: 2px solid white;
     cursor: pointer;
+}
+
+.avatar-icon,
+.dashboard-avatar-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+.dashboard-avatar-icon {
+    width: 48px;
+    height: 48px;
+    margin-right: 12px;
 }
 
 .avatar-circle-nav { 
@@ -201,6 +222,12 @@
   background: rgba(255,255,255,0.08);
   box-shadow: 0 0 20px rgba(255,255,255,0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ctrl-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .ctrl-btn:hover {

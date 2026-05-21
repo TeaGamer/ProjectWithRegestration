@@ -28,8 +28,6 @@ export default function KalendarPage() {
   const [loading, setLoading] = useState(true);
   // Стан для відкриття чату ШІ
   const [isChatOpen, setIsChatOpen] = useState(false);
-  // Стан для режиму видалення нотаток
-  const [isDeleteMode, setIsDeleteMode] = useState(false);
   // Стан для модального вікна нотатки
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   // Тип нотатки: нотатка або свято
@@ -129,11 +127,22 @@ export default function KalendarPage() {
     return () => window.clearInterval(interval);
   }, [notes, smsRemindersSent]);
 
+  const sortNotesByDateTime = (notesToSort: Note[]) =>
+    notesToSort
+      .slice()
+      .sort((a, b) => {
+        const dateCompare = a.date.localeCompare(b.date);
+        if (dateCompare !== 0) return dateCompare;
+        return (a.time || "23:59").localeCompare(b.time || "23:59");
+      });
+
+  const sortedNotes = useMemo(() => sortNotesByDateTime(notes), [notes]);
+
   const filteredNotes = useMemo(() => {
     return selectedCategory === "all"
-      ? notes
-      : notes.filter((note) => note.category === selectedCategory);
-  }, [notes, selectedCategory]);
+      ? sortedNotes
+      : sortedNotes.filter((note) => note.category === selectedCategory);
+  }, [selectedCategory, sortedNotes]);
 
   const selectedNote = useMemo(
     () => notes.find((note) => note.id === selectedNoteId) || null,
@@ -311,7 +320,7 @@ export default function KalendarPage() {
         time: noteTime,
         category,
       };
-      setNotes((prev) => [...prev, newNote]);
+      setNotes((prev) => sortNotesByDateTime([...prev, newNote]));
     }
 
     setChatInput("");
@@ -335,7 +344,9 @@ export default function KalendarPage() {
   };
 
   const cellNotes = (day: number, offset: number) => {
-    return filteredNotes.filter((note) => noteMatchesCell(note, day, offset));
+    return filteredNotes
+      .filter((note) => noteMatchesCell(note, day, offset))
+      .sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
   };
 
   const prevMonthDays = new Date(year, month, 0).getDate();
@@ -396,24 +407,22 @@ export default function KalendarPage() {
     };
 
     if (selectedNote) {
-      setNotes((prev) => prev.map((item) => (item.id === selectedNote.id ? newNote : item)));
+      setNotes((prev) => sortNotesByDateTime(prev.map((item) => (item.id === selectedNote.id ? newNote : item))));
     } else {
-      setNotes((prev) => [...prev, newNote]);
+      setNotes((prev) => sortNotesByDateTime([...prev, newNote]));
     }
 
     closeModal();
   };
 
   const handleNoteClick = (note: Note) => {
-    if (isDeleteMode) {
-      setNotes((prev) => prev.filter((item) => item.id !== note.id));
-      if (selectedNoteId === note.id) {
-        setSelectedNoteId(null);
-      }
-      return;
-    }
-
     setSelectedNoteId(note.id);
+  };
+
+  const handleDeleteSelectedNote = () => {
+    if (!selectedNote) return;
+    setNotes((prev) => prev.filter((item) => item.id !== selectedNote.id));
+    setSelectedNoteId(null);
   };
 
   const changeMonth = (direction: number) => {
@@ -438,14 +447,8 @@ export default function KalendarPage() {
       <div className = "topbar-cal">
         <div className = "logo-section"> Calendar with Alex </div>
         <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
+          <div className="avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
           <span>{currentUser.login}</span>
-          <div className = "Avatar-img">
-            {currentUser.avatar ? (
-              <Image src = {currentUser.avatar} alt = "Avatar" width={39} height = {39} className = "avatar.png" />
-            ) : (
-              <div className = "avatar-letter">{currentUser.login.charAt(0).toUpperCase()}</div>
-            )}
-          </div>
         </button>
       </div>
 
@@ -453,7 +456,7 @@ export default function KalendarPage() {
       <div className = "controls-row">
         <button className = "ctrl-btn yellow" onClick = {() => openModal("Holiday")}> Add Date </button>
         <button className = "ctrl-btn" onClick = {openEditNote}> Edit Note </button>
-        <button className = {`ctrl-btn pink ${isDeleteMode ? "active-del" : ""}`} onClick = {() => setIsDeleteMode((prev) => !prev)}>
+        <button className = "ctrl-btn pink" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}>
           Delete Note
         </button>
         <button className = "ctrl-btn green" onClick = {() => openModal("Note")}> Add Note </button>
@@ -675,6 +678,7 @@ export default function KalendarPage() {
         <div className="dashboard-overlay" onClick={() => setIsDashboardOpen(false)}>
           <div className="dashboard-panel" onClick={(e) => e.stopPropagation()}>
             <div className="dashboard-panel-header">
+              <div className="dashboard-avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
               <div>
                 <h3>Dashboard</h3>
                 <p>Quick info panel</p>
@@ -692,9 +696,11 @@ export default function KalendarPage() {
         </div>
       )}
 
-      <button className="ai-neon-circle" onClick={() => setIsChatOpen((prev) => !prev)} aria-label="Open AI chat">
-        <span>💬</span>
-      </button>
+      {!isChatOpen && (
+        <button className="ai-neon-circle" onClick={() => setIsChatOpen(true)} aria-label="Open AI chat">
+          <span>💬</span>
+        </button>
+      )}
 
       {/* Редагування профілю */}
       {showEditModal && user && (
