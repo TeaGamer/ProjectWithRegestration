@@ -1,7 +1,7 @@
 "use client";
 
 // Імпорт необхідних хуків та компонентів для сторінки календаря
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import Profile from "../components/Profile";
 import { sendChatMessage } from "../services/chatService";
@@ -64,6 +64,7 @@ export default function KalendarPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
 
   // useEffect для завантаження збереженого користувача без примусової захищеної перевірки
@@ -245,6 +246,10 @@ export default function KalendarPage() {
     event.target.value = "";
   };
 
+  const handleAttachButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
   const removeAttachedFile = (index: number) => {
     setAttachedFiles((prev) => prev.filter((_, idx) => idx !== index));
   };
@@ -261,10 +266,11 @@ export default function KalendarPage() {
 
   const handleSendChatMessage = async () => {
     const trimmed = chatInput.trim();
-    if (!trimmed) return;
+    const userText = trimmed || (attachedFiles.length > 0 ? "Please review attached file(s)" : "");
+    if (!userText) return;
 
     const userId = Date.now();
-    setChatMessages((prev) => [...prev, { id: userId, sender: "user", text: trimmed }]);
+    setChatMessages((prev) => [...prev, { id: userId, sender: "user", text: userText }]);
     setChatLoading(true);
     setChatError(null);
 
@@ -300,11 +306,11 @@ export default function KalendarPage() {
         }
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Помилка відправки повідомлення";
+      const message = error instanceof Error ? error.message : "Error sending message";
       setChatError(message);
       setChatMessages((prev) => [
         ...prev,
-        { id: userId + 2, sender: "ai", text: `Помилка: ${message}` },
+        { id: userId + 2, sender: "ai", text: `Error: ${message}` },
       ]);
     } finally {
       setChatLoading(false);
@@ -637,7 +643,7 @@ export default function KalendarPage() {
               </div>
             )}
             {chatMessages.length === 0 ? (
-              <div className = "ai-text"> Welcome, {currentUser.login}! Ask something... </div>
+              <div className = "ai-text"> Welcome, {currentUser.first_name}! Ask something... </div>
             ) : (
               chatMessages.map((message) => (
                 <div key = {message.id} className = {`chat-message ${message.sender}`}>
@@ -653,8 +659,8 @@ export default function KalendarPage() {
             </div>
           )}
           <div className = "chat-bottom">
-            <label htmlFor="file-upload" className="file-upload-button" title="Attach file">📎</label>
-            <input id="file-upload" type="file" multiple onChange={handleFileInputChange} hidden />
+            <button type="button" className="file-upload-button" title="Attach file" onClick={handleAttachButtonClick}>📎</button>
+            <input ref={fileInputRef} id="file-upload" type="file" multiple onChange={handleFileInputChange} hidden />
             <input
               className = "ai-input"
               placeholder = "Ask something..."
@@ -672,7 +678,7 @@ export default function KalendarPage() {
               className = "send-message-btn"
               type = "button"
               onClick = {handleSendChatMessage}
-              disabled={chatLoading || !chatInput.trim()}
+              disabled={chatLoading || (!chatInput.trim() && attachedFiles.length === 0)}
             >
               {chatLoading ? 'Sending...' : 'Send'}
             </button>

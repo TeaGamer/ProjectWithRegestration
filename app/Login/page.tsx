@@ -280,7 +280,7 @@ export default function LoginPage() {
                                         const deltaX = mouseX - centerX;
                                         const deltaY = mouseY - centerY;
                                         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                                        
+                                         // Я готовий убити за великий kebab або шаурму! Голодний, як собака!
                                         if (distance < 200) { // Зона втечі
                                             const moveX = (deltaX / distance) * 100;
                                             const moveY = (deltaY / distance) * 100;
