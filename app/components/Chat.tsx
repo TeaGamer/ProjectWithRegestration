@@ -16,11 +16,21 @@ const ChatWidget: React.FC = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [token, setToken] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Завантажити історію при монтуванні компонента
   useEffect(() => {
-    loadChatHistory();
+    // Отримуємо токен з localStorage
+    const storedToken = localStorage.getItem('token') || '';
+    console.log('Token from localStorage:', storedToken ? 'Present' : 'Missing');
+    setToken(storedToken);
+    
+    if (storedToken) {
+      loadChatHistory(storedToken);
+    } else {
+      setError('Користувач не авторизований. Будь ласка, увійдіть.');
+    }
   }, []);
 
   // Автоскрол до останнього повідомлення
@@ -28,10 +38,10 @@ const ChatWidget: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const loadChatHistory = async () => {
+  const loadChatHistory = async (authToken: string) => {
     try {
       setError(null);
-      const history = await getChatHistory('', 50);
+      const history = await getChatHistory(authToken, 50);
       setMessages(history.messages);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Помилка завантаження історії');
@@ -43,6 +53,11 @@ const ChatWidget: React.FC = () => {
     e.preventDefault();
 
     if (!input.trim()) return;
+    
+    if (!token) {
+      setError('Помилка: користувач не авторизований.');
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -50,7 +65,7 @@ const ChatWidget: React.FC = () => {
     setInput('');
 
     try {
-      const response = await sendChatMessage(userMessage, '');
+      const response = await sendChatMessage(userMessage, token);
 
       setMessages(prev => [...prev, {
         id: response.message_id,
@@ -70,7 +85,7 @@ const ChatWidget: React.FC = () => {
 
   const handleDeleteMessage = async (messageId: number) => {
     try {
-      await deleteChatMessage(messageId, '');
+      await deleteChatMessage(messageId, token);
       setMessages(prev => prev.filter(msg => msg.id !== messageId));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Помилка видалення');
