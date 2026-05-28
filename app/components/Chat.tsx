@@ -31,6 +31,7 @@ const ChatWidget: React.FC = () => {
   const loadChatHistory = async () => {
     try {
       setError(null);
+      // Token передається автоматично через HttpOnly cookie з credentials: 'include'
       const history = await getChatHistory('', 50);
       setMessages(history.messages);
     } catch (err) {
@@ -70,6 +71,7 @@ const ChatWidget: React.FC = () => {
 
   const handleDeleteMessage = async (messageId: number) => {
     try {
+      // Token передається автоматично через HttpOnly cookie з credentials: 'include'
       await deleteChatMessage(messageId, '');
       setMessages(prev => prev.filter(msg => msg.id !== messageId));
     } catch (err) {

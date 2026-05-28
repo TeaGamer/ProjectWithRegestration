@@ -46,8 +46,9 @@ export async function sendChatMessage(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        ...(token && { 'Authorization': `Bearer ${token}` })
       },
+      credentials: 'include',
       body: JSON.stringify(payload)
     });
 
@@ -75,7 +76,10 @@ export async function getChatHistory(
     url.searchParams.append('limit', limit.toString());
 
     const response = await fetch(url.toString(), {
-      headers: {'Authorization': `Bearer ${token}`}
+      headers: {
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      },
+      credentials: 'include'
     });
 
     if (!response.ok) {
@@ -100,7 +104,10 @@ export async function deleteChatMessage(
   try {
     const response = await fetch(`${API_BASE_URL}/api/chat/${messageId}`, {
       method: 'DELETE',
-      headers: {'Authorization': `Bearer ${token}`}
+      headers: {
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      },
+      credentials: 'include'
     });
 
     if (!response.ok) {
