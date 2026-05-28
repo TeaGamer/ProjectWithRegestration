@@ -104,7 +104,9 @@ export async function getChatHistory(
 export async function deleteChatMessage(
   messageId: number,
   token: string
-): Promiole.log('Deleting message with token:', token ? 'Present' : 'Missing');
+): Promise<{ message: string }> {
+  try {
+    console.log('Deleting message with token:', token ? 'Present' : 'Missing');
 
     const response = await fetch(`${API_BASE_URL}/api/chat/${messageId}`, {
       method: 'DELETE',
@@ -116,9 +118,7 @@ export async function deleteChatMessage(
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || `Error deleting message: ${response.status}`
-      const error = await response.json();
-      throw new Error(error.error || 'Error deleting message');
+      throw new Error(error.error || `Error deleting message: ${response.status}`);
     }
 
     return await response.json();
