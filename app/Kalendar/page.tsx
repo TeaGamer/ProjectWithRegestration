@@ -269,8 +269,9 @@ export default function KalendarPage() {
     setChatError(null);
 
     try {
+      const token = localStorage.getItem("token") || "";
       const fileNames = attachedFiles.map((file) => file.name);
-      const response = await sendChatMessage(trimmed, "", fileNames.length ? fileNames : undefined);
+      const response = await sendChatMessage(trimmed, token, fileNames.length ? fileNames : undefined);
       setChatMessages((prev) => [
         ...prev,
         { id: userId + 1, sender: "ai", text: response.ai_response ?? "No response from AI." },
