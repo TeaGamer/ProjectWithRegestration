@@ -109,7 +109,7 @@ export default function LoginPage() {
             } else {
                 setError(data.error || "Invalid email or password!");
             }
-        } catch {setError(" Connection error. Please try again. ");}
+        } catch {setError(" Connection error. Please try again.");} 
     };
 
     const handleRegisterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import Profile from "../components/Profile";
+import { sendChatMessage } from "../services/chatService";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
 
@@ -55,6 +56,9 @@ export default function KalendarPage() {
     text: string;
   }[]>([]);
   const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+  const [usedFiles, setUsedFiles] = useState<File[]>([]);
   const [smsRemindersSent, setSmsRemindersSent] = useState<number[]>([]);
   // Стан для відкриття модального вікна редагування профілю
   const [showEditModal, setShowEditModal] = useState(false);
@@ -245,95 +249,66 @@ export default function KalendarPage() {
     setAttachedFiles((prev) => prev.filter((_, idx) => idx !== index));
   };
 
-  const generateAiReply = (
-    message: string,
-    language: "uk" | "pl" | "en",
-    createdNote?: boolean,
-    noteDate?: string,
-    category?: string,
-    files: File[] = []
-  ) => {
-    const normalized = message.toLowerCase();
-
-    if (files.length > 0) {
-      const names = files.map((file) => file.name).join(", ");
-      if (language === "uk") {
-        return `Я переглянув файли: ${names}. Що бажаєш запитати далі?`;
-      }
-      if (language === "pl") {
-        return `Przejrzałem pliki: ${names}. O co chcesz zapytać dalej?`;
-      }
-      return `I reviewed the files: ${names}. What would you like to ask next?`;
-    }
-
-    if (createdNote && noteDate && category) {
-      if (language === "uk") {
-        return `Готово! Я додав ${category.toLowerCase()} на ${noteDate}.`;
-      }
-      if (language === "pl") {
-        return `Gotowe! Dodałem ${category.toLowerCase()} на ${noteDate}.`;
-      }
-      return `Done! I added the ${category.toLowerCase()} for ${noteDate}.`;
-    }
-
-    if (language === "uk") {
-      if (/(привіт|вітаю|доброго|здоров)/.test(normalized)) {
-        return "Привіт! Я готовий допомогти з твоїм календарем українською.";
-      }
-      if (/(додай|добав|заплан|зустріч|поді|нотатк)/.test(normalized)) {
-        return "Звісно, розкажи мені більше про подію, яку хочеш додати.";
-      }
-      return "Я відповідаю українською. Що ще бажаєш дізнатися або запланувати?";
-    }
-
-    if (language === "pl") {
-      if (/(cześć|witaj|dzień dobry|hej)/.test(normalized)) {
-        return "Cześć! Jestem tutaj, aby pomóc Ci z kalendarzem po polsku.";
-      }
-      if (/(dodaj|zaplan|spotkanie|wydarzenie|notatkę)/.test(normalized)) {
-        return "Pewnie, powiedz mi więcej o wydarzeniu, które chcesz dodać.";
-      }
-      return "Odpowiadam po polsku. Co chciałbyś teraz zrobić?";
-    }
-
-    if (/(hello|hi|hey|good morning|good afternoon)/.test(normalized)) {
-      return "Hello! I'm ready to help with your calendar in English.";
-    }
-    if (/(add|plan|meeting|event|note)/.test(normalized)) {
-      return "Sure, tell me more about the event you want to add.";
-    }
-    return "I respond in English. What would you like to do next?";
+  const openFile = (file: File) => {
+    const url = URL.createObjectURL(file);
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
   };
 
-  const handleSendChatMessage = () => {
+  const removeUsedFile = (index: number) => {
+    setUsedFiles((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleSendChatMessage = async () => {
     const trimmed = chatInput.trim();
     if (!trimmed) return;
 
-    const language = detectChatLanguage(trimmed) as "uk" | "pl" | "en";
-    const createNote = shouldCreateNote(trimmed);
-    const noteDate = createNote ? extractDateFromMessage(trimmed) : undefined;
-    const noteTime = createNote ? extractTimeFromMessage(trimmed) : "";
-    const category = createNote ? inferNoteCategoryFromMessage(trimmed) : undefined;
     const userId = Date.now();
+    setChatMessages((prev) => [...prev, { id: userId, sender: "user", text: trimmed }]);
+    setChatLoading(true);
+    setChatError(null);
 
-    setChatMessages((prev) => [
-      ...prev,
-      { id: userId, sender: "user", text: trimmed },
-      { id: userId + 1, sender: "ai", text: generateAiReply(trimmed, language, createNote, noteDate, category, attachedFiles) },
-    ]);
+    try {
+      const fileNames = attachedFiles.map((file) => file.name);
+      const response = await sendChatMessage(trimmed, "", fileNames.length ? fileNames : undefined);
+      setChatMessages((prev) => [
+        ...prev,
+        { id: userId + 1, sender: "ai", text: response.ai_response ?? "No response from AI." },
+      ]);
 
-    if (createNote && category) {
-      const newNote: Note = {
-        id: Date.now() + 1,
-        text: trimmed,
-        date: noteDate ?? new Date().toISOString().slice(0, 10),
-        time: noteTime,
-        category,
-      };
-      setNotes((prev) => sortNotesByDateTime([...prev, newNote]));
+      if (attachedFiles.length > 0) {
+        setUsedFiles((prev) => [...prev, ...attachedFiles]);
+        setAttachedFiles([]);
+      }
+
+      const createNote = shouldCreateNote(trimmed);
+      if (createNote) {
+        const noteDate = extractDateFromMessage(trimmed);
+        const noteTime = extractTimeFromMessage(trimmed);
+        const category = inferNoteCategoryFromMessage(trimmed);
+
+        if (category) {
+          const newNote: Note = {
+            id: Date.now() + 1,
+            text: trimmed,
+            date: noteDate,
+            time: noteTime,
+            category,
+          };
+          setNotes((prev) => sortNotesByDateTime([...prev, newNote]));
+        }
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Помилка відправки повідомлення";
+      setChatError(message);
+      setChatMessages((prev) => [
+        ...prev,
+        { id: userId + 2, sender: "ai", text: `Помилка: ${message}` },
+      ]);
+    } finally {
+      setChatLoading(false);
+      setChatInput("");
     }
-
-    setChatInput("");
   };
 
   const year = currentDate.getFullYear();
@@ -483,16 +458,18 @@ export default function KalendarPage() {
             </button>
           ))}
           <div className="file-list-box">
-            <div className="file-list-title">AI files for RAG</div>
-            {attachedFiles.length > 0 ? (
-              attachedFiles.map((file, index) => (
+            <div className="file-list-title">AI files used</div>
+            {usedFiles.length > 0 ? (
+              usedFiles.map((file, index) => (
                 <div key={`${file.name}-${index}`} className="file-chip">
-                  <span>{file.name}</span>
-                  <button type="button" onClick={() => removeAttachedFile(index)}>×</button>
+                  <button type="button" onClick={() => openFile(file)} style={{ flex: 1, textAlign: 'left', background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+                    {file.name}
+                  </button>
+                  <button type="button" onClick={() => removeUsedFile(index)}>×</button>
                 </div>
               ))
             ) : (
-              <div className="file-list-empty">No files attached yet.</div>
+              <div className="file-list-empty">No used files yet.</div>
             )}
           </div>
         </div>
@@ -538,7 +515,7 @@ export default function KalendarPage() {
 
         {/* Інформація про Alex і нотатки */}
         <div className = "alex-profile">
-          <span> ALEX </span>
+          <span> ALEX Assistent</span>
           <div className = "circle purple"></div>
           <div style = {{ marginTop: "20px", color: "white" }}>
             <strong> Notes ({filteredNotes.length})</strong>
@@ -647,6 +624,17 @@ export default function KalendarPage() {
             <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
           </div>
           <div className = "chat-mid">
+            {attachedFiles.length > 0 && (
+              <div className="file-list-box" style={{ marginBottom: '14px' }}>
+                <div className="file-list-title">Files attached for this request</div>
+                {attachedFiles.map((file, index) => (
+                  <div key={`${file.name}-${index}`} className="file-chip">
+                    <span>{file.name}</span>
+                    <button type="button" onClick={() => removeAttachedFile(index)}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
             {chatMessages.length === 0 ? (
               <div className = "ai-text"> Welcome, {currentUser.login}! Ask something... </div>
             ) : (
@@ -658,9 +646,14 @@ export default function KalendarPage() {
               ))
             )}
           </div>
+          {chatError && (
+            <div className="file-list-box" style={{ margin: '0 20px 10px', background: 'rgba(255, 0, 0, 0.1)', color: '#ffdddd', borderColor: 'rgba(255,0,0,0.25)' }}>
+              {chatError}
+            </div>
+          )}
           <div className = "chat-bottom">
             <label htmlFor="file-upload" className="file-upload-button" title="Attach file">📎</label>
-            <input id="file-upload" type="file" multiple onChange={handleFileInputChange} hidden />
+            <input id="file-upload" type="file" multiple onChange={handleFileInputChange} hidden disabled={chatLoading} />
             <input
               className = "ai-input"
               placeholder = "Ask something..."
@@ -672,13 +665,15 @@ export default function KalendarPage() {
                   handleSendChatMessage();
                 }
               }}
+              disabled={chatLoading}
             />
             <button
               className = "send-message-btn"
               type = "button"
               onClick = {handleSendChatMessage}
+              disabled={chatLoading || !chatInput.trim()}
             >
-              Send
+              {chatLoading ? 'Sending...' : 'Send'}
             </button>
           </div>
         </div>

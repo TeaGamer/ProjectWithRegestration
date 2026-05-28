@@ -68,7 +68,9 @@ html, body {
 }
 
 /* Profile Avatar */
-.profile-avatar-wrapper {position: relative;}
+.profile-avatar-wrapper {
+    position: relative;
+}
 
 .profile-avatar-btn {
     background: none;
@@ -78,7 +80,9 @@ html, body {
     transition: transform 0.3s ease;
 }
 
-.profile-avatar-btn:hover {transform: scale(1.1);}
+.profile-avatar-btn:hover {
+    transform: scale(1.1);
+}
 
 .avatar-circle {
     width: 50px;
@@ -183,8 +187,12 @@ html, body {
     transition: all 0.3s ease;
 }
 
-.profile-menu-logout:hover {background: #ff5252;}
-.profile-menu-edit:hover {background: #5568d3;}
+.profile-menu-logout:hover {
+    background: #ff5252;
+}
+.profile-menu-edit:hover {
+    background: #5568d3;
+}
 
 /* Edit Button in Menu */
 .profile-menu-edit {
@@ -260,7 +268,9 @@ html, body {
     line-height: 1.6;
 }
 
-.info-popup-body p {margin: 10px 0;}
+.info-popup-body p {
+    margin: 10px 0;
+}
 
 .close-info-btn {
     border: none;
@@ -271,7 +281,9 @@ html, body {
     cursor: pointer;
 }
 
-.close-info-btn:hover {background: rgba(255,255,255,0.3);}
+.close-info-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
 
 /* Темна фонова накладка для модальних вікон */
 .modal-overlay {
@@ -344,7 +356,9 @@ html, body {
     outline: none !important;
 }
 
-.modal-content.note-modal .modal-body input::placeholder {color: rgba(248, 250, 252, 0.5);}
+.modal-content.note-modal .modal-body input::placeholder {
+    color: rgba(248, 250, 252, 0.5);
+}
 
 .modal-content.note-modal .modal-footer {
     gap: 14px;
@@ -359,9 +373,15 @@ html, body {
     background: rgba(255,255,255,0.06);
 }
 
-.modal-header.note-modal h2 {color: #f8fafc;}
+.modal-header.note-modal h2 {
+    color: #f8fafc;
+    font-size: 1.3rem;
+    margin: 0;
+}
 
-.modal-close.note-modal {color: #e2e8f0;}
+.modal-close.note-modal {
+    color: #e2e8f0;
+}
 
 .modal-content.note-modal input,
 .modal-content.note-modal select {
@@ -416,7 +436,9 @@ html, body {
     color: #e2e8f0;
 }
 
-.modal-btn.cancel-btn:hover {background: rgba(255,255,255,0.18);}
+.modal-btn.cancel-btn:hover {
+    background: rgba(255,255,255,0.18)
+}
 
 .modal-header {
     display: flex;
@@ -447,12 +469,18 @@ html, body {
     justify-content: center;
 }
 
-.modal-close:hover {color: #333;}
+.modal-close:hover {
+    color: #333;
+}
 
 /* Форми редагування профілю у модалці */
-.edit-profile-form {padding: 20px;}
+.edit-profile-form {
+    padding: 20px
+}
 
-.form-group {margin-bottom: 20px;}
+.form-group {
+    margin-bottom: 20px
+}
 
 .form-group label {
     display: block;

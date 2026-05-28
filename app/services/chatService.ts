@@ -33,16 +33,22 @@ interface ChatHistoryResponse {
  */
 export async function sendChatMessage(
   message: string,
-  token: string
+  token: string,
+  fileNames?: string[]
 ): Promise<ChatResponse> {
   try {
+    const payload: { message: string; fileNames?: string[] } = { message };
+    if (fileNames && fileNames.length > 0) {
+      payload.fileNames = fileNames;
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ message })
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
