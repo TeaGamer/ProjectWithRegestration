@@ -42,11 +42,13 @@ export async function sendChatMessage(
       payload.fileNames = fileNames;
     }
 
+    console.log('Sending chat message with token:', token ? 'Present' : 'Missing');
+    
     const response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` })
+        'Authorization': `Bearer ${token}`
       },
       credentials: 'include',
       body: JSON.stringify(payload)
@@ -54,7 +56,7 @@ export async function sendChatMessage(
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Error sending message');
+      throw new Error(error.error || `Error sending message: ${response.status}`);
     }
 
     return await response.json();
@@ -72,19 +74,21 @@ export async function getChatHistory(
   limit: number = 50
 ): Promise<ChatHistoryResponse> {
   try {
-    const url = new URL(`${API_BASE_URL}/api/chat/history`); // Використовуємо URL для зручного додавання параметрів
+    const url = new URL(`${API_BASE_URL}/api/chat/history`);
     url.searchParams.append('limit', limit.toString());
+
+    console.log('Fetching chat history with token:', token ? 'Present' : 'Missing');
 
     const response = await fetch(url.toString(), {
       headers: {
-        ...(token && { 'Authorization': `Bearer ${token}` })
+        'Authorization': `Bearer ${token}`
       },
       credentials: 'include'
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Error fetching history');
+      throw new Error(error.error || `Error fetching history: ${response.status}`);
     }
 
     return await response.json();
@@ -100,17 +104,19 @@ export async function getChatHistory(
 export async function deleteChatMessage(
   messageId: number,
   token: string
-): Promise<{ message: string }> {
-  try {
+): Promiole.log('Deleting message with token:', token ? 'Present' : 'Missing');
+
     const response = await fetch(`${API_BASE_URL}/api/chat/${messageId}`, {
       method: 'DELETE',
       headers: {
-        ...(token && { 'Authorization': `Bearer ${token}` })
+        'Authorization': `Bearer ${token}`
       },
       credentials: 'include'
     });
 
     if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || `Error deleting message: ${response.status}`
       const error = await response.json();
       throw new Error(error.error || 'Error deleting message');
     }
