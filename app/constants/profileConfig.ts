@@ -1,3 +1,4 @@
+import { profile } from "console";
 
 export interface User {
     id: number;
