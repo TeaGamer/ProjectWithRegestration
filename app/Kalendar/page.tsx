@@ -654,7 +654,7 @@ export default function KalendarPage() {
           )}
           <div className = "chat-bottom">
             <label htmlFor="file-upload" className="file-upload-button" title="Attach file">📎</label>
-            <input id="file-upload" type="file" multiple onChange={handleFileInputChange} hidden disabled={chatLoading} />
+            <input id="file-upload" type="file" multiple onChange={handleFileInputChange} hidden />
             <input
               className = "ai-input"
               placeholder = "Ask something..."
