@@ -161,11 +161,11 @@ export default function KalendarPage() {
   }, [selectedCategory, sortedNotes]);
 
   const getCategoryClass = (category: string) => {
-    if (category === "Виклади(лекції)") return "lectures";
-    if (category === "Екзамени") return "exams";
-    if (category === "Зустрічі") return "meetings";
-    if (category === "Нотатки") return "notes";
-    if (category === "Події") return "events";
+    if (category === "Lectures (lessons)") return "lectures";
+    if (category === "Exams") return "exams";
+    if (category === "Meetings") return "meetings";
+    if (category === "Notes") return "notes";
+    if (category === "Events") return "events";
     return "events";
   };
 
