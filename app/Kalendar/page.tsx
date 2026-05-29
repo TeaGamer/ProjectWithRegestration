@@ -18,7 +18,7 @@ interface Note {
 }
 
 // Константи для категорій та днів тижня
-const CATEGORY_OPTIONS = ["Meeting", "Birthday", "Holiday", "Event"];
+const CATEGORY_OPTIONS = ["Виклади(лекції)", "Екзамени", "Зустрічі", "Нотатки", "Події"];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // Головний компонент сторінки календаря
@@ -63,6 +63,7 @@ export default function KalendarPage() {
   // Стан для відкриття модального вікна редагування профілю
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
@@ -109,7 +110,7 @@ export default function KalendarPage() {
   }, [notes]);
 
   const sendSmsReminder = (note: Note) => {
-    const reminderText = `Нагадування: зустріч "${note.text}" починається о ${note.time} ${note.date}.`;
+    const reminderText = `Reminder: meeting "${note.text}" starts at ${note.time} on ${note.date}.`;
     console.log("SMS reminder sent:", reminderText);
     setChatMessages((prev) => [
       ...prev,
@@ -124,7 +125,7 @@ export default function KalendarPage() {
   const checkMeetingReminders = () => {
     const now = new Date();
     notes.forEach((note) => {
-      if (note.category !== "Meeting" || !note.time || !note.date) return;
+      if (!["Meeting", "Зустрічі"].includes(note.category) || !note.time || !note.date) return;
 
       const reminderDate = new Date(`${note.date}T${note.time}`);
       const diffMs = reminderDate.getTime() - now.getTime();
@@ -159,13 +160,22 @@ export default function KalendarPage() {
       : sortedNotes.filter((note) => note.category === selectedCategory);
   }, [selectedCategory, sortedNotes]);
 
+  const getCategoryClass = (category: string) => {
+    if (category === "Виклади(лекції)") return "lectures";
+    if (category === "Екзамени") return "exams";
+    if (category === "Зустрічі") return "meetings";
+    if (category === "Нотатки") return "notes";
+    if (category === "Події") return "events";
+    return "events";
+  };
+
   const selectedNote = useMemo(
     () => notes.find((note) => note.id === selectedNoteId) || null,
     [notes, selectedNoteId]
   );
 
   const detectChatLanguage = (text: string) => {
-    if (/[А-Яа-яЁёЇїІіЄєҐґ]/.test(text)) {
+    if (/[А-Я а-я ЁёЇїІіЄєҐґ]/.test(text)) {
       return "uk";
     }
     if (/[ąćęłńóśżźĄĆĘŁŃÓŚŻŹ]/.test(text)) {
@@ -218,19 +228,25 @@ export default function KalendarPage() {
 
   const inferNoteCategoryFromMessage = (message: string) => {
     const normalized = message.toLowerCase();
-    if (/(birthday|день народження|urodziny)/.test(normalized)) {
-      return "Birthday";
+    if (/(lecture|лекц|виклад|лекція|лекції)/.test(normalized)) {
+      return "Виклади(лекції)";
+    }
+    if (/(exam|екзам|тест)/.test(normalized)) {
+      return "Екзамени";
     }
     if (/(meeting|зустріч|spotkanie)/.test(normalized)) {
-      return "Meeting";
+      return "Зустрічі";
     }
-    if (/(holiday|відпустка|свято|wydarzenie|święto)/.test(normalized)) {
-      return "Holiday";
+    if (/(birthday|день народження|urodziny|holiday|відпустка|свято)/.test(normalized)) {
+      return "Події";
+    }
+    if (/(note|нотат|заміт|notat|notatkę)/.test(normalized)) {
+      return "Нотатки";
     }
     if (/(event|подія|wydarzenie)/.test(normalized)) {
-      return "Event";
+      return "Події";
     }
-    return /(note|нотатк|notatkę|замітку)/.test(normalized) ? "Event" : "Meeting";
+    return "Зустрічі";
   };
 
   const shouldCreateNote = (message: string) => {
@@ -354,9 +370,18 @@ export default function KalendarPage() {
     return {day: index - shift - daysInMonth + 1, offset: 1};
   });
 
+  const handleLogout = () => {
+    setShowLogoutConfirm(false);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    window.location.href = "/Login";
+  };
+
   const openModal = (type: "Note" | "Holiday") => {
+
     setNoteType(type);
-    setNoteCategory(type === "Holiday" ? "Holiday" : "Meeting");
+    setNoteCategory(type === "Holiday" ? "Події" : "Зустрічі");
     setNoteText("");
     setNoteDate("");
     setNoteTime("");
@@ -509,7 +534,7 @@ export default function KalendarPage() {
                   </div>
                   <div className = "cell-notes">
                     {notesInCell.slice(0, 2).map((note) => (
-                      <div key = {note.id} className = {`cell-note-badge ${note.category.toLowerCase()}`}>
+                      <div key = {note.id} className = {`cell-note-badge ${getCategoryClass(note.category)}`}>
                         {note.category}: {note.text}
                       </div>
                     ))}
@@ -703,6 +728,73 @@ export default function KalendarPage() {
               <p><strong>Email:</strong> {currentUser.email || "Not set"}</p>
               {currentUser.region && <p><strong>Region:</strong> {currentUser.region}</p>}
               {currentUser.date_of_birth && <p><strong>Date of Birth:</strong> {currentUser.date_of_birth}</p>}
+              <button
+                className="logout-btn"
+                onClick={() => setShowLogoutConfirm(true)}
+                style={{
+                  marginTop: "20px",
+                  width: "100%",
+                  padding: "12px 16px",
+                  backgroundColor: "#dc2626",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s"
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#b91c1c")}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#dc2626")}
+              >
+                Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="modal-content note-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header note-modal">
+              <h2>Confirm Logout</h2>
+              <button className="modal-close note-modal" onClick={() => setShowLogoutConfirm(false)}>✕</button>
+            </div>
+            <div className="modal-body" style={{ padding: "20px", textAlign: "center" }}>
+              <p>Are you sure you want to log out?</p>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="modal-btn"
+                onClick={() => setShowLogoutConfirm(false)}
+                style={{
+                  background: "#6b7280",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  marginRight: "10px"
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="modal-btn"
+                onClick={handleLogout}
+                style={{
+                  background: "#dc2626",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "6px",
+                  cursor: "pointer"
+                }}
+              >
+                Log Out
+              </button>
             </div>
           </div>
         </div>
