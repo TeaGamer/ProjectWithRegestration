@@ -18,7 +18,7 @@ interface Note {
 }
 
 // Константи для категорій та днів тижня
-const CATEGORY_OPTIONS = ["Виклади(лекції)", "Екзамени", "Зустрічі", "Нотатки", "Події"];
+const CATEGORY_OPTIONS = ["Lectures (lessons)", "Exams", "Meetings", "Notes", "Events"];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // Головний компонент сторінки календаря
@@ -229,24 +229,20 @@ export default function KalendarPage() {
   const inferNoteCategoryFromMessage = (message: string) => {
     const normalized = message.toLowerCase();
     if (/(lecture|лекц|виклад|лекція|лекції)/.test(normalized)) {
-      return "Виклади(лекції)";
+      return "Lectures (lessons)";
     }
     if (/(exam|екзам|тест)/.test(normalized)) {
-      return "Екзамени";
+      return "Exams";
     }
     if (/(meeting|зустріч|spotkanie)/.test(normalized)) {
-      return "Зустрічі";
+      return "Meetings";
     }
-    if (/(birthday|день народження|urodziny|holiday|відпустка|свято)/.test(normalized)) {
-      return "Події";
+    if (/(birthday|день народження|urodziny|holiday|відпустка|свято|event|подія|wydarzenie)/.test(normalized)) {
+      return "Events";
     }
     if (/(note|нотат|заміт|notat|notatkę)/.test(normalized)) {
-      return "Нотатки";
+      return "Notes";
     }
-    if (/(event|подія|wydarzenie)/.test(normalized)) {
-      return "Події";
-    }
-    return "Зустрічі";
   };
 
   const shouldCreateNote = (message: string) => {
