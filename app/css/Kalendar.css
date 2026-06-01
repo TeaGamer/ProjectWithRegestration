@@ -1,11 +1,13 @@
 
 /* Стилі для сторінки календаря: фон, кольори та розташування */
-html, body {
+html, body, #__next {
   margin: 0;
   padding: 0;
+  height: 100%;
   min-height: 100%;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,11 +22,25 @@ html, body {
 
 /* Фоновий градієнт для всієї сторінки */
 .dashboard-layout-calendar {
-  min-height: 100vh;
+  height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   background: transparent;
   color: white;
   padding: 20px;
+}
+
+.main-grid-cal {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) 120px;
+  gap: 24px;
 }
 
 /* Хедер */
@@ -350,10 +366,8 @@ html, body {
   object-fit: cover; 
 }
 
-/* Force vertical scrollbar to prevent layout shift when content changes */
-html { overflow-y: auto; scrollbar-gutter: stable both-edges; }
-/* Prefer stable scrollbar gutter where supported */
-body { overflow-x: hidden; scrollbar-gutter: stable both-edges; }
+html { overflow-y: hidden !important; scrollbar-gutter: stable both-edges; }
+body { overflow-x: hidden !important; overflow-y: hidden !important; scrollbar-gutter: stable both-edges; }
 
 /* Prevent layout transition when toggling chat/dashboard */
 .dashboard-layout-calendar { transition: none !important; }
