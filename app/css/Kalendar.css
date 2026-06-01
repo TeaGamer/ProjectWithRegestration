@@ -31,24 +31,25 @@ html, body, #__next {
   overflow: hidden;
   background: transparent;
   color: white;
-  padding: 20px;
+  padding: 16px;
 }
 
 .main-grid-cal {
   flex: 1;
   min-height: 0;
+  max-height: calc(100vh - 140px);
   overflow: auto;
   display: grid;
   grid-template-columns: 170px minmax(0, 1fr) 120px;
-  gap: 24px;
+  gap: 18px;
 }
 
 /* Хедер */
-.topbar-cal { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-bottom: 20px; 
+.topbar-cal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
   gap: 16px;
 }
 
@@ -132,11 +133,12 @@ html, body, #__next {
 }
 
 /* Кнопки */
-.controls-row { 
-  display: flex; 
+.controls-row {
+  display: flex;
   justify-content: center;
   gap: 18px;
-  margin-bottom: 30px;
+  margin-bottom: 16px;
+  margin-top: -8px;
   flex-wrap: wrap;
 }
 
@@ -201,7 +203,8 @@ html, body, #__next {
   justify-content: center;
   align-items: center;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 8px;
+  margin-top: -10px;
 }
 
 .month-pill {
@@ -232,7 +235,7 @@ html, body, #__next {
   background: #1f2937;
   border-radius: 22px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.18);
+  border: none;
 }
 
 .grid-head-cell {
@@ -249,7 +252,7 @@ html, body, #__next {
   color: #111;
   min-height: 108px;
   padding: 10px;
-  border: 1px solid rgba(17,24,39,0.08);
+  border: none;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
