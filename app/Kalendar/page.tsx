@@ -259,10 +259,6 @@ export default function KalendarPage() {
     event.target.value = "";
   };
 
-  const handleAttachButtonClick = () => {
-    fileInputRef.current?.click();
-  };
-
   const removeAttachedFile = (index: number) => {
     setAttachedFiles((prev) => prev.filter((_, idx) => idx !== index));
   };
@@ -575,11 +571,11 @@ export default function KalendarPage() {
         </div>
 
         {/* Інформація про Alex і нотатки */}
-        <div className = "alex-profile">
-          <span> ALEX Assistent</span>
+        <div className = "your_notes">
+          <span> Your notes</span>
           <div className = "circle purple"></div>
           <div style = {{ marginTop: "20px", color: "white" }}>
-            <strong> Notes ({filteredNotes.length})</strong>
+            <strong> Number of notes ({filteredNotes.length})</strong>
             {filteredNotes.map((note) => (
               <button
                 key = {note.id}
@@ -681,7 +677,7 @@ export default function KalendarPage() {
       {isChatOpen && (
         <div className = "ai-chat-box">
               <div className = "chat-top">
-                <span> Chat with AI </span>
+                <span> Chat with your Alex </span>
                 <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
               </div>
           <div className = "chat-mid">
@@ -714,8 +710,8 @@ export default function KalendarPage() {
             </div>
           )}
           <div className = "chat-bottom">
-            <button type="button" className="file-upload-button" title="Attach file" onClick={handleAttachButtonClick}>📎</button>
-            <input ref={fileInputRef} id="file-upload" type="file" multiple onChange={handleFileInputChange} hidden />
+            <label htmlFor="file-upload" className="file-upload-button" title="Attach file">📎</label>
+            <input ref={fileInputRef} id="file-upload" type="file" multiple accept="*/*" onChange={handleFileInputChange} hidden />
             <input
               className = "ai-input"
               placeholder = "Ask something..."
