@@ -1,5 +1,15 @@
 
 /* Стилі для сторінки календаря: фон, кольори та розташування */
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
 /* Сьогоднішня дата: чорний грубий контур */
 .today-highlight {
@@ -10,11 +20,11 @@
 
 /* Фоновий градієнт для всієї сторінки */
 .dashboard-layout-calendar {
-  overflow: auto;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  overflow: hidden;
+  background: transparent;
   color: white;
   padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Хедер */
@@ -341,9 +351,9 @@
 }
 
 /* Force vertical scrollbar to prevent layout shift when content changes */
-html { overflow-y: scroll; scrollbar-gutter: stable both-edges; }
+html { overflow-y: auto; scrollbar-gutter: stable both-edges; }
 /* Prefer stable scrollbar gutter where supported */
-body { scrollbar-gutter: stable both-edges; }
+body { overflow-x: hidden; scrollbar-gutter: stable both-edges; }
 
 /* Prevent layout transition when toggling chat/dashboard */
 .dashboard-layout-calendar { transition: none !important; }
