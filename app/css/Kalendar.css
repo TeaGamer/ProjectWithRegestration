@@ -449,9 +449,12 @@
 }
 
 /* Force vertical scrollbar to prevent layout shift when content changes */
-html { overflow-y: scroll; }
+html { overflow-y: scroll; scrollbar-gutter: stable both-edges; }
 /* Prefer stable scrollbar gutter where supported */
-body { scrollbar-gutter: stable; }
+body { scrollbar-gutter: stable both-edges; }
+
+/* Prevent layout transition when toggling chat/dashboard */
+.dashboard-layout-calendar { transition: none !important; }
 
 /* Стиль вікна чату ШІ: плаває над вмістом */
 .ai-chat-box {

@@ -338,6 +338,33 @@ export default function KalendarPage() {
     }
   }, [chatMessages]);
 
+  // Diagnostic: log page height changes and likely causes to the console
+  const _pageHeightPrev = useRef<number>(typeof document !== 'undefined' ? document.documentElement.scrollHeight : 0);
+  useEffect(() => {
+    try {
+      const newH = document.documentElement.scrollHeight;
+      if (_pageHeightPrev.current !== newH) {
+        console.info("[diag] pageHeight change", {
+          prev: _pageHeightPrev.current,
+          now: newH,
+          reason: {
+            isChatOpen,
+            chatMessages: chatMessages.length,
+            attachedFiles: attachedFiles.length,
+            usedFiles: usedFiles.length,
+            isDashboardOpen,
+            isNoteModalOpen,
+            showLogoutConfirm,
+            notes: notes.length,
+          },
+        });
+        _pageHeightPrev.current = newH;
+      }
+    } catch (e) {
+      // ignore in SSR or restricted env
+    }
+  }, [isChatOpen, chatMessages.length, attachedFiles.length, usedFiles.length, isDashboardOpen, isNoteModalOpen, showLogoutConfirm, notes.length]);
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const monthName = currentDate.toLocaleString("en-US", { month: "long" });
