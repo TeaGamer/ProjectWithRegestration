@@ -448,6 +448,11 @@
   object-fit: cover; 
 }
 
+/* Force vertical scrollbar to prevent layout shift when content changes */
+html { overflow-y: scroll; }
+/* Prefer stable scrollbar gutter where supported */
+body { scrollbar-gutter: stable; }
+
 /* Стиль вікна чату ШІ: плаває над вмістом */
 .ai-chat-box {
   position: fixed;

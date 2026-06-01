@@ -334,7 +334,7 @@ export default function KalendarPage() {
   // Auto-scroll chat to bottom when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
     }
   }, [chatMessages]);
 
@@ -653,10 +653,10 @@ export default function KalendarPage() {
       {/* Чат ШІ */}
       {isChatOpen && (
         <div className = "ai-chat-box">
-          <div className = "chat-top">
-            <span> Chat with Alex </span>
-            <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
-          </div>
+              <div className = "chat-top">
+                <span> Chat with AI </span>
+                <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
+              </div>
           <div className = "chat-mid">
             {attachedFiles.length > 0 && (
               <div className="file-list-box" style={{ marginBottom: '14px' }}>
@@ -674,7 +674,7 @@ export default function KalendarPage() {
             ) : (
               chatMessages.map((message) => (
                 <div key = {message.id} className = {`chat-message ${message.sender}`}>
-                  <span className = "message-sender">{message.sender === "user" ? "You" : "Alex"}</span>
+                  <span className = "message-sender">{message.sender === "user" ? "You" : "AI"}</span>
                   <p>{message.text}</p>
                 </div>
               ))
