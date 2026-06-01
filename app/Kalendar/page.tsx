@@ -66,6 +66,7 @@ export default function KalendarPage() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
 
   // useEffect для завантаження збереженого користувача без примусової захищеної перевірки
@@ -330,6 +331,13 @@ export default function KalendarPage() {
     }
   };
 
+  // Auto-scroll chat to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages]);
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const monthName = currentDate.toLocaleString("en-US", { month: "long" });
@@ -467,12 +475,10 @@ export default function KalendarPage() {
 
       {/* Панель дій */}
       <div className = "controls-row">
-        <button className = "ctrl-btn yellow" onClick = {() => openModal("Holiday")}> Add Date </button>
-        <button className = "ctrl-btn" onClick = {openEditNote}> Edit Note </button>
-        <button className = "ctrl-btn pink" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}>
-          Delete Note
-        </button>
-        <button className = "ctrl-btn green" onClick = {() => openModal("Note")}> Add Note </button>
+        <button className = "ctrl-btn" onClick = {() => openModal("Holiday")}>📅 Add Date</button>
+        <button className = "ctrl-btn" onClick = {openEditNote}>✏️ Edit Note</button>
+        <button className = "ctrl-btn" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}>🗑️ Delete Note</button>
+        <button className = "ctrl-btn" onClick = {() => openModal("Note")}>📝 Add Note</button>
       </div>
 
       <div className = "main-grid-cal">
@@ -673,6 +679,7 @@ export default function KalendarPage() {
                 </div>
               ))
             )}
+            <div ref={messagesEndRef} />
           </div>
           {chatError && (
             <div className="file-list-box" style={{ margin: '0 20px 10px', background: 'rgba(255, 0, 0, 0.1)', color: '#ffdddd', borderColor: 'rgba(255,0,0,0.25)' }}>
