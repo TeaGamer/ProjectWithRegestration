@@ -1,3 +1,4 @@
+import { profile } from "console";
 
 export interface User {
     id: number;
@@ -88,10 +89,10 @@ export const termsAndConditionsText: string = `
     - Adhere to ethical standards for the use of AI.
 
   5. PRIVACY
- We collect and process your data in accordance with our privacy
- policy.
- Your data is protected and will not be shared with third parties
- without your consent.
+ We collect and process your data in accordance with our 
+ privacy policy.
+ Your data is protected and will not be shared with 
+ third parties without your consent.
 
   6. LIABILITY
  The Alex service is not liable for:
@@ -201,4 +202,5 @@ export const Study: Teacher[] = [
         subjects: [" Technologie internetu rzeczy"]
     }
 ];
+
 

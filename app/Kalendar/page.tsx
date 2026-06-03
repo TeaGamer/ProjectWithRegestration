@@ -1,7 +1,7 @@
 "use client";
 
 // Імпорт необхідних хуків та компонентів для сторінки календаря
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import Profile from "../components/Profile";
 import { sendChatMessage } from "../services/chatService";
@@ -18,8 +18,8 @@ interface Note {
 }
 
 // Константи для категорій та днів тижня
-const CATEGORY_OPTIONS = ["Meeting", "Birthday", "Holiday", "Event"];
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const CATEGORY_OPTIONS = ["Lectures (lessons)", "Exams", "Meetings", "Notes", "Events"];
+const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 // Головний компонент сторінки календаря
 export default function KalendarPage() {
@@ -63,7 +63,10 @@ export default function KalendarPage() {
   // Стан для відкриття модального вікна редагування профілю
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
 
   // useEffect для завантаження збереженого користувача без примусової захищеної перевірки
@@ -108,7 +111,7 @@ export default function KalendarPage() {
   }, [notes]);
 
   const sendSmsReminder = (note: Note) => {
-    const reminderText = `Нагадування: зустріч "${note.text}" починається о ${note.time} ${note.date}.`;
+    const reminderText = `Reminder: meeting "${note.text}" starts at ${note.time} on ${note.date}.`;
     console.log("SMS reminder sent:", reminderText);
     setChatMessages((prev) => [
       ...prev,
@@ -123,7 +126,7 @@ export default function KalendarPage() {
   const checkMeetingReminders = () => {
     const now = new Date();
     notes.forEach((note) => {
-      if (note.category !== "Meeting" || !note.time || !note.date) return;
+      if (!["Meeting", "Зустрічі"].includes(note.category) || !note.time || !note.date) return;
 
       const reminderDate = new Date(`${note.date}T${note.time}`);
       const diffMs = reminderDate.getTime() - now.getTime();
@@ -158,13 +161,22 @@ export default function KalendarPage() {
       : sortedNotes.filter((note) => note.category === selectedCategory);
   }, [selectedCategory, sortedNotes]);
 
+  const getCategoryClass = (category: string) => {
+    if (category === "Lectures (lessons)") return "lectures";
+    if (category === "Exams") return "exams";
+    if (category === "Meetings") return "meetings";
+    if (category === "Notes") return "notes";
+    if (category === "Events") return "events";
+    return "events";
+  };
+
   const selectedNote = useMemo(
     () => notes.find((note) => note.id === selectedNoteId) || null,
     [notes, selectedNoteId]
   );
 
   const detectChatLanguage = (text: string) => {
-    if (/[А-Яа-яЁёЇїІіЄєҐґ]/.test(text)) {
+    if (/[А-Я а-я ЁёЇїІіЄєҐґ]/.test(text)) {
       return "uk";
     }
     if (/[ąćęłńóśżźĄĆĘŁŃÓŚŻŹ]/.test(text)) {
@@ -217,19 +229,21 @@ export default function KalendarPage() {
 
   const inferNoteCategoryFromMessage = (message: string) => {
     const normalized = message.toLowerCase();
-    if (/(birthday|день народження|urodziny)/.test(normalized)) {
-      return "Birthday";
+    if (/(lecture|лекц|виклад|лекція|лекції)/.test(normalized)) {
+      return "Lectures (lessons)";
+    }
+    if (/(exam|екзам|тест)/.test(normalized)) {
+      return "Exams";
     }
     if (/(meeting|зустріч|spotkanie)/.test(normalized)) {
-      return "Meeting";
+      return "Meetings";
     }
-    if (/(holiday|відпустка|свято|wydarzenie|święto)/.test(normalized)) {
-      return "Holiday";
+    if (/(birthday|день народження|urodziny|holiday|відпустка|свято|event|подія|wydarzenie)/.test(normalized)) {
+      return "Events";
     }
-    if (/(event|подія|wydarzenie)/.test(normalized)) {
-      return "Event";
+    if (/(note|нотат|заміт|notat|notatkę)/.test(normalized)) {
+      return "Notes";
     }
-    return /(note|нотатк|notatkę|замітку)/.test(normalized) ? "Event" : "Meeting";
   };
 
   const shouldCreateNote = (message: string) => {
@@ -261,10 +275,11 @@ export default function KalendarPage() {
 
   const handleSendChatMessage = async () => {
     const trimmed = chatInput.trim();
-    if (!trimmed) return;
+    const userText = trimmed || (attachedFiles.length > 0 ? "Please review attached file(s)" : "");
+    if (!userText) return;
 
     const userId = Date.now();
-    setChatMessages((prev) => [...prev, { id: userId, sender: "user", text: trimmed }]);
+    setChatMessages((prev) => [...prev, { id: userId, sender: "user", text: userText }]);
     setChatLoading(true);
     setChatError(null);
 
@@ -300,17 +315,51 @@ export default function KalendarPage() {
         }
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Помилка відправки повідомлення";
+      const message = error instanceof Error ? error.message : "Error sending message";
       setChatError(message);
       setChatMessages((prev) => [
         ...prev,
-        { id: userId + 2, sender: "ai", text: `Помилка: ${message}` },
+        { id: userId + 2, sender: "ai", text: `Error: ${message}` },
       ]);
     } finally {
       setChatLoading(false);
       setChatInput("");
     }
   };
+
+  // Auto-scroll chat to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+    }
+  }, [chatMessages]);
+
+  // Diagnostic: log page height changes and likely causes to the console
+  const _pageHeightPrev = useRef<number>(typeof document !== 'undefined' ? document.documentElement.scrollHeight : 0);
+  useEffect(() => {
+    try {
+      const newH = document.documentElement.scrollHeight;
+      if (_pageHeightPrev.current !== newH) {
+        console.info("[diag] pageHeight change", {
+          prev: _pageHeightPrev.current,
+          now: newH,
+          reason: {
+            isChatOpen,
+            chatMessages: chatMessages.length,
+            attachedFiles: attachedFiles.length,
+            usedFiles: usedFiles.length,
+            isDashboardOpen,
+            isNoteModalOpen,
+            showLogoutConfirm,
+            notes: notes.length,
+          },
+        });
+        _pageHeightPrev.current = newH;
+      }
+    } catch (e) {
+      // ignore in SSR or restricted env
+    }
+  }, [isChatOpen, chatMessages.length, attachedFiles.length, usedFiles.length, isDashboardOpen, isNoteModalOpen, showLogoutConfirm, notes.length]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -348,9 +397,18 @@ export default function KalendarPage() {
     return {day: index - shift - daysInMonth + 1, offset: 1};
   });
 
+  const handleLogout = () => {
+    setShowLogoutConfirm(false);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    window.location.href = "/Login";
+  };
+
   const openModal = (type: "Note" | "Holiday") => {
+
     setNoteType(type);
-    setNoteCategory(type === "Holiday" ? "Holiday" : "Meeting");
+    setNoteCategory(type === "Holiday" ? "Події" : "Зустрічі");
     setNoteText("");
     setNoteDate("");
     setNoteTime("");
@@ -428,7 +486,7 @@ export default function KalendarPage() {
   };
 
   return (
-    <div className = "dashboard-layout-calendar" style = {{ paddingRight: isChatOpen ? "calc(min(35vw, 520px) + 32px)" : "20px" }}>
+    <div className = "dashboard-layout-calendar">
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
         <div className = "logo-section"> Calendar with Alex </div>
@@ -440,12 +498,10 @@ export default function KalendarPage() {
 
       {/* Панель дій */}
       <div className = "controls-row">
-        <button className = "ctrl-btn yellow" onClick = {() => openModal("Holiday")}> Add Date </button>
-        <button className = "ctrl-btn" onClick = {openEditNote}> Edit Note </button>
-        <button className = "ctrl-btn pink" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}>
-          Delete Note
-        </button>
-        <button className = "ctrl-btn green" onClick = {() => openModal("Note")}> Add Note </button>
+        <button className = "ctrl-btn" onClick = {() => openModal("Holiday")}>📅 Add Date</button>
+        <button className = "ctrl-btn" onClick = {openEditNote}>✏️ Edit Note</button>
+        <button className = "ctrl-btn" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}>🗑️ Delete Note</button>
+        <button className = "ctrl-btn" onClick = {() => openModal("Note")}>📝 Add Note</button>
       </div>
 
       <div className = "main-grid-cal">
@@ -503,7 +559,7 @@ export default function KalendarPage() {
                   </div>
                   <div className = "cell-notes">
                     {notesInCell.slice(0, 2).map((note) => (
-                      <div key = {note.id} className = {`cell-note-badge ${note.category.toLowerCase()}`}>
+                      <div key = {note.id} className = {`cell-note-badge ${getCategoryClass(note.category)}`}>
                         {note.category}: {note.text}
                       </div>
                     ))}
@@ -515,11 +571,11 @@ export default function KalendarPage() {
         </div>
 
         {/* Інформація про Alex і нотатки */}
-        <div className = "alex-profile">
-          <span> ALEX Assistent</span>
+        <div className = "your_notes">
+          <span> Your notes</span>
           <div className = "circle purple"></div>
           <div style = {{ marginTop: "20px", color: "white" }}>
-            <strong> Notes ({filteredNotes.length})</strong>
+            <strong> Number of notes ({filteredNotes.length})</strong>
             {filteredNotes.map((note) => (
               <button
                 key = {note.id}
@@ -620,10 +676,10 @@ export default function KalendarPage() {
       {/* Чат ШІ */}
       {isChatOpen && (
         <div className = "ai-chat-box">
-          <div className = "chat-top">
-            <span> Chat with Alex </span>
-            <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
-          </div>
+              <div className = "chat-top">
+                <span> Chat with your Alex </span>
+                <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
+              </div>
           <div className = "chat-mid">
             {attachedFiles.length > 0 && (
               <div className="file-list-box" style={{ marginBottom: '14px' }}>
@@ -637,15 +693,16 @@ export default function KalendarPage() {
               </div>
             )}
             {chatMessages.length === 0 ? (
-              <div className = "ai-text"> Welcome, {currentUser.login}! Ask something... </div>
+              <div className = "ai-text"> Welcome, {currentUser.first_name}! Ask something... </div>
             ) : (
               chatMessages.map((message) => (
                 <div key = {message.id} className = {`chat-message ${message.sender}`}>
-                  <span className = "message-sender">{message.sender === "user" ? "You" : "Alex"}</span>
+                  <span className = "message-sender">{message.sender === "user" ? "You" : "AI"}</span>
                   <p>{message.text}</p>
                 </div>
               ))
             )}
+            <div ref={messagesEndRef} />
           </div>
           {chatError && (
             <div className="file-list-box" style={{ margin: '0 20px 10px', background: 'rgba(255, 0, 0, 0.1)', color: '#ffdddd', borderColor: 'rgba(255,0,0,0.25)' }}>
@@ -654,7 +711,7 @@ export default function KalendarPage() {
           )}
           <div className = "chat-bottom">
             <label htmlFor="file-upload" className="file-upload-button" title="Attach file">📎</label>
-            <input id="file-upload" type="file" multiple onChange={handleFileInputChange} hidden disabled={chatLoading} />
+            <input ref={fileInputRef} id="file-upload" type="file" multiple accept="*/*" onChange={handleFileInputChange} hidden />
             <input
               className = "ai-input"
               placeholder = "Ask something..."
@@ -672,7 +729,7 @@ export default function KalendarPage() {
               className = "send-message-btn"
               type = "button"
               onClick = {handleSendChatMessage}
-              disabled={chatLoading || !chatInput.trim()}
+              disabled={chatLoading || (!chatInput.trim() && attachedFiles.length === 0)}
             >
               {chatLoading ? 'Sending...' : 'Send'}
             </button>
@@ -697,6 +754,73 @@ export default function KalendarPage() {
               <p><strong>Email:</strong> {currentUser.email || "Not set"}</p>
               {currentUser.region && <p><strong>Region:</strong> {currentUser.region}</p>}
               {currentUser.date_of_birth && <p><strong>Date of Birth:</strong> {currentUser.date_of_birth}</p>}
+              <button
+                className="logout-btn"
+                onClick={() => setShowLogoutConfirm(true)}
+                style={{
+                  marginTop: "20px",
+                  width: "100%",
+                  padding: "12px 16px",
+                  backgroundColor: "#dc2626",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s"
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#b91c1c")}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#dc2626")}
+              >
+                Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="modal-content note-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header note-modal">
+              <h2>Confirm Logout</h2>
+              <button className="modal-close note-modal" onClick={() => setShowLogoutConfirm(false)}>✕</button>
+            </div>
+            <div className="modal-body" style={{ padding: "20px", textAlign: "center" }}>
+              <p>Are you sure you want to log out?</p>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="modal-btn"
+                onClick={() => setShowLogoutConfirm(false)}
+                style={{
+                  background: "#6b7280",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  marginRight: "10px"
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="modal-btn"
+                onClick={handleLogout}
+                style={{
+                  background: "#dc2626",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "6px",
+                  cursor: "pointer"
+                }}
+              >
+                Log Out
+              </button>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 
-/* Стилі для сторінки логіну та реєстрації у стилі Dashboard/Kalendar */
+/* Стилі для сторінки логіну та реєстрації у стилі Kalendar */
 
 .login-container {
     min-height: 100vh;
@@ -348,5 +348,179 @@
         padding-right: 22px;
     }
     .tabs {gap: 8px;}
+}
+
+/* Desktop - Large screens */
+@media (min-width: 1200px) {
+    .login-container {
+        padding: 40px;
+    }
+    .login-form-wrapper {
+        max-width: 520px;
+    }
+}
+
+/* Tablets - Medium screens */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .login-container {
+        padding: 20px;
+    }
+    .login-form-wrapper {
+        max-width: 480px;
+    }
+}
+
+/* Mobile - Small screens (480px - 767px) */
+@media (max-width: 767px) {
+    .login-container {
+        padding: 16px;
+        min-height: auto;
+    }
+
+    .login-form-wrapper {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .login-form-header {
+        padding: 24px 20px 18px;
+    }
+
+    .login-form-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .login-form-header p {
+        font-size: 0.9rem;
+    }
+
+    .tabs {
+        padding: 18px 20px 16px;
+    }
+
+    .form-container {
+        padding: 0 20px 24px;
+    }
+
+    .login-form input[type=\"text\"],
+    .login-form input[type=\"password\"],
+    .login-form input[type=\"email\"],
+    .login-form select {
+        padding: 12px 14px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Very small mobile (up to 479px) */
+@media (max-width: 479px) {
+    .login-container {
+        padding: 12px;
+    }
+
+    .login-container::before,
+    .login-container::after {
+        display: none;
+    }
+
+    .login-form-wrapper {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 16px;
+    }
+
+    .login-form-header {
+        padding: 18px 16px 14px;
+    }
+
+    .login-form-header h1 {
+        font-size: 1.3rem;
+        line-height: 1.2;
+    }
+
+    .login-form-header p {
+        font-size: 0.85rem;
+        margin-top: 8px;
+    }
+
+    .tabs {
+        padding: 14px 16px 12px;
+        gap: 6px;
+    }
+
+    .tab-btn {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .form-container {
+        padding: 0 16px 18px;
+    }
+
+    .form-container h2 {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+    }
+
+    .login-form {
+        gap: 12px;
+    }
+
+    .login-form input[type=\"text\"],
+    .login-form input[type=\"password\"],
+    .login-form input[type=\"email\"],
+    .login-form select {
+        padding: 11px 12px;
+        font-size: 0.88rem;
+        border-radius: 12px;
+    }
+
+    .checkbox-label {
+        font-size: 0.85rem;
+    }
+
+    .submit-btn {
+        padding: 12px 0;
+        font-size: 0.9rem;
+    }
+
+    .error-message,
+    .success-message {
+        font-size: 0.85rem;
+        padding: 10px 12px;
+    }
+
+    .modal-content {
+        width: min(95vw, 100%);
+        max-height: 95vh;
+        border-radius: 16px;
+    }
+}
+
+/* Extra small (up to 359px) */
+@media (max-width: 359px) {
+    .login-form-header h1 {
+        font-size: 1.1rem;
+    }
+
+    .login-form-header p {
+        font-size: 0.8rem;
+    }
+
+    .tab-btn {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+
+    .login-form input[type=\"text\"],
+    .login-form input[type=\"password\"],
+    .login-form input[type=\"email\"],
+    .login-form select {
+        padding: 10px 11px;
+        font-size: 0.85rem;
+    }
+
+    .checkbox-label {
+        font-size: 0.8rem;
+    }
 }
 

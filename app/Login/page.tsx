@@ -41,6 +41,7 @@ export default function LoginPage() {
         last_name: "",
         region: UKRAINIAN_REGIONS[0] || "",
         agreedToTerms: false,
+        isStudent: false,
     });
     // Стан для повідомлень про помилки та успіх
     const [error, setError] = useState("");
@@ -126,6 +127,10 @@ export default function LoginPage() {
             setError(" Enter a valid email! ");
             return;
         }
+        if (registerData.isStudent && !registerData.email.endsWith("@student.san.edu.pl")) {
+            setError(" Student email must end with @student.san.edu.pl ");
+            return;
+        }
         if (registerData.password !== registerData.confirmPassword) {
             setError("Passwords do not match!");
             return;
@@ -152,6 +157,7 @@ export default function LoginPage() {
                     first_name: registerData.first_name || registerData.login,
                     last_name: registerData.last_name || "",
                     region: registerData.region || "Ukraine",
+                    isStudent: registerData.isStudent,
                 }),
             });
 
@@ -167,7 +173,8 @@ export default function LoginPage() {
                     first_name: "",
                     last_name: "",
                     region: "Ukraine",
-                    agreedToTerms: false 
+                    agreedToTerms: false,
+                    isStudent: false,
                 });
                 setTimeout(() => {
                     setIsLogin(true);
@@ -280,7 +287,7 @@ export default function LoginPage() {
                                         const deltaX = mouseX - centerX;
                                         const deltaY = mouseY - centerY;
                                         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                                        
+                                         // Я готовий убити за великий kebab або шаурму! Голодний, як собака!
                                         if (distance < 200) { // Зона втечі
                                             const moveX = (deltaX / distance) * 100;
                                             const moveY = (deltaY / distance) * 100;
@@ -311,9 +318,19 @@ export default function LoginPage() {
                                 onChange = {handleRegisterChange}
                                 required
                             />
+                            <label className = "checkbox-label">
+                                <input
+                                    type = "checkbox"
+                                    name = "isStudent"
+                                    checked = {registerData.isStudent}
+                                    onChange = {handleRegisterChange}
+                                />
+                                {" "}I am a student
+                            </label>
+
                             <input
                                 name = "email"
-                                placeholder = "Email *"
+                                placeholder = {registerData.isStudent ? "Email student's (must end with @student.san.edu.pl) *" : "Email *"}
                                 type = "email"
                                 value = {registerData.email}
                                 onChange = {handleRegisterChange}
