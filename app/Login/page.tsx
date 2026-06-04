@@ -366,7 +366,7 @@ export default function LoginPage() {
                                     className = "password-toggle-btn"
                                     aria-label = "Toggle password visibility"
                                 >
-                                    {showRegisterPassword ? "1" : "0"}
+                                    {showRegisterPassword ? "⚪" : "⚫"}
                                 </button>
                             </div>
 
