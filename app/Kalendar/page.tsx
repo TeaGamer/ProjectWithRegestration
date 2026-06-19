@@ -393,8 +393,8 @@ export default function KalendarPage() {
     <div className = "dashboard-layout-calendar">
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
-        <img src="IMG_1074.png" alt = "AI Alex Avatar" className = "avatar-img"/>
         <div className = "logo-section" > Calendar with Alex</div>
+        <img src="IMG_1074.png" alt = "AI Alex Avatar" className = "avatar-img"/>
         <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
           <div className="avatar-icon" > {currentUser.login.charAt(0).toUpperCase()}</div>
           <span>{currentUser.login}</span>
@@ -661,66 +661,32 @@ export default function KalendarPage() {
 
       {/* Панель Dashboard */}
       {isDashboardOpen && (
-        <div className = "dashboard-overlay" onClick = {() => setIsDashboardOpen(false)}>
-          <div className = "dashboard-panel" onClick = {(e) => e.stopPropagation()}>
-            <div className = "dashboard-panel-header">
-              <div className = "dashboard-avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
-              <div>
-                <h3>Dashboard</h3>
-                <p>Quick info panel</p>
-              </div>
-              <button className = "close-info-btn" type = "button" onClick = {() => setIsDashboardOpen(false)}>✕</button>
+         <div className="dashboard-overlay" onClick={() => setIsDashboardOpen(false)}>
+            <div className="dashboard-panel" onClick={(e) => e.stopPropagation()}>
+              <div className="dashboard-panel-header">
+                {/* КРУЖЕЧОК-КНОПКА: Клік по ньому перенаправляє на великий дашборд */}
+                <div 
+                    className="dashboard-avatar-icon clickable-avatar" 
+                    onClick={() => router.push("/Dashboard")}
+                    title="Відкрити повний Dashboard"
+                >
+                    {(currentUser.first_name || currentUser.login)[0].toUpperCase()}
+                </div>
+                <div>
+                    <h3>{currentUser.first_name || currentUser.login}</h3>
+                    <p>Quick View</p>
+                </div>
+                <button className="close-info-btn" onClick={() => setIsDashboardOpen(false)}>×</button>
             </div>
-            <div className = "dashboard-panel-body">
-              <p><strong>User:</strong> {currentUser.first_name || currentUser.login}</p>
-              <p><strong>Login:</strong> {currentUser.login}</p>
-              <p><strong>Email:</strong> {currentUser.email || "Not set"}</p>
-              {currentUser.region && <p><strong>Region:</strong> {currentUser.region}</p>}
-              {currentUser.date_of_birth && <p><strong>Date of Birth:</strong> {currentUser.date_of_birth}</p>}
-              
-              <button
-                className = "modal-btn" 
-                onClick = {() => profileModal.open()}
-                style = {{
-                  marginTop: "10px",
-                  width: "100%",
-                  padding: "12px 16px",
-                  backgroundColor: "#4a5568",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  fontWeight: "600",
-                  cursor: "pointer"
-                }}
-              >Edit Profile ⚙️</button>
+            <div className="dashboard-panel-body">
+                <p><strong>Login:</strong> {currentUser.login}</p>
+                <p><strong>Email:</strong> {currentUser.email || "Not specified"}</p>
+                {/* Сюди можна додати ще 1-2 важливих поля для швидкого інфо */}
+            </div>
 
-              <button
-                className = "logout-btn"
-                onClick = {() => setShowLogoutConfirm(true)}
-                style = {{
-                  marginTop: "20px",
-                  width: "100%",
-                  padding: "12px 16px",
-                  backgroundColor: "#dc2626",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  transition: "background-color 0.3s"
-                }}
-                onMouseOver = {(e) => (e.currentTarget.style.backgroundColor = "#b91c1c")}
-                onMouseOut = {(e) => (e.currentTarget.style.backgroundColor = "#dc2626")}
-              >
-                Log Out
-              </button>
-            </div>
-          </div>
         </div>
-      )}
-
+    </div>
+)}
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
         <div className = "modal-overlay" onClick = {() => setShowLogoutConfirm(false)}>

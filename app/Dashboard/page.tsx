@@ -39,7 +39,8 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
     };
 
     return (
-        <div className="Dashboard-layout">
+        /* Фікс: змінено "Dashboard-layout" на "dashboard-layout" для збігу з CSS */
+        <div className="dashboard-layout">
             <div className="dashboard-info-popup">
                 <div className="info-popup-header">
                     <div>
