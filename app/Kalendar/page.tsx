@@ -393,11 +393,10 @@ export default function KalendarPage() {
     <div className = "dashboard-layout-calendar">
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
-        <div className = "logo-section"> Calendar with Alex
-          <img src="IMG_1074.png" alt="AI Alex Avatar" className="avatar-img"/>
-        </div>
+        <img src="IMG_1074.png" alt = "AI Alex Avatar" className = "avatar-img"/>
+        <div className = "logo-section" > Calendar with Alex</div>
         <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
-          <div className="avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
+          <div className="avatar-icon" > {currentUser.login.charAt(0).toUpperCase()}</div>
           <span>{currentUser.login}</span>
         </button>
       </div>
@@ -420,19 +419,19 @@ export default function KalendarPage() {
               {cat}
             </button>
           ))}
-          <div className="file-list-box">
-            <div className="file-list-title">AI files used</div>
+          <div className = "file-list-box">
+            <div className = "file-list-title">AI files used</div>
             {usedFiles.length > 0 ? (
               usedFiles.map((file, index) => (
-                <div key={`${file.name}-${index}`} className="file-chip">
-                  <button type="button" onClick={() => openFile(file)} style={{ flex: 1, textAlign: 'left', background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer' }}>
+                <div key = {`${file.name}-${index}`} className = "file-chip">
+                  <button type = "button" onClick = {() => openFile(file)} style = {{ flex: 1, textAlign: 'left', background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer' }}>
                     {file.name}
                   </button>
-                  <button type="button" onClick={() => removeUsedFile(index)}>×</button>
+                  <button type = "button" onClick = {() => removeUsedFile(index)}> × </button>
                 </div>
               ))
             ) : (
-              <div className="file-list-empty">No used files yet.</div>
+              <div className = "file-list-empty">No used files yet.</div>
             )}
           </div>
         </div>
@@ -447,7 +446,7 @@ export default function KalendarPage() {
 
           <div className = "days-grid">
             {WEEKDAYS.map((day) => (
-              <div key={day} className = "grid-head-cell">{day}</div>
+              <div key = {day} className = "grid-head-cell">{day}</div>
             ))}
             {calendarCells.map((cell, index) => {
               const isCurrentMonth = cell.offset === 0;
@@ -518,7 +517,7 @@ export default function KalendarPage() {
             
             <div className = "modal-body">
               {/* Стрічка: Нотатка */}
-              <div className="modal-form-row">
+              <div className = "modal-form-row">
                 <label>Note</label>
                 <input
                   type = "text"
@@ -529,7 +528,7 @@ export default function KalendarPage() {
               </div>
 
               {/* Стрічка: Категорія події */}
-              <div className="modal-form-row">
+              <div className = "modal-form-row">
                 <label>Category</label>
                 <select
                   value = {noteCategory}
@@ -542,7 +541,7 @@ export default function KalendarPage() {
               </div>
 
               {/* Стрічка: Час */}
-              <div className="modal-form-row">
+              <div className = "modal-form-row">
                 <label>Time</label>
                 <input
                   type = "text"
@@ -553,14 +552,14 @@ export default function KalendarPage() {
               </div>
 
               {/* Стрічка: Дата з висувним календариком */}
-              <div className="modal-form-row" style={{ position: "relative" }}>
+              <div className = "modal-form-row" style = {{ position: "relative" }}>
                 <label>Date</label>
-                <div className="date-input-wrapper">
+                <div className = "date-input-wrapper">
                   <button 
-                    type="button" 
-                    className="date-dropdown-btn"
-                    onClick={() => datePickerRef.current?.showPicker()}
-                    title="Select from the calendar"
+                    type = "button" 
+                    className = "date-dropdown-btn"
+                    onClick = {() => datePickerRef.current?.showPicker()}
+                    title = "Select from the calendar"
                   >
                     ▼
                   </button>
@@ -571,15 +570,15 @@ export default function KalendarPage() {
                     onChange = {(e) => setNoteDate(e.target.value)}
                   />
                   <input
-                    type="date"
-                    ref={datePickerRef}
-                    style={{
+                    type = "date"
+                    ref = {datePickerRef}
+                    style = {{
                       position: "absolute",
                       visibility: "hidden",
                       width: "0",
                       height: "0"
                     }}
-                    onChange={(e) => {
+                    onChange = {(e) => {
                       if (e.target.value) {
                         setNoteDate(e.target.value);
                       }
@@ -606,12 +605,12 @@ export default function KalendarPage() {
           </div>
           <div className = "chat-mid">
             {attachedFiles.length > 0 && (
-              <div className="file-list-box" style={{ marginBottom: '14px' }}>
-                <div className="file-list-title">Files attached for this request</div>
+              <div className = "file-list-box" style = {{ marginBottom: '14px' }}>
+                <div className = "file-list-title">Files attached for this request</div>
                 {attachedFiles.map((file, index) => (
-                  <div key={`${file.name}-${index}`} className="file-chip">
+                  <div key = {`${file.name}-${index}`} className = "file-chip">
                     <span>{file.name}</span>
-                    <button type="button" onClick={() => removeAttachedFile(index)}>×</button>
+                    <button type = "button" onClick = {() => removeAttachedFile(index)}>×</button>
                   </div>
                 ))}
               </div>
@@ -628,13 +627,13 @@ export default function KalendarPage() {
             <div ref={messagesEndRef} />
           </div>
           {chatError && (
-            <div className="file-list-box" style={{ margin: '0 20px 10px', background: 'rgba(255, 0, 0, 0.1)', color: '#ffdddd', borderColor: 'rgba(255,0,0,0.25)' }}>
+            <div className = "file-list-box" style = {{ margin: '0 20px 10px', background: 'rgba(255, 0, 0, 0.1)', color: '#ffdddd', borderColor: 'rgba(255,0,0,0.25)' }}>
               {chatError}
             </div>
           )}
           <div className = "chat-bottom">
-            <label htmlFor="file-upload" className="file-upload-button" title="Attach file">📎</label>
-            <input ref={fileInputRef} id="file-upload" type="file" multiple accept="*/*" onChange={handleFileInputChange} hidden />
+            <label htmlFor="file-upload" className = "file-upload-button" title = "Attach file">📎</label>
+            <input ref = {fileInputRef} id = "file-upload" type = "file" multiple accept = "*/*" onChange = {handleFileInputChange} hidden />
             <input
               className = "ai-input"
               placeholder = "Ask something..."
@@ -652,7 +651,7 @@ export default function KalendarPage() {
               className = "send-message-btn"
               type = "button"
               onClick = {handleSendChatMessage}
-              disabled={chatLoading || (!chatInput.trim() && attachedFiles.length === 0)}
+              disabled = {chatLoading || (!chatInput.trim() && attachedFiles.length === 0)}
             >
               {chatLoading ? 'Sending...' : 'Send'}
             </button>
@@ -662,17 +661,17 @@ export default function KalendarPage() {
 
       {/* Панель Dashboard */}
       {isDashboardOpen && (
-        <div className="dashboard-overlay" onClick={() => setIsDashboardOpen(false)}>
-          <div className="dashboard-panel" onClick={(e) => e.stopPropagation()}>
-            <div className="dashboard-panel-header">
-              <div className="dashboard-avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
+        <div className = "dashboard-overlay" onClick = {() => setIsDashboardOpen(false)}>
+          <div className = "dashboard-panel" onClick = {(e) => e.stopPropagation()}>
+            <div className = "dashboard-panel-header">
+              <div className = "dashboard-avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
               <div>
                 <h3>Dashboard</h3>
                 <p>Quick info panel</p>
               </div>
-              <button className="close-info-btn" type="button" onClick={() => setIsDashboardOpen(false)}>✕</button>
+              <button className = "close-info-btn" type = "button" onClick = {() => setIsDashboardOpen(false)}>✕</button>
             </div>
-            <div className="dashboard-panel-body">
+            <div className = "dashboard-panel-body">
               <p><strong>User:</strong> {currentUser.first_name || currentUser.login}</p>
               <p><strong>Login:</strong> {currentUser.login}</p>
               <p><strong>Email:</strong> {currentUser.email || "Not set"}</p>
@@ -680,9 +679,9 @@ export default function KalendarPage() {
               {currentUser.date_of_birth && <p><strong>Date of Birth:</strong> {currentUser.date_of_birth}</p>}
               
               <button
-                className="modal-btn" 
-                onClick={() => profileModal.open()}
-                style={{
+                className = "modal-btn" 
+                onClick = {() => profileModal.open()}
+                style = {{
                   marginTop: "10px",
                   width: "100%",
                   padding: "12px 16px",
@@ -697,9 +696,9 @@ export default function KalendarPage() {
               >Edit Profile ⚙️</button>
 
               <button
-                className="logout-btn"
-                onClick={() => setShowLogoutConfirm(true)}
-                style={{
+                className = "logout-btn"
+                onClick = {() => setShowLogoutConfirm(true)}
+                style = {{
                   marginTop: "20px",
                   width: "100%",
                   padding: "12px 16px",
@@ -712,8 +711,8 @@ export default function KalendarPage() {
                   cursor: "pointer",
                   transition: "background-color 0.3s"
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#b91c1c")}
-                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#dc2626")}
+                onMouseOver = {(e) => (e.currentTarget.style.backgroundColor = "#b91c1c")}
+                onMouseOut = {(e) => (e.currentTarget.style.backgroundColor = "#dc2626")}
               >
                 Log Out
               </button>
@@ -724,20 +723,20 @@ export default function KalendarPage() {
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
-        <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
-          <div className="modal-content note-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header note-modal">
+        <div className = "modal-overlay" onClick = {() => setShowLogoutConfirm(false)}>
+          <div className = "modal-content note-modal" onClick = {(e) => e.stopPropagation()}>
+            <div className = "modal-header note-modal">
               <h2>Confirm Logout</h2>
-              <button className="modal-close note-modal" onClick={() => setShowLogoutConfirm(false)}>✕</button>
+              <button className = "modal-close note-modal" onClick = {() => setShowLogoutConfirm(false)}>✕</button>
             </div>
-            <div className="modal-body" style={{ padding: "20px", textAlign: "center" }}>
+            <div className = "modal-body" style = {{ padding: "20px", textAlign: "center" }}>
               <p>Are you sure you want to log out?</p>
             </div>
-            <div className="modal-footer">
+            <div className = "modal-footer">
               <button
-                className="modal-btn"
-                onClick={() => setShowLogoutConfirm(false)}
-                style={{
+                className = "modal-btn"
+                onClick = {() => setShowLogoutConfirm(false)}
+                style = {{
                   background: "#6b7280",
                   color: "white",
                   border: "none",
@@ -750,9 +749,9 @@ export default function KalendarPage() {
                 Cancel
               </button>
               <button
-                className="modal-btn"
-                onClick={handleLogout}
-                style={{
+                className = "modal-btn"
+                onClick = {handleLogout}
+                style = {{
                   background: "#dc2626",
                   color: "white",
                   border: "none",
@@ -769,7 +768,7 @@ export default function KalendarPage() {
       )}
 
       {!isChatOpen && (
-        <button className="ai-neon-circle" onClick={() => setIsChatOpen(true)} aria-label="Open AI chat">
+        <button className = "ai-neon-circle" onClick = {() => setIsChatOpen(true)} aria-label = "Open AI chat">
           <span>💬</span>
         </button>
       )}
@@ -777,9 +776,9 @@ export default function KalendarPage() {
       {/* Редагування профілю (Зв'язано через кастомний хук) */}
       {profileModal.isOpen && user && (
         <Profile
-          user={user}
-          isOpen={profileModal.isOpen}
-          onClose={() => {
+          user = {user}
+          isOpen = {profileModal.isOpen}
+          onClose = {() => {
             profileModal.close();
             const userStr = localStorage.getItem("user");
             if (userStr) {
