@@ -498,7 +498,7 @@ export default function KalendarPage() {
     <div className = "dashboard-layout-calendar">
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
-        <div className = "logo-section"> Calendar with Alex </div>
+        {/*<div className = "logo-section"> Calendar with Alex </div> */}
         <div className="logo-section">
             <img src="IMG_1074.png" alt="AI Alex Avatar" className="avatar-img"/>
             <span>Calendar with Alex</span>
