@@ -9,7 +9,6 @@ import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
 import { useProfileModal } from "../hooks/useProfileModal";
 
-
 // Інтерфейс для нотатки в календарі
 interface Note {
   id: number;
@@ -62,14 +61,15 @@ export default function KalendarPage() {
   const [chatError, setChatError] = useState<string | null>(null);
   const [usedFiles, setUsedFiles] = useState<File[]>([]);
   const [smsRemindersSent, setSmsRemindersSent] = useState<number[]>([]);
-  // Стан для відкриття модального вікна редагування профілю
+  
+  // Стан для відкриття модального вікна редагування профілю через кастомний хук
   const profileModal = useProfileModal();
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди до хорошої компанії на ul. Papernicza 1, Łódź. А від неї уже пиздуй на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
+  //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди до допомогти хорошої компанії на ul. Papernicza 1, Łódź. А від неї уже пиздуй на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
   // Реф для виклику прихованого календарика в полі дати
   const datePickerRef = useRef<HTMLInputElement | null>(null);
 
@@ -394,8 +394,8 @@ export default function KalendarPage() {
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
         <div className = "logo-section"> Calendar with Alex
-            <img src="IMG_1074.png" alt="AI Alex Avatar" className="avatar-img"/>
-          </div>
+          <img src="IMG_1074.png" alt="AI Alex Avatar" className="avatar-img"/>
+        </div>
         <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
           <div className="avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
           <span>{currentUser.login}</span>
@@ -456,7 +456,7 @@ export default function KalendarPage() {
 
               return (
                 <div
-                  key = {`${index}-${cell.day}-${cell.offset}`}
+                  key = {`cell-${index}-${cell.day}`}
                   className = {`grid-cell ${!isCurrentMonth ? "grid-cell-inactive" : ""} ${isToday ? "today-highlight" : ""}`}
                 >
                   <div className = "cell-top-row">
@@ -476,7 +476,7 @@ export default function KalendarPage() {
           </div>
         </div>
 
-        {/* Інформація про Alex і нотатки */}
+        {/* Інформація про нотатки */}
         <div className = "your_notes">
           <span> Your notes</span>
           <div className = "circle purple"></div>
@@ -507,7 +507,7 @@ export default function KalendarPage() {
         </div>
       </div>
 
-      {/* ОНОВЛЕНЕ МОДАЛЬНЕ ВІКНО ДЛЯ НОТАТОК (СТРІЧКАМИ З РОЗУМНОЮ ДАТОЮ) */}
+      {/* ОНОВЛЕНЕ МОДАЛЬНЕ ВІКНО ДЛЯ НОТАТОК */}
       {isNoteModalOpen && (
         <div className = "modal-overlay" onClick = {closeModal}>
           <div className = "modal-content note-modal" onClick = {(e) => e.stopPropagation()}>
@@ -519,10 +519,10 @@ export default function KalendarPage() {
             <div className = "modal-body">
               {/* Стрічка: Нотатка */}
               <div className="modal-form-row">
-                <label>Нотатка</label>
+                <label>Note</label>
                 <input
                   type = "text"
-                  placeholder = "Текст нотатки..."
+                  placeholder = "Note text..."
                   value = {noteText}
                   onChange = {(e) => setNoteText(e.target.value)}
                 />
@@ -530,7 +530,7 @@ export default function KalendarPage() {
 
               {/* Стрічка: Категорія події */}
               <div className="modal-form-row">
-                <label>Категорія події</label>
+                <label>Category</label>
                 <select
                   value = {noteCategory}
                   onChange = {(e) => setNoteCategory(e.target.value)}
@@ -543,36 +543,33 @@ export default function KalendarPage() {
 
               {/* Стрічка: Час */}
               <div className="modal-form-row">
-                <label>Час</label>
+                <label>Time</label>
                 <input
                   type = "text"
-                  placeholder = "Конкретний час (напр. 15:30) або період (12:00-14:00)"
+                  placeholder = "A specific time (e.g., 15:30) or period (12:00-14:00)"
                   value = {noteTime}
                   onChange = {(e) => setNoteTime(e.target.value)}
                 />
               </div>
 
-              {/* Стрічка: Дата з висувним календариком ліворуч */}
+              {/* Стрічка: Дата з висувним календариком */}
               <div className="modal-form-row" style={{ position: "relative" }}>
-                <label>Дата</label>
+                <label>Date</label>
                 <div className="date-input-wrapper">
-                  {/* Кнопка-стрілочка в лівій частині */}
                   <button 
                     type="button" 
                     className="date-dropdown-btn"
                     onClick={() => datePickerRef.current?.showPicker()}
-                    title="Обрати з календаря"
+                    title="Select from the calendar"
                   >
                     ▼
                   </button>
-                  {/* Поле для ручного введення */}
                   <input
                     type = "text"
-                    placeholder = "дд.мм.рррр або рррр-мм-дд"
+                    placeholder = "dd.mm.yyyy  or  yyyy-mm-dd"
                     value = {noteDate}
                     onChange = {(e) => setNoteDate(e.target.value)}
                   />
-                  {/* Прихований нативний інпут для відкриття системного календаря */}
                   <input
                     type="date"
                     ref={datePickerRef}
@@ -592,7 +589,6 @@ export default function KalendarPage() {
               </div>
             </div>
 
-            {/* Кнопки: Save зліва, Cancel справа завдяки flexbox / justify-content: space-between */}
             <div className = "modal-footer">
               <button className = "modal-btn save-btn" onClick = {handleSaveNote}> Save </button>
               <button className = "modal-btn cancel-btn" onClick = {closeModal}> Cancel </button>
@@ -604,10 +600,10 @@ export default function KalendarPage() {
       {/* Чат ШІ */}
       {isChatOpen && (
         <div className = "ai-chat-box">
-              <div className = "chat-top">
-                <span> Chat with your Alex </span>
-                <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
-              </div>
+          <div className = "chat-top">
+            <span> Chat with your Alex </span>
+            <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
+          </div>
           <div className = "chat-mid">
             {attachedFiles.length > 0 && (
               <div className="file-list-box" style={{ marginBottom: '14px' }}>
@@ -622,8 +618,7 @@ export default function KalendarPage() {
             )}
             {chatMessages.length === 0 ? (
               <div className = "ai-text"> Welcome, {currentUser.first_name}! Ask something... </div>
-            ) : (
-              chatMessages.map((message) => (
+            ) : ( chatMessages.map((message) => (
                 <div key = {message.id} className = {`chat-message ${message.sender}`}>
                   <span className = "message-sender">{message.sender === "user" ? "You" : "Alex"}</span>
                   <p>{message.text}</p>
@@ -665,6 +660,7 @@ export default function KalendarPage() {
         </div>
       )}
 
+      {/* Панель Dashboard */}
       {isDashboardOpen && (
         <div className="dashboard-overlay" onClick={() => setIsDashboardOpen(false)}>
           <div className="dashboard-panel" onClick={(e) => e.stopPropagation()}>
@@ -698,9 +694,7 @@ export default function KalendarPage() {
                   fontWeight: "600",
                   cursor: "pointer"
                 }}
-              >
-                ⚙️ Редагувати профіль
-              </button>
+              >Edit Profile ⚙️</button>
 
               <button
                 className="logout-btn"
@@ -780,17 +774,17 @@ export default function KalendarPage() {
         </button>
       )}
 
-      {/* Редагування профілю */}
+      {/* Редагування профілю (Зв'язано через кастомний хук) */}
       {profileModal.isOpen && user && (
         <Profile
           user={user}
           isOpen={profileModal.isOpen}
           onClose={() => {
-          profileModal.close();
-          const userStr = localStorage.getItem("user");
-          if (userStr) {
-            setUser(JSON.parse(userStr));
-          }
+            profileModal.close();
+            const userStr = localStorage.getItem("user");
+            if (userStr) {
+              setUser(JSON.parse(userStr));
+            }
           }}
         />
       )}

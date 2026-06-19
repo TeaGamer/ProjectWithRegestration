@@ -1,6 +1,3 @@
-/* ==========================================================================
-   БАЗОВІ СТИЛІ СТОРІНКИ ТА ОТОЧЕННЯ
-   ========================================================================== */
 html, body, #__next {
   margin: 0;
   padding: 0;
@@ -168,13 +165,9 @@ html, body, #__next {
   border-radius: 12px;
   transition: background 0.2s ease;
 }
-
 .side-cat-btn:hover { background: rgba(255,255,255,0.2); }
 
-
-/* ==========================================================================
-   ЦЕНТРАЛЬНИЙ БЛОК КАЛЕНДАРЯ ТА СІТКА ДНІВ
-   ========================================================================== */
+/* ЦЕНТРАЛЬНИЙ БЛОК КАЛЕНДАРЯ ТА СІТКА ДНІВ*/
 .calendar-block {
   margin-top: 4px;
   background: transparent;
@@ -494,19 +487,11 @@ html, body, #__next {
   transition: background 0.2s, color 0.2s;
 }
 
-.modal-btn.cancel-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-.modal-btn:active {
-  transform: scale(0.97);
-}
+.modal-btn.cancel-btn:hover {background: rgba(255, 255, 255, 0.2); color: white}
+.modal-btn:active {transform: scale(0.97)}
 
 
-/* ==========================================================================
-   КНОПКА ТА ВІКНО ЧАТУ ШІ (AI CHAT)
-   ========================================================================== */
+/* КНОПКА ТА ВІКНО ЧАТУ ШІ (AI CHAT) */
 .ai-neon-circle {
   position: fixed; 
   bottom: 30px; 
