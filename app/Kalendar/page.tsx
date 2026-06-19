@@ -498,10 +498,8 @@ export default function KalendarPage() {
     <div className = "dashboard-layout-calendar">
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
-        {/*<div className = "logo-section"> Calendar with Alex </div> */}
-        <div className="logo-section">
+        <div className = "logo-section"> Calendar with Alex
             <img src="IMG_1074.png" alt="AI Alex Avatar" className="avatar-img"/>
-            <span>Calendar with Alex</span>
           </div>
         <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
           <div className="avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
@@ -654,23 +652,23 @@ export default function KalendarPage() {
                 type = "time"
                 value = {noteTime}
                 onChange = {(e) => setNoteTime(e.target.value)}
-                style = {{ 
-                  width: "100%", 
-                  padding: "10px", 
-                  marginBottom: "15px", 
-                  borderRadius: "8px", 
-                  border: "1px solid #ccc" 
+                style = {{
+                  width: "100%",
+                  padding: "10px",
+                  marginBottom: "15px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc"
                 }}
               />
               <label style = {{display: "block", marginBottom: "10px"}}> Category </label>
               <select
                 value = {noteCategory}
                 onChange = {(e) => setNoteCategory(e.target.value)}
-                style = {{ 
-                  width: "100%", 
-                  padding: "10px", 
-                  borderRadius: "8px", 
-                  border: "1px solid #ccc" 
+                style = {{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc"
                 }}
               >
                 {CATEGORY_OPTIONS.map((category) => (
