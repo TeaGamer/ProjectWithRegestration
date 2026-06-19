@@ -8,6 +8,9 @@ import { sendChatMessage, parseEventFromText } from "../services/chatService";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
 import { useProfileModal } from "../hooks/useProfileModal";
+import { useRouter } from "next/navigation";
+
+
 
 // Інтерфейс для нотатки в календарі
 interface Note {
@@ -24,6 +27,7 @@ const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Satur
 
 // Головний компонент сторінки календаря
 export default function KalendarPage() {
+  const router = useRouter();
   // Стан для зберігання даних користувача
   const [user, setUser] = useState<User | null>(null);
   // Стан для індикатора завантаження
@@ -395,7 +399,7 @@ export default function KalendarPage() {
       <div className = "topbar-cal">
         <div className = "logo-section" > <img src="IMG_1074.png" alt = "AI Alex Avatar" className = "avatar-img"/> Calendar with Alex</div>
         <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
-          <div className="avatar-icon" > {currentUser.login.charAt(0).toUpperCase()}</div>
+          <div className = "avatar-icon" > {currentUser.login.charAt(0).toUpperCase()}</div>
           <span>{currentUser.login}</span>
         </button>
       </div>
@@ -414,7 +418,7 @@ export default function KalendarPage() {
           <div className = "kategories-header"> Kategories </div>
           <button className = "side-cat-btn" onClick = {() => setSelectedCategory("all")}> All </button>
           {CATEGORY_OPTIONS.map((cat) => (
-            <button key={cat} className = "side-cat-btn" onClick = {() => setSelectedCategory(cat)}>
+            <button key = {cat} className = "side-cat-btn" onClick = {() => setSelectedCategory(cat)}>
               {cat}
             </button>
           ))}
@@ -623,7 +627,7 @@ export default function KalendarPage() {
                 </div>
               ))
             )}
-            <div ref={messagesEndRef} />
+            <div ref = {messagesEndRef} />
           </div>
           {chatError && (
             <div className = "file-list-box" style = {{ margin: '0 20px 10px', background: 'rgba(255, 0, 0, 0.1)', color: '#ffdddd', borderColor: 'rgba(255,0,0,0.25)' }}>
@@ -644,7 +648,7 @@ export default function KalendarPage() {
                   handleSendChatMessage();
                 }
               }}
-              disabled={chatLoading}
+              disabled = {chatLoading}
             />
             <button
               className = "send-message-btn"
@@ -660,14 +664,14 @@ export default function KalendarPage() {
 
       {/* Панель Dashboard */}
       {isDashboardOpen && (
-         <div className="dashboard-overlay" onClick={() => setIsDashboardOpen(false)}>
-            <div className="dashboard-panel" onClick={(e) => e.stopPropagation()}>
-              <div className="dashboard-panel-header">
+         <div className = "dashboard-overlay" onClick = {() => setIsDashboardOpen(false)}>
+            <div className = "dashboard-panel" onClick = {(e) => e.stopPropagation()}>
+              <div className = "dashboard-panel-header">
                 {/* КРУЖЕЧОК-КНОПКА: Клік по ньому перенаправляє на великий дашборд */}
                 <div 
-                    className="dashboard-avatar-icon clickable-avatar" 
-                    onClick={() => router.push("/Dashboard")}
-                    title="Відкрити повний Dashboard"
+                    className = "dashboard-avatar-icon clickable-avatar" 
+                    onClick = {() => router.push("/Dashboard")}
+                    title = "Відкрити повний Dashboard"
                 >
                     {(currentUser.first_name || currentUser.login)[0].toUpperCase()}
                 </div>
@@ -675,17 +679,17 @@ export default function KalendarPage() {
                     <h3>{currentUser.first_name || currentUser.login}</h3>
                     <p>Quick View</p>
                 </div>
-                <button className="close-info-btn" onClick={() => setIsDashboardOpen(false)}>×</button>
-            </div>
-            <div className="dashboard-panel-body">
-                <p><strong>Login:</strong> {currentUser.login}</p>
-                <p><strong>Email:</strong> {currentUser.email || "Not specified"}</p>
-                {/* Сюди можна додати ще 1-2 важливих поля для швидкого інфо */}
-            </div>
+                <button className = "close-info-btn" onClick = {() => setIsDashboardOpen(false)}>×</button>
+                </div>
+                <div className="dashboard-panel-body">
+                  <p><strong>Login:</strong> {currentUser.login}</p>
+                  <p><strong>Email:</strong> {currentUser.email || "Not specified"}</p>
+                  {/* Сюди можна додати ще 1-2 важливих поля для швидкого інфо */}
+                </div>
 
-        </div>
-    </div>
-)}
+            </div>
+          </div>
+        )}
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
         <div className = "modal-overlay" onClick = {() => setShowLogoutConfirm(false)}>
