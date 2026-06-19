@@ -1,6 +1,4 @@
 
-/* Стилі для сторінки Dashboard та модальних вікон */
-
 .dashboard-layout {
     display: flex;
     flex-direction: column;
@@ -37,7 +35,6 @@ html, body {
 }
 
 .topbar-left {flex: 1;}
-
 .topbar-left h1 {
     color: white;
     font-size: 1.8rem;
@@ -68,10 +65,8 @@ html, body {
 }
 
 /* Profile Avatar */
-.profile-avatar-wrapper {
-    position: relative;
-}
-
+.profile-avatar-wrapper {position: relative}
+.profile-avatar-btn:hover {transform: scale(1.1)}
 .profile-avatar-btn {
     background: none;
     border: none;
@@ -80,9 +75,6 @@ html, body {
     transition: transform 0.3s ease;
 }
 
-.profile-avatar-btn:hover {
-    transform: scale(1.1);
-}
 
 .avatar-circle {
     width: 50px;
@@ -107,7 +99,8 @@ html, body {
     animation: slideDown 0.3s ease;
 }
 
-@keyframes slideDown {
+@keyframes 
+slideDown {
     from {
         opacity: 0;
         transform: translateY(-10px);
@@ -187,12 +180,8 @@ html, body {
     transition: all 0.3s ease;
 }
 
-.profile-menu-logout:hover {
-    background: #ff5252;
-}
-.profile-menu-edit:hover {
-    background: #5568d3;
-}
+.profile-menu-logout:hover {background: #ff5252}
+.profile-menu-edit:hover {background: #5568d3}
 
 /* Edit Button in Menu */
 .profile-menu-edit {
@@ -268,9 +257,7 @@ html, body {
     line-height: 1.6;
 }
 
-.info-popup-body p {
-    margin: 10px 0;
-}
+.info-popup-body p {margin: 10px 0}
 
 .close-info-btn {
     border: none;
@@ -281,9 +268,7 @@ html, body {
     cursor: pointer;
 }
 
-.close-info-btn:hover {
-    background: rgba(255,255,255,0.3);
-}
+.close-info-btn:hover {background: rgba(255,255,255,0.3)}
 
 /* Темна фонова накладка для модальних вікон */
 .modal-overlay {
@@ -310,7 +295,8 @@ html, body {
     animation: modalSlideIn 0.3s ease;
 }
 
-@keyframes modalSlideIn {
+@keyframes 
+modalSlideIn {
     from {
         opacity: 0;
         transform: translateY(-50px);
@@ -343,8 +329,7 @@ html, body {
     font-weight: 600;
 }
 
-.modal-content.note-modal .modal-body input,
-.modal-content.note-modal .modal-body select {
+.modal-content.note-modal .modal-body input, .modal-content.note-modal .modal-body select {
     width: 100% !important;
     min-height: 52px !important;
     padding: 14px 16px !important;
@@ -356,9 +341,7 @@ html, body {
     outline: none !important;
 }
 
-.modal-content.note-modal .modal-body input::placeholder {
-    color: rgba(248, 250, 252, 0.5);
-}
+.modal-content.note-modal .modal-body input::placeholder {color: rgba(248, 250, 252, 0.5)}
 
 .modal-content.note-modal .modal-footer {
     gap: 14px;
@@ -379,12 +362,8 @@ html, body {
     margin: 0;
 }
 
-.modal-close.note-modal {
-    color: #e2e8f0;
-}
-
-.modal-content.note-modal input,
-.modal-content.note-modal select {
+.modal-close.note-modal {color: #e2e8f0}
+.modal-content.note-modal input, .modal-content.note-modal select {
     width: 100%;
     padding: 12px;
     border: 1px solid rgba(255,255,255,0.18);
@@ -436,9 +415,7 @@ html, body {
     color: #e2e8f0;
 }
 
-.modal-btn.cancel-btn:hover {
-    background: rgba(255,255,255,0.18)
-}
+.modal-btn.cancel-btn:hover {background: rgba(255,255,255,0.18)}
 
 .modal-header {
     display: flex;
@@ -469,19 +446,12 @@ html, body {
     justify-content: center;
 }
 
-.modal-close:hover {
-    color: #333;
-}
+.modal-close:hover {color: #333}
 
 /* Форми редагування профілю у модалці */
-.edit-profile-form {
-    padding: 20px
-}
+.edit-profile-form {padding: 20px}
 
-.form-group {
-    margin-bottom: 20px
-}
-
+.form-group {margin-bottom: 20px}
 .form-group label {
     display: block;
     color: #333;
@@ -489,8 +459,7 @@ html, body {
     margin-bottom: 8px;
 }
 
-.form-group input,
-.form-group select {
+.form-group input, .form-group select {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -500,8 +469,7 @@ html, body {
     transition: border-color 0.3s ease;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-group input:focus, .form-group select:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -541,7 +509,6 @@ html, body {
     background: rgba(255,255,255,0.12);
     color: #e2e8f0;
 }
-
 .modal-btn.cancel-btn:hover {background: rgba(255,255,255,0.18);}
 
 /* Modal Buttons */
@@ -553,8 +520,7 @@ html, body {
     border-top: 1px solid #f0f0f0;
 }
 
-.modal-submit-btn,
-.modal-cancel-btn {
+.modal-submit-btn, .modal-cancel-btn {
     flex: 1;
     padding: 12px 20px;
     border: none;
@@ -657,35 +623,137 @@ html, body {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media 
+(max-width: 768px) {
     .topbar {
         padding: 15px 20px;
         flex-wrap: wrap;
     }
-
-    .topbar-left h1 {
-        font-size: 1.3rem;
-    }
-
-    .avatar-circle {
-        width: 40px;
-        height: 40px;
-    }
-
-    .profile-menu-dropdown {
-        width: 280px;
-        right: -20px;
-    }
-
-    .dashboard-container {
-        padding: 20px 10px;
-    }
-
-    .profile-info {
-        grid-template-columns: 1fr;
-    }
-
-    .user-profile h2 {
-        font-size: 1.4rem;
-    }
+    .topbar-left h1 {font-size: 1.3rem;}
+    .avatar-circle {width: 40px; height: 40px}
+    .profile-menu-dropdown {width: 280px; right: -20px}
+    .dashboard-container {padding: 20px 10px}
+    .profile-info {grid-template-columns: 1fr}
+    .user-profile h2 {font-size: 1.4rem}
 }
+
+
+
+
+
+
+
+/* СТИЛІ ДЛЯ МЕНШОГО DASHBOARD (ВИСУВНА БІЧНА ПАНЕЛЬ НА КАЛЕНДАРІ)*/
+/* Напівпрозорий задній фон, що перекриває календар */
+.dashboard-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(3px);
+    z-index: 2000; /* Перекриває сітку календаря */
+    display: flex;
+    justify-content: flex-end; /* Панель виїжджає справа */
+    align-items: stretch;
+}
+
+/* Сама бічна панель (менший дашборд) */
+.dashboard-panel {
+    width: 380px;
+    max-width: 100%;
+    background: #1a1a2e; /* Темний колір під тон твого Topbar */
+    border-left: 3px solid #667eea; /* Фіолетовий акцент */
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    color: white;
+    animation: slideRightToLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Анімація появи */
+@keyframes slideRightToLeft {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+/* Шапка меншого дашборду */
+.dashboard-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.dashboard-panel-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.dashboard-panel-header p {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+/* ІНТЕРАКТИВНИЙ КРУЖЕЧОК (Перехід на Старший Дашборд) */
+.clickable-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+}
+
+/* Ефекти наведення на кружечок імені */
+.clickable-avatar:hover {
+    transform: scale(1.08);
+    border-color: #667eea;
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.6);
+}
+
+/* Тіло з даними */
+.dashboard-panel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.dashboard-panel-body strong {color: #667eea}
+.dashboard-panel-body p {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin: 0;
+    font-size: 0.95rem;
+    border-left: 3px solid #764ba2;
+}
+
+/* Кнопка закриття */
+.close-info-btn {
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 1.6rem;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 0 5px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close-info-btn:hover {color: #ff6b6b}

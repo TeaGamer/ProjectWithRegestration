@@ -1,3 +1,4 @@
+
 html, body, #__next {
   margin: 0;
   padding: 0;
@@ -97,8 +98,7 @@ html, body, #__next {
     cursor: pointer;
 }
 
-.avatar-icon,
-.dashboard-avatar-icon {
+.avatar-icon, .dashboard-avatar-icon {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -140,7 +140,7 @@ html, body, #__next {
   box-shadow: none;
 }
 
-.active-del { outline: 4px solid rgba(255, 99, 71, 0.6); }
+.active-del { outline: 4px solid rgba(255, 99, 71, 0.6)}
 
 /* Панель категорій ліворуч */
 .category-panel {
@@ -165,7 +165,7 @@ html, body, #__next {
   border-radius: 12px;
   transition: background 0.2s ease;
 }
-.side-cat-btn:hover { background: rgba(255,255,255,0.2); }
+.side-cat-btn:hover { background: rgba(255,255,255,0.2)}
 
 /* ЦЕНТРАЛЬНИЙ БЛОК КАЛЕНДАРЯ ТА СІТКА ДНІВ*/
 .calendar-block {
@@ -262,7 +262,7 @@ html, body, #__next {
   align-items: flex-start;
 }
 
-.cell-day-number { font-weight: 700; }
+.cell-day-number { font-weight: 700}
 
 /* Нотатки та бейджі всередині клітинок */
 .cell-notes {
@@ -283,9 +283,9 @@ html, body, #__next {
   white-space: nowrap;
 }
 
-.cell-note-badge.events, .cell-note-badge.event { background: rgba(234,179,8,0.2); color: #b45309; }
-.cell-note-badge.lectures { background: rgba(59,130,246,0.15); color: #1d4ed8; }
-.cell-note-badge.exams { background: rgba(239,68,68,0.15); color: #b91c1c; }
+.cell-note-badge.events, .cell-note-badge.event { background: rgba(234,179,8,0.2); color: #b45309}
+.cell-note-badge.lectures { background: rgba(59,130,246,0.15); color: #1d4ed8}
+.cell-note-badge.exams { background: rgba(239,68,68,0.15); color: #b91c1c}
 
 /* Сьогоднішня дата: Чорний жирний контур */
 .today-highlight { 
