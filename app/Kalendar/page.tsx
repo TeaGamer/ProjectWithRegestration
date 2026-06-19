@@ -7,6 +7,7 @@ import Profile from "../components/Profile";
 import { sendChatMessage, parseEventFromText } from "../services/chatService";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
+import { useProfileModal } from "../hooks/useProfileModal";
 
 
 // Інтерфейс для нотатки в календарі
@@ -62,7 +63,7 @@ export default function KalendarPage() {
   const [usedFiles, setUsedFiles] = useState<File[]>([]);
   const [smsRemindersSent, setSmsRemindersSent] = useState<number[]>([]);
   // Стан для відкриття модального вікна редагування профілю
-  const [showEditModal, setShowEditModal] = useState(false);
+  const profileModal = useProfileModal();
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
@@ -681,6 +682,26 @@ export default function KalendarPage() {
               <p><strong>Email:</strong> {currentUser.email || "Not set"}</p>
               {currentUser.region && <p><strong>Region:</strong> {currentUser.region}</p>}
               {currentUser.date_of_birth && <p><strong>Date of Birth:</strong> {currentUser.date_of_birth}</p>}
+              
+              <button
+                className="modal-btn" 
+                onClick={() => profileModal.open()}
+                style={{
+                  marginTop: "10px",
+                  width: "100%",
+                  padding: "12px 16px",
+                  backgroundColor: "#4a5568",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                }}
+              >
+                ⚙️ Редагувати профіль
+              </button>
+
               <button
                 className="logout-btn"
                 onClick={() => setShowLogoutConfirm(true)}
@@ -760,15 +781,16 @@ export default function KalendarPage() {
       )}
 
       {/* Редагування профілю */}
-      {showEditModal && user && (
+      {profileModal.isOpen && user && (
         <Profile
-          user = {user}
-          onClose = {() => {
-            setShowEditModal(false);
-            const userStr = localStorage.getItem("user");
-            if (userStr) {
-              setUser(JSON.parse(userStr));
-            }
+          user={user}
+          isOpen={profileModal.isOpen}
+          onClose={() => {
+          profileModal.close();
+          const userStr = localStorage.getItem("user");
+          if (userStr) {
+            setUser(JSON.parse(userStr));
+          }
           }}
         />
       )}

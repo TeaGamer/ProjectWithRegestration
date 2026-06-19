@@ -216,8 +216,6 @@ html, body, #__next {
 .days-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  /* Жорсткі 45px для днів тижня, решта 6 рядків ідеально ділять залишок */
-  grid-template-rows: 45px repeat(6, 1fr);
   flex: 1;
   min-height: 0;
   height: 100%;
@@ -237,6 +235,13 @@ html, body, #__next {
   justify-content: center;
   font-weight: 700;
   border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.calendar-days-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #4a5568;
 }
 
 /* Клітинки днів */
@@ -311,10 +316,7 @@ html, body, #__next {
 }
 
 
-/* ==========================================================================
-   ОНОВЛЕНІ СТИЛІ МОДАЛЬНОГО ВІКНА (ПОВЕРХ КАЛЕНДАРЯ)
-   ========================================================================== */
-
+/* ОНОВЛЕНІ СТИЛІ МОДАЛЬНОГО ВІКНА (ПОВЕРХ КАЛЕНДАРЯ)
 /* Оверлей фону */
 .modal-overlay {
   position: fixed;
