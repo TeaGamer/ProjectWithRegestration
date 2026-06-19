@@ -1,4 +1,6 @@
-/* Базові стилі сторінки: фіксуємо в'юпорт, прибираємо глобальні скроли */
+/* ==========================================================================
+   БАЗОВІ СТИЛІ СТОРІНКИ ТА ОТОЧЕННЯ
+   ========================================================================== */
 html, body, #__next {
   margin: 0;
   padding: 0;
@@ -25,7 +27,7 @@ html, body, #__next {
   padding: 0.8%;
 }
 
-/* ГОЛОВНА СІТКА: Виправлено помилки, чіткі пропорції без повзунків */
+/* ГОЛОВНА СІТКА: Чіткі пропорції без повзунків */
 .main-grid-cal {
   display: grid;
   grid-template-columns: 14% 1fr 16%;
@@ -169,7 +171,10 @@ html, body, #__next {
 
 .side-cat-btn:hover { background: rgba(255,255,255,0.2); }
 
-/* Центральний блок календаря */
+
+/* ==========================================================================
+   ЦЕНТРАЛЬНИЙ БЛОК КАЛЕНДАРЯ ТА СІТКА ДНІВ
+   ========================================================================== */
 .calendar-block {
   margin-top: 4px;
   background: transparent;
@@ -305,7 +310,201 @@ html, body, #__next {
   gap: 8px;
 }
 
-/* Кнопка AI чату */
+
+/* ==========================================================================
+   ОНОВЛЕНІ СТИЛІ МОДАЛЬНОГО ВІКНА (ПОВЕРХ КАЛЕНДАРЯ)
+   ========================================================================== */
+
+/* Оверлей фону */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Перекриває все */
+}
+
+/* Головний контейнер модалки */
+.modal-content.note-modal {
+  background: #1e293b;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  width: 100%;
+  max-width: 455px;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* Шапка модалки */
+.modal-header.note-modal {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  padding: 16px 20px;
+  color: white;
+}
+
+.modal-header.note-modal h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Тіло форми — вирівнювання стрічками */
+.modal-content.note-modal .modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Рядок форми (Стрічка) */
+.modal-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-form-row label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+/* Інпути та селектори подій */
+.modal-form-row input[type="text"],
+.modal-form-row select {
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: white;
+  font-size: 0.95rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.modal-form-row input:focus,
+.modal-form-row select:focus {
+  border-color: #38bdf8;
+}
+
+/* Обгортка для стрічки "Дата" */
+.date-input-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Кнопка-стрілочка вниз З ЛІВОЇ СТОРОНИ поля дати */
+.date-dropdown-btn {
+  order: 1; /* Гарантує ліве положення */
+  background: transparent;
+  border: none;
+  color: #38bdf8;
+  padding: 0 14px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.date-dropdown-btn:hover {
+  color: #7dd3fc;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Поле ручного вводу тексту дати (Справа від стрілочки) */
+.date-input-wrapper input {
+  order: 2; /* Поле після іконки */
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  padding: 11px 14px !important;
+  color: white;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+/* Випадаючий міні-календарик під стрілкою */
+.date-picker-dropdown {
+  position: absolute;
+  top: 105%;
+  left: 0;
+  z-index: 10000;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  padding: 10px;
+}
+
+/* НИЖНЯ ПАНЕЛЬ: РОЗШТОВХУЄ КНОПКИ ПО БОКАХ */
+.modal-content.note-modal .modal-footer {
+  display: flex;
+  justify-content: space-between; /* Зліва і Справа */
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Кнопка Save (Зліва) */
+.modal-btn.save-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  transition: transform 0.1s;
+}
+
+/* Кнопка Cancel (Справа) */
+.modal-btn.cancel-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.modal-btn.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.modal-btn:active {
+  transform: scale(0.97);
+}
+
+
+/* ==========================================================================
+   КНОПКА ТА ВІКНО ЧАТУ ШІ (AI CHAT)
+   ========================================================================== */
 .ai-neon-circle {
   position: fixed; 
   bottom: 30px; 
@@ -324,4 +523,95 @@ html, body, #__next {
   width: 100%; 
   height: 100%; 
   object-fit: cover; 
+}
+
+.ai-chat-box {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 380px;
+  height: 500px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(18px);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+}
+
+.chat-top {
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  font-weight: 700;
+}
+
+.chat-close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.chat-mid {
+  flex: 1;
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-message {
+  border-radius: 14px;
+  padding: 10px 12px;
+  max-width: 85%;
+  font-size: 0.9rem;
+}
+
+.chat-message.user {
+  align-self: flex-end;
+  background: rgba(59, 130, 246, 0.2);
+  color: white;
+}
+
+.chat-message.ai {
+  align-self: flex-start;
+  background: rgba(147, 51, 234, 0.2);
+  color: white;
+}
+
+.chat-bottom {
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  background: rgba(0,0,0,0.15);
+}
+
+.ai-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: white;
+  padding: 8px 12px;
+  outline: none;
+}
+
+.send-message-btn {
+  background: #38bdf8;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 700;
 }

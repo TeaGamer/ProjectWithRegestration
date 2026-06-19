@@ -68,7 +68,9 @@ export default function KalendarPage() {
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
+  //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди до хорошої компанії на ul. Papernicza 1, Łódź. А від неї уже пиздуй на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
+  // Реф для виклику прихованого календарика в полі дати
+  const datePickerRef = useRef<HTMLInputElement | null>(null);
 
   // useEffect для завантаження збереженого користувача без примусової захищеної перевірки
   useEffect(() => {
@@ -176,83 +178,6 @@ export default function KalendarPage() {
     [notes, selectedNoteId]
   );
 
-  const detectChatLanguage = (text: string) => {
-    if (/[А-Я а-я ЁёЇїІіЄєҐґ]/.test(text)) {
-      return "uk";
-    }
-    if (/[ąćęłńóśżźĄĆĘŁŃÓŚŻŹ]/.test(text)) {
-      return "pl";
-    }
-    return "en";
-  };
-
-  const extractDateFromMessage = (message: string) => {
-    const normalized = message.toLowerCase();
-    const today = new Date();
-
-    const parseIso = (value: string) => {
-      const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? null : date;
-    };
-
-    const formatDate = (date: Date) => date.toISOString().slice(0, 10);
-
-    const explicitDate = message.match(/\b(\d{4}-\d{2}-\d{2})\b/);
-    if (explicitDate) {
-      return formatDate(parseIso(explicitDate[1]) ?? today);
-    }
-
-    const dotDate = message.match(/\b(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{2,4})\b/);
-    if (dotDate) {
-      const day = Number(dotDate[1]);
-      const month = Number(dotDate[2]) - 1;
-      const year = Number(dotDate[3].length === 2 ? `20${dotDate[3]}` : dotDate[3]);
-      const date = new Date(year, month, day);
-      if (!Number.isNaN(date.getTime())) {
-        return formatDate(date);
-      }
-    }
-
-    if (/(завтра|jutro|tomorrow)/.test(normalized)) {
-      return formatDate(new Date(today.getTime() + 24 * 60 * 60 * 1000));
-    }
-    if (/(післязавтра|pojutrze|day after tomorrow)/.test(normalized)) {
-      return formatDate(new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000));
-    }
-
-    return formatDate(today);
-  };
-
-  const extractTimeFromMessage = (message: string) => {
-    const match = message.match(/\b(\d{1,2}:\d{2})\b/);
-    return match ? match[1] : "";
-  };
-
-  const inferNoteCategoryFromMessage = (message: string) => {
-    const normalized = message.toLowerCase();
-    if (/(lecture|лекц|виклад|лекція|лекції)/.test(normalized)) {
-      return "Lectures (lessons)";
-    }
-    if (/(exam|екзам|тест)/.test(normalized)) {
-      return "Exams";
-    }
-    if (/(meeting|зустріч|spotkanie)/.test(normalized)) {
-      return "Meetings";
-    }
-    if (/(birthday|день народження|urodziny|holiday|відпустка|свято|event|подія|wydarzenie)/.test(normalized)) {
-      return "Events";
-    }
-    if (/(note|нотат|заміт|notat|notatkę)/.test(normalized)) {
-      return "Notes";
-    }
-  };
-
-  const shouldCreateNote = (message: string) => {
-    const normalized = message.toLowerCase();
-    return /(додай|добав|заплан|плануй|запланувати|додати|add|plan|create|створи|запиши|напиши|zaplan|dodaj|utwórz|zapisz)/.test(normalized) &&
-      /(note|meeting|event|birthday|holiday|зустріч|подія|нотатка|замітку|день народження|свято|wydarzenie|spotkanie|urodziny|notatkę)/.test(normalized);
-  };
-
   const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
@@ -298,7 +223,6 @@ export default function KalendarPage() {
         setAttachedFiles([]);
       }
 
-      // Просимо AI розпарсити подію
       try {
         const parsed = await parseEventFromText(trimmed, token);
         if (parsed.is_event && parsed.title && parsed.date && parsed.category) {
@@ -310,7 +234,6 @@ export default function KalendarPage() {
             category: parsed.category,
           };
           setNotes((prev) => sortNotesByDateTime([...prev, newNote]));
-          // Показати підтвердження в чаті
           setChatMessages((prev) => [
             ...prev,
             {
@@ -321,7 +244,7 @@ export default function KalendarPage() {
           ]);
         }
       } catch {
-        // Якщо парсинг не вдався — просто не додаємо нотатку, AI вже відповів
+        // Пропускаємо помилку парсингу події ШІ
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error sending message";
@@ -336,39 +259,11 @@ export default function KalendarPage() {
     }
   };
 
-  // Auto-scroll chat to bottom when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "auto" });
     }
   }, [chatMessages]);
-
-  // Diagnostic: log page height changes and likely causes to the console
-  const _pageHeightPrev = useRef<number>(typeof document !== 'undefined' ? document.documentElement.scrollHeight : 0);
-  useEffect(() => {
-    try {
-      const newH = document.documentElement.scrollHeight;
-      if (_pageHeightPrev.current !== newH) {
-        console.info("[diag] pageHeight change", {
-          prev: _pageHeightPrev.current,
-          now: newH,
-          reason: {
-            isChatOpen,
-            chatMessages: chatMessages.length,
-            attachedFiles: attachedFiles.length,
-            usedFiles: usedFiles.length,
-            isDashboardOpen,
-            isNoteModalOpen,
-            showLogoutConfirm,
-            notes: notes.length,
-          },
-        });
-        _pageHeightPrev.current = newH;
-      }
-    } catch (e) {
-      // ignore in SSR or restricted env
-    }
-  }, [isChatOpen, chatMessages.length, attachedFiles.length, usedFiles.length, isDashboardOpen, isNoteModalOpen, showLogoutConfirm, notes.length]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -415,9 +310,8 @@ export default function KalendarPage() {
   };
 
   const openModal = (type: "Note" | "Holiday") => {
-
     setNoteType(type);
-    setNoteCategory(type === "Holiday" ? "Події" : "Зустрічі");
+    setNoteCategory(CATEGORY_OPTIONS[0]);
     setNoteText("");
     setNoteDate("");
     setNoteTime("");
@@ -612,7 +506,7 @@ export default function KalendarPage() {
         </div>
       </div>
 
-      {/* Модальне вікно для нотаток */}
+      {/* ОНОВЛЕНЕ МОДАЛЬНЕ ВІКНО ДЛЯ НОТАТОК (СТРІЧКАМИ З РОЗУМНОЮ ДАТОЮ) */}
       {isNoteModalOpen && (
         <div className = "modal-overlay" onClick = {closeModal}>
           <div className = "modal-content note-modal" onClick = {(e) => e.stopPropagation()}>
@@ -620,62 +514,84 @@ export default function KalendarPage() {
               <h2>{noteType === "Holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
               <button className = "modal-close note-modal" onClick = {closeModal}>✕</button>
             </div>
+            
             <div className = "modal-body">
-              <label style = {{display: "block", marginBottom: "10px"}} > Text </label>
-              <input
-                type = "text"
-                value = {noteText}
-                onChange = {(e) => setNoteText(e.target.value)}
-                style = {{
-                  width: "100%", 
-                  padding: "10px", 
-                  marginBottom: "15px", 
-                  borderRadius: "8px", 
-                  border: "1px solid #ccc" 
-                }}
-              />
-              <label style = {{display: "block", marginBottom: "10px"}} > Date </label>
-              <input
-                type = "date"
-                value = {noteDate}
-                onChange = {(e) => setNoteDate(e.target.value)}
-                style = {{ 
-                  width: "100%", 
-                  padding: "10px", 
-                  marginBottom: "15px", 
-                  borderRadius: "8px", 
-                  border: "1px solid #ccc" 
-                }}
-              />
-              <label style = {{display: "block", marginBottom: "10px"}}> Time </label>
-              <input
-                type = "time"
-                value = {noteTime}
-                onChange = {(e) => setNoteTime(e.target.value)}
-                style = {{
-                  width: "100%",
-                  padding: "10px",
-                  marginBottom: "15px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc"
-                }}
-              />
-              <label style = {{display: "block", marginBottom: "10px"}}> Category </label>
-              <select
-                value = {noteCategory}
-                onChange = {(e) => setNoteCategory(e.target.value)}
-                style = {{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc"
-                }}
-              >
-                {CATEGORY_OPTIONS.map((category) => (
-                  <option key = {category} value = {category}>{category}</option>
-                ))}
-              </select>
+              {/* Стрічка: Нотатка */}
+              <div className="modal-form-row">
+                <label>Нотатка</label>
+                <input
+                  type = "text"
+                  placeholder = "Текст нотатки..."
+                  value = {noteText}
+                  onChange = {(e) => setNoteText(e.target.value)}
+                />
+              </div>
+
+              {/* Стрічка: Категорія події */}
+              <div className="modal-form-row">
+                <label>Категорія події</label>
+                <select
+                  value = {noteCategory}
+                  onChange = {(e) => setNoteCategory(e.target.value)}
+                >
+                  {CATEGORY_OPTIONS.map((category) => (
+                    <option key = {category} value = {category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Стрічка: Час */}
+              <div className="modal-form-row">
+                <label>Час</label>
+                <input
+                  type = "text"
+                  placeholder = "Конкретний час (напр. 15:30) або період (12:00-14:00)"
+                  value = {noteTime}
+                  onChange = {(e) => setNoteTime(e.target.value)}
+                />
+              </div>
+
+              {/* Стрічка: Дата з висувним календариком ліворуч */}
+              <div className="modal-form-row" style={{ position: "relative" }}>
+                <label>Дата</label>
+                <div className="date-input-wrapper">
+                  {/* Кнопка-стрілочка в лівій частині */}
+                  <button 
+                    type="button" 
+                    className="date-dropdown-btn"
+                    onClick={() => datePickerRef.current?.showPicker()}
+                    title="Обрати з календаря"
+                  >
+                    ▼
+                  </button>
+                  {/* Поле для ручного введення */}
+                  <input
+                    type = "text"
+                    placeholder = "дд.мм.рррр або рррр-мм-дд"
+                    value = {noteDate}
+                    onChange = {(e) => setNoteDate(e.target.value)}
+                  />
+                  {/* Прихований нативний інпут для відкриття системного календаря */}
+                  <input
+                    type="date"
+                    ref={datePickerRef}
+                    style={{
+                      position: "absolute",
+                      visibility: "hidden",
+                      width: "0",
+                      height: "0"
+                    }}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setNoteDate(e.target.value);
+                      }
+                    }}
+                  />
+                </div>
+              </div>
             </div>
+
+            {/* Кнопки: Save зліва, Cancel справа завдяки flexbox / justify-content: space-between */}
             <div className = "modal-footer">
               <button className = "modal-btn save-btn" onClick = {handleSaveNote}> Save </button>
               <button className = "modal-btn cancel-btn" onClick = {closeModal}> Cancel </button>
@@ -854,7 +770,6 @@ export default function KalendarPage() {
               setUser(JSON.parse(userStr));
             }
           }}
-          isOpen = {showEditModal}
         />
       )}
     </div>
