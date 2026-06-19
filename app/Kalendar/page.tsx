@@ -706,7 +706,7 @@ export default function KalendarPage() {
             ) : (
               chatMessages.map((message) => (
                 <div key = {message.id} className = {`chat-message ${message.sender}`}>
-                  <span className = "message-sender">{message.sender === "user" ? "You" : "AI"}</span>
+                  <span className = "message-sender">{message.sender === "user" ? "You" : "Alex"}</span>
                   <p>{message.text}</p>
                 </div>
               ))
