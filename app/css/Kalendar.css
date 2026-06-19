@@ -1,4 +1,4 @@
-/* Стилі для сторінки календаря: фон, кольори та розташування */
+/* Базові стилі сторінки: фіксуємо в'юпорт, прибираємо глобальні скроли */
 html, body, #__next {
   margin: 0;
   padding: 0;
@@ -12,13 +12,7 @@ html, body, #__next {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Сьогоднішня дата: чорний грубий контур */
-.today-highlight {
-  border: 4px solid black !important;
-  font-weight: bold;
-}
-
-/* Фоновий градієнт для всієї сторінки */
+/* Фоновий макет календаря */
 .dashboard-layout-calendar {
   width: 100%;
   height: 100vh;
@@ -31,15 +25,18 @@ html, body, #__next {
   padding: 0.8%;
 }
 
+/* ГОЛОВНА СІТКА: Виправлено помилки, чіткі пропорції без повзунків */
 .main-grid-cal {
+  display: grid;
+  grid-template-columns: 14% 1fr 16%;
+  gap: 1.5%;
   flex: 1;
   min-height: 0;
-  display: grid;
-  /* Компактні бічні панелі, календар розширено */
-  grid-template-columns: 13% 1fr 15%;
-  gap: 1.5%;
+  height: calc(100vh - 160px); /* Втискаємо в екран, враховуючи топбар */
+  overflow: hidden;
 }
 
+/* Верхня панель навігації */
 .topbar-cal {
   display: flex;
   justify-content: space-between;
@@ -48,6 +45,31 @@ html, body, #__next {
   gap: 16px;
 }
 
+/* Блок логотипу з підтримкою твоєї аватарки ШІ */
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Відступ між круглим фото та текстом */
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.45rem;
+  letter-spacing: 0.5px;
+  padding: 0;
+  margin-left: 6px;
+  background: none;
+}
+
+/* Кругла аватарка сайту зліва від назви */
+.avatar-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Кнопка назад */
 .back-button {
   padding: 10px 16px;
   border: 1px solid rgba(255,255,255,0.35);
@@ -64,31 +86,7 @@ html, body, #__next {
   background: rgba(255,255,255,0.2);
 }
 
-/* Назва сайту з підтримкою аватарки */
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px; /* Відступ між фото та текстом */
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 1.45rem;
-  letter-spacing: 0.5px;
-  padding: 0;
-  margin-left: 6px;
-  background: none;
-}
-
-/* Стиль для нової аватарки сайту */
-.avatar-img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Бульбашка користувача праворуч */
+/* Бульбашка юзера праворуч */
 .user-bubble-nav {
     display: flex;
     align-items: center;
@@ -115,28 +113,7 @@ html, body, #__next {
     border: 1px solid rgba(255,255,255,0.25);
 }
 
-.dashboard-avatar-icon {
-    width: 48px;
-    height: 48px;
-    margin-right: 12px;
-}
-
-.avatar-circle-nav { 
-    width: 40px; 
-    height: 40px; 
-    border-radius: 50%; 
-    overflow: hidden; 
-    border: 2px solid white; 
-    background: #444; 
-}
-
-.nav-img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-}
-
-/* Кнопки */
+/* Кнопки керування */
 .controls-row {
   display: flex;
   justify-content: center;
@@ -164,14 +141,9 @@ html, body, #__next {
   box-shadow: none;
 }
 
-.ctrl-btn.active-del,
-.ctrl-btn.pink.active-del {
-  box-shadow: 0 0 30px rgba(249, 115, 22, 0.7);
-  transform: translateY(-1px) scale(1.03);
-}
+.active-del { outline: 4px solid rgba(255, 99, 71, 0.6); }
 
-.active-del {outline: 4px solid rgba(255, 99, 71, 0.6);}
-
+/* Панель категорій ліворуч */
 .category-panel {
   margin-top: 15px;
   display: flex;
@@ -181,17 +153,6 @@ html, body, #__next {
   padding: 16px;
   border-radius: 24px;
   border: 1px solid rgba(255,255,255,0.1);
-}
-
-.calendar-block {
-  margin-top: 4px;
-  background: transparent;
-  border-radius: 0;
-  padding: 0;
-  box-shadow: none;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
 }
 
 .side-cat-btn {
@@ -206,7 +167,17 @@ html, body, #__next {
   transition: background 0.2s ease;
 }
 
-.side-cat-btn:hover {background: rgba(255,255,255,0.2);}
+.side-cat-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* Центральний блок календаря */
+.calendar-block {
+  margin-top: 4px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
 
 .month-picker {
   display: flex;
@@ -214,7 +185,6 @@ html, body, #__next {
   align-items: center;
   gap: 16px;
   margin-bottom: 6px;
-  margin-top: 0;
 }
 
 .month-pill {
@@ -225,7 +195,6 @@ html, body, #__next {
   color: white;
   font-size: 1rem;
   text-transform: capitalize;
-  box-shadow: inset 0 0 8px rgba(255,255,255,0.08);
 }
 
 .month-arrow {
@@ -235,15 +204,15 @@ html, body, #__next {
   color: white;
   font-size: 1.1rem;
   cursor: pointer;
-  box-shadow: 0 12px 30px rgba(139,92,246,0.25);
   padding: 12px 16px;
 }
 
+/* СІТКА КАЛЕНДАРЯ: Захист від зажовування */
 .days-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  /* ВИПРАВЛЕНО: перший рядок підлаштовується під назви днів, інші 6 ділять висоту */
-  grid-template-rows: auto repeat(6, 1fr);
+  /* Жорсткі 45px для днів тижня, решта 6 рядків ідеально ділять залишок */
+  grid-template-rows: 45px repeat(6, 1fr);
   flex: 1;
   min-height: 0;
   height: 100%;
@@ -253,15 +222,19 @@ html, body, #__next {
   border: none;
 }
 
+/* Рядок днів тижня (Шапка) */
 .grid-head-cell {
   background: rgba(255,255,255,0.14);
   color: #f8fafc;
   text-align: center;
-  padding: 14px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 700;
   border-bottom: 1px solid rgba(255,255,255,0.12);
 }
 
+/* Клітинки днів */
 .grid-cell {
   background: rgba(255,255,255,0.95);
   color: #111;
@@ -286,70 +259,53 @@ html, body, #__next {
   align-items: flex-start;
 }
 
-.cell-day-number {font-weight: 700;}
+.cell-day-number { font-weight: 700; }
 
-.note-marker {
-  background: #7c3aed;
-  color: white;
-  border-radius: 999px;
-  padding: 2px 8px;
-  font-size: 0.8rem;
-}
-
+/* Нотатки та бейджі всередині клітинок */
 .cell-notes {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  overflow-y: auto;
 }
 
 .cell-note-badge {
   display: block;
-  border-radius: 12px;
-  padding: 5px 8px;
-  font-size: 0.75rem;
-  line-height: 1.4;
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-size: 0.72rem;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.cell-note-badge.meeting {
-  background: rgba(59,130,246,0.15);
-  color: #1d4ed8;
-}
+.cell-note-badge.events, .cell-note-badge.event { background: rgba(234,179,8,0.2); color: #b45309; }
+.cell-note-badge.lectures { background: rgba(59,130,246,0.15); color: #1d4ed8; }
+.cell-note-badge.exams { background: rgba(239,68,68,0.15); color: #b91c1c; }
 
-.cell-note-badge.birthday {
-  background: rgba(233,30,99,0.14);
-  color: #be185d;
-}
-
-.cell-note-badge.holiday {
-  background: rgba(234,179,8,0.15);
-  color: #b45309;
-}
-
-.cell-note-badge.event {
-  background: rgba(16,185,129,0.13);
-  color: #047857;
-}
-
-.cell-note-badge.lectures {
-  background: rgba(59,130,246,0.10);
-  color: #1d4ed8;
-}
-
-.cell-note-badge.exams {
-  background: rgba(239,68,68,0.12);
-  color: #b91c1c;
-}
-
-/* СЬОГОДНІ - ЧОРНИЙ КОНТУР */
+/* Сьогоднішня дата: Чорний жирний контур */
 .today-highlight { 
-  border: 6px solid black !important; 
-  z-index: 10; 
+  border: 4px solid black !important; 
+  z-index: 5; 
   position: relative; 
 }
 
-/* Стиль неонової кнопки для відкриття AI-чату */
+/* Панель нотаток праворуч з внутрішнім скролом */
+.file-list-box {
+  margin-top: 16px;
+  padding: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 18px;
+  max-height: 200px; 
+  overflow-y: auto;   
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Кнопка AI чату */
 .ai-neon-circle {
   position: fixed; 
   bottom: 30px; 
@@ -369,320 +325,3 @@ html, body, #__next {
   height: 100%; 
   object-fit: cover; 
 }
-
-.dashboard-layout-calendar { transition: none !important; }
-
-/* Стиль вікна чату ШІ */
-.ai-chat-box {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  max-height: 100%;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(18px);
-  border-radius: 28px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.16);
-  box-shadow: 0 32px 80px rgba(0,0,0,0.35);
-  z-index: 1000;
-}
-
-.chat-top,
-.chat-bottom,
-.chat-mid,
-.chat-message,
-.message-sender,
-.ai-text,
-.ai-input,
-.send-message-btn {font-size: 0.9rem;}
-.chat-message {padding: 10px 12px;}
-.chat-top {padding: 14px 18px;}
-.chat-bottom {padding: 14px 16px;}
-
-.ai-input {padding: 10px 12px;}
-.send-message-btn {padding: 10px 14px;}
-
-.chat-top {
-  padding: 20px 24px;
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-  font-weight: 700;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
-}
-
-.chat-close-btn {
-  background: rgba(255,255,255,0.18);
-  border: none;
-  border-radius: 50%;
-  padding: 10px;
-  color: white;
-  cursor: pointer;
-}
-
-.chat-mid {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.chat-message {
-  border-radius: 18px;
-  padding: 12px 14px;
-  max-width: 100%;
-  word-break: break-word;
-}
-
-.chat-message.user {
-  align-self: flex-end;
-  background: rgba(59,130,246,0.16);
-  color: #e2e8f0;
-}
-
-.chat-message.ai {
-  align-self: flex-start;
-  background: rgba(147,51,234,0.18);
-  color: #f8fafc;
-}
-
-.message-sender {
-  display: block;
-  font-size: 0.75rem;
-  margin-bottom: 6px;
-  opacity: 0.8;
-}
-
-.ai-text {
-  background: rgba(255,255,255,0.08);
-  padding: 16px;
-  border-radius: 22px;
-  color: #e2e8f0;
-  line-height: 1.5;
-}
-
-.chat-bottom {
-  padding: 18px;
-  background: rgba(15,23,42,0.95);
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.ai-input {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 14px;
-  color: white;
-  width: 100%;
-  outline: none;
-  padding: 12px 14px;
-}
-
-.send-message-btn {
-  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-  border: none;
-  border-radius: 14px;
-  color: white;
-  padding: 12px 16px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.file-upload-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.08);
-  color: white;
-  font-size: 1.3rem;
-  cursor: pointer;
-}
-
-.file-list-box {
-  margin-top: 16px;
-  padding: 14px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 18px;
-  max-height: 160px; 
-  overflow-y: auto;   
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.file-list-title {
-  margin-bottom: 10px;
-  color: #e5e7eb;
-  font-size: 0.95rem;
-  font-weight: 700;
-}
-
-.file-chip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 12px;
-  color: white;
-  font-size: 0.9rem;
-}
-
-.file-chip button {
-  padding: 0 10px;
-  border: none;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.14);
-  color: white;
-  cursor: pointer;
-}
-
-.file-list-empty {
-  color: rgba(255,255,255,0.7);
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.dashboard-overlay {
-  position: fixed;
-  top: -2px;
-  right: 3px;
-  bottom: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.35);
-  z-index: 1100;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
-  padding: 24px;
-}
-
-.dashboard-panel {
-  width: auto;
-  max-width: 100%;
-  background: rgba(15, 23, 42, 0.98);
-  border: 1px solid rgba(255,255,255,0.16);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: -10px 20px 80px rgba(0,0,0,0.35);
-}
-
-.dashboard-panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 18px 20px;
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
-  color: white;
-}
-
-.dashboard-panel-header h3 {
-  margin: 0;
-  font-size: 1.05rem;
-}
-
-.dashboard-panel-header p {
-  margin: 2px 0 0;
-  opacity: 0.85;
-  font-size: 0.9rem;
-}
-
-.dashboard-panel-body {
-  padding: 20px;
-  color: #f8fafc;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-.dashboard-panel-body p {
-  margin: 10px 0;
-}
-
-.ai-neon-circle span {
-  font-size: 1.6rem;
-}
-
-/* Modal overlays */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  backdrop-filter: blur(4px);
-}
-
-.modal-content.note-modal {
-  background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(79,70,229,0.95));
-  border: 1px solid rgba(255,255,255,0.12);
-  width: auto;
-  max-width: 100%;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 28px 80px rgba(0,0,0,0.35);
-  padding: 0;
-}
-
-.modal-header.note-modal {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 18px;
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
-  color: white;
-}
-
-.modal-header.note-modal h2 { margin: 0; font-size: 1.05rem; }
-
-.modal-close.note-modal {
-  background: rgba(255,255,255,0.14);
-  border: none;
-  color: white;
-  padding: 10px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.modal-content.note-modal .modal-body {
-  padding: 18px;
-  color: #f8fafc;
-}
-
-.modal-content.note-modal .modal-footer {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  padding: 12px 18px;
-  background: rgba(0,0,0,0.03);
-}
-
-.modal-btn {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.modal-btn.save-btn { background: linear-gradient(135deg,#34d399,#059669); color: white; }
-.modal-btn.cancel-btn { background: rgba(255,255,255,0.12); color: white; }

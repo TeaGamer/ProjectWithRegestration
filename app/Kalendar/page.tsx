@@ -499,12 +499,12 @@ export default function KalendarPage() {
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
         <div className = "logo-section"> Calendar with Alex </div>
-        <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
-          <div className="avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
-          <div className="logo-section">
+        <div className="logo-section">
             <img src="IMG_1074.png" alt="AI Alex Avatar" className="avatar-img"/>
             <span>Calendar with Alex</span>
           </div>
+        <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
+          <div className="avatar-icon">{currentUser.login.charAt(0).toUpperCase()}</div>
           <span>{currentUser.login}</span>
         </button>
       </div>
