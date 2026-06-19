@@ -115,7 +115,7 @@ export const Study: Teacher[] = [
         id: 1,
         name: "Doctor Alina Marchlewska",
         format: [0, 1],
-        subjects: ["Wprowadzenie do metor munerycznych", " Metody probabilistyczne i statystyczne w informatyce", "Analiza matematychna i numerychna"]
+        subjects: ["Wprowadzenie do metor munerycznych", "Metody probabilistyczne i statystyczne w informatyce", "Analiza matematychna i numerychna"]
     },
     {
         id: 2,
@@ -151,13 +151,13 @@ export const Study: Teacher[] = [
         id: 7,
         name: "Doktor inżynier Józef Paszkowski",
         format: [0],
-        subjects: ["Bazy danych", "Problemy społeczne i zawodowe", "Problemy społeczne i zawodowe"]
+        subjects: ["Bazy danych", "Problemy społeczne i zawodowe"]
     },
     {
         id: 8,
         name: "Doktor inżynier Grzanek Konrad",
         format: [0],
-        subjects: ["Programowanie i konfiguracja serwerów aplikacyjnych", "Języki i paradygmaty programowania", "Programowanie funkcyjne", "Programowanie i konfiguracja serwerów aplikacyjnych"]
+        subjects: ["Programowanie i konfiguracja serwerów aplikacyjnych", "Języki i paradygmaty programowania", "Programowanie funkcyjne"]
     },
     {
         id: 9,
@@ -199,8 +199,6 @@ export const Study: Teacher[] = [
         id: 15,
         name: "Matusiak Marek",
         format: [0, 1],
-        subjects: [" Technologie internetu rzeczy"]
+        subjects: ["Technologie internetu rzeczy"]
     }
 ];
-
-

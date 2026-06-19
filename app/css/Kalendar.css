@@ -1,11 +1,9 @@
-
 /* Стилі для сторінки календаря: фон, кольори та розташування */
 html, body, #__next {
   margin: 0;
   padding: 0;
   height: 100%;
   min-height: 100%;
-  min-width: 100vw;
   width: 100%;
   overflow-x: hidden !important;
   overflow-y: hidden !important;
@@ -20,33 +18,27 @@ html, body, #__next {
   font-weight: bold;
 }
 
-
 /* Фоновий градієнт для всієї сторінки */
 .dashboard-layout-calendar {
-  min-width: 100vw;
-  min-height: 100vh;
-  width: 100vw;
-  max-width: 100vw;
+  width: 100%;
+  height: 100vh;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 12px 16px 10px;
+  padding: 0.8%;
 }
 
 .main-grid-cal {
   flex: 1;
   min-height: 0;
-  max-height: calc(100vh - 170px);
-  overflow: auto;
   display: grid;
-  grid-template-columns: minmax(150px, 200px) minmax(0, 1fr) minmax(130px, 220px);
-  gap: 14px;
+  grid-template-columns: minmax(15%, 20%) minmax(0, 1fr) minmax(13%, 22%);
+  gap: 1.4%;
 }
 
-/* Хедер */
 .topbar-cal {
   display: flex;
   justify-content: space-between;
@@ -144,8 +136,6 @@ html, body, #__next {
   flex-wrap: wrap;
 }
 
-
-
 .ctrl-btn {
   padding: 12px 20px;
   border: none;
@@ -170,7 +160,7 @@ html, body, #__next {
   transform: translateY(-1px) scale(1.03);
 }
 
-.active-del {outline: 4px solid rgba(255, 99, 71, 0.6);}
+.active-del {outline: 4px solid rgba(255, 99, 71, 0.6)}
 
 .category-panel {
   margin-top: 30px;
@@ -189,6 +179,9 @@ html, body, #__next {
   border-radius: 0;
   padding: 0;
   box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .side-cat-btn {
@@ -203,7 +196,7 @@ html, body, #__next {
   transition: background 0.2s ease;
 }
 
-.side-cat-btn:hover {background: rgba(255,255,255,0.2);}
+.side-cat-btn:hover {background: rgba(255,255,255,0.2)}
 
 .month-picker {
   display: flex;
@@ -239,6 +232,9 @@ html, body, #__next {
 .days-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(6, 1fr);
+  flex: 1;
+  min-height: 0;
   background: #1f2937;
   border-radius: 22px;
   overflow: hidden;
@@ -257,7 +253,7 @@ html, body, #__next {
 .grid-cell {
   background: rgba(255,255,255,0.95);
   color: #111;
-  min-height: 96px;
+  min-height: 0;
   padding: 10px;
   border: none;
   display: flex;
@@ -277,7 +273,7 @@ html, body, #__next {
   align-items: flex-start;
 }
 
-.cell-day-number {font-weight: 700;}
+.cell-day-number {font-weight: 700}
 
 .note-marker {
   background: #7c3aed;
@@ -505,14 +501,6 @@ html, body, #__next {
   cursor: pointer;
 }
 
-.chat-bottom {
-  padding: 18px;
-  background: rgba(15,23,42,0.95);
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
 .file-upload-button {
   display: inline-flex;
   align-items: center;
@@ -533,6 +521,9 @@ html, body, #__next {
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 18px;
   min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .file-list-title {
@@ -548,7 +539,6 @@ html, body, #__next {
   justify-content: space-between;
   gap: 8px;
   padding: 10px 12px;
-  margin-bottom: 8px;
   background: rgba(255,255,255,0.1);
   border-radius: 12px;
   color: white;
@@ -622,13 +612,9 @@ html, body, #__next {
   line-height: 1.6;
 }
 
-.dashboard-panel-body p {
-  margin: 10px 0;
-}
+.dashboard-panel-body p {margin: 10px 0}
 
-.ai-neon-circle span {
-  font-size: 1.6rem;
-}
+.ai-neon-circle span {font-size: 1.6rem}
 
 /* Modal overlay and modal styles (ensure Kalendar modal appears as overlay) */
 .modal-overlay {
@@ -696,6 +682,12 @@ html, body, #__next {
   cursor: pointer;
 }
 
-.modal-btn.save-btn { background: linear-gradient(135deg,#34d399,#059669); color: white; }
-.modal-btn.cancel-btn { background: rgba(255,255,255,0.12); color: white; }
+.modal-btn.save-btn {
+  background: linear-gradient(135deg,#34d399,#059669); 
+  color: white; 
+}
 
+.modal-btn.cancel-btn {
+  background: rgba(255,255,255,0.12);
+  color: white;
+}
