@@ -127,6 +127,36 @@ export async function deleteChatMessage(
     throw error;
   }
 }
+// Додати перед "export default {"
+
+export interface ParsedEvent {
+  is_event: boolean;
+  title?: string;
+  date?: string;
+  time?: string;
+  category?: string;
+}
+
+export async function parseEventFromText(
+  text: string,
+  token: string
+): Promise<ParsedEvent> {
+  const response = await fetch(`${API_BASE_URL}/api/chat/parse-event`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    credentials: 'include',
+    body: JSON.stringify({ text })
+  });
+
+  if (!response.ok) {
+    throw new Error('Не вдалося розпарсити подію');
+  }
+
+  return response.json();
+}
 
 export default {
   sendMessage: sendChatMessage,

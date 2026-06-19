@@ -4,9 +4,10 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import Profile from "../components/Profile";
-import { sendChatMessage } from "../services/chatService";
+import { sendChatMessage, parseEventFromText } from "../services/chatService";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
+
 
 // Інтерфейс для нотатки в календарі
 interface Note {
@@ -297,22 +298,30 @@ export default function KalendarPage() {
         setAttachedFiles([]);
       }
 
-      const createNote = shouldCreateNote(trimmed);
-      if (createNote) {
-        const noteDate = extractDateFromMessage(trimmed);
-        const noteTime = extractTimeFromMessage(trimmed);
-        const category = inferNoteCategoryFromMessage(trimmed);
-
-        if (category) {
+      // Просимо AI розпарсити подію
+      try {
+        const parsed = await parseEventFromText(trimmed, token);
+        if (parsed.is_event && parsed.title && parsed.date && parsed.category) {
           const newNote: Note = {
             id: Date.now() + 1,
-            text: trimmed,
-            date: noteDate,
-            time: noteTime,
-            category,
+            text: parsed.title,
+            date: parsed.date,
+            time: parsed.time ?? "",
+            category: parsed.category,
           };
           setNotes((prev) => sortNotesByDateTime([...prev, newNote]));
+          // Показати підтвердження в чаті
+          setChatMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now() + 2,
+              sender: "ai",
+              text: `✅ Додано подію: "${parsed.title}" на ${parsed.date}${parsed.time ? " о " + parsed.time : ""}`,
+            },
+          ]);
         }
+      } catch {
+        // Якщо парсинг не вдався — просто не додаємо нотатку, AI вже відповів
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error sending message";
