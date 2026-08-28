@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import Profile from "../components/Profile";
-import { sendChatMessage, parseEventFromText } from "../services/chatService";
+import { sendChatMessage, parseEventFromText, uploadDocuments } from "../services/chatService";
 import "../css/Kalendar.css";
 import { User } from "../constants/profileConfig";
 import { useProfileModal } from "../hooks/useProfileModal";
@@ -216,6 +216,11 @@ export default function KalendarPage() {
 
     try {
       const token = localStorage.getItem("token") || "";
+
+      if (attachedFiles.length > 0) {
+        await uploadDocuments(attachedFiles, token);
+      }
+
       const fileNames = attachedFiles.map((file) => file.name);
       const response = await sendChatMessage(trimmed, token, fileNames.length ? fileNames : undefined);
       setChatMessages((prev) => [

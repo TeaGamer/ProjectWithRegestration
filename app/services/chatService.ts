@@ -158,6 +158,33 @@ export async function parseEventFromText(
   return response.json();
 }
 
+/**
+ * Завантажити файли на бекенд для RAG-індексації
+ */
+export async function uploadDocuments(
+  files: File[],
+  token: string
+): Promise<void> {
+  if (!files.length) return;
+
+  const formData = new FormData();
+  files.forEach((file) => formData.append('files', file));
+
+  const response = await fetch(`${API_BASE_URL}/api/documents/upload`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    credentials: 'include',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || `Error uploading documents: ${response.status}`);
+  }
+}
+
 export default {
   sendMessage: sendChatMessage,
   getHistory: getChatHistory,
