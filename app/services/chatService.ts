@@ -34,12 +34,17 @@ interface ChatHistoryResponse {
 export async function sendChatMessage(
   message: string,
   token: string,
-  fileNames?: string[]
+  files?: File[]
 ): Promise<ChatResponse> {
   try {
-    const payload: { message: string; fileNames?: string[] } = { message };
-    if (fileNames && fileNames.length > 0) {
-      payload.fileNames = fileNames;
+    let requestBody: BodyInit;
+    if (files?.length) {
+      const formData = new FormData();
+      formData.append('message', message);
+      files.forEach((file) => formData.append('files', file, file.name));
+      requestBody = formData;
+    } else {
+      requestBody = JSON.stringify({ message });
     }
 
     console.log('Sending chat message with token:', token ? 'Present' : 'Missing');
@@ -47,16 +52,16 @@ export async function sendChatMessage(
     const response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        ...(files?.length ? {} : { 'Content-Type': 'application/json' }),
         'Authorization': `Bearer ${token}`
       },
       credentials: 'include',
-      body: JSON.stringify(payload)
+      body: requestBody
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || `Error sending message: ${response.status}`);
+      const error = await response.json().catch(() => null);
+      throw new Error(error?.error || `Error sending message: ${response.status}`);
     }
 
     return await response.json();
@@ -152,7 +157,7 @@ export async function parseEventFromText(
   });
 
   if (!response.ok) {
-    throw new Error('Не вдалося розпарсити подію');
+    throw new Error('Failed to parse the event from the text');
   }
 
   return response.json();

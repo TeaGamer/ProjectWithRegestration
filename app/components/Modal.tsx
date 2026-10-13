@@ -29,7 +29,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
                     <button 
                         className = "modal-close"
                         onClick = {onClose}
-                        aria-label="Close modal"
+                        aria-label = "Close modal"
                     >
                         ✕
                     </button>

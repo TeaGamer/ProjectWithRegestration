@@ -15,13 +15,13 @@ export interface User {
 export interface Teacher {
     id: number;
     name: string;
-    format: (0 | 1)[]; 
+    format: (0 | 1)[];
     subjects: string[];
 } export const FORMAT_LABELS: Record<number, string> = { 0: "Online", 1: "Face to face"};
 
 
-export const UKRAINIAN_REGIONS = [
-    " -- none -- ", 
+export const Regions = [
+    " -- none -- ",
     " Autonomous Republic of Crimea",
     " Cherkasy",
     " Chernivtsi",
@@ -58,9 +58,9 @@ export const termsAndConditionsText: string = `
     TERMS OF USE FOR THE ALEX SERVICE
 
   1. GENERAL PROVISIONS
- By using the Alex service, you agree to these terms. 
- The service is provided ‘"as is"’. 
- We do not guarantee 100% accuracy of AI responses. 
+ By using the Alex service, you agree to these terms.
+ The service is provided ‘"as is"’.
+ We do not guarantee 100% accuracy of AI responses.
  It is prohibited to use the service for illegal activities.
 
   2. PROHIBITED:
@@ -89,23 +89,23 @@ export const termsAndConditionsText: string = `
     - Adhere to ethical standards for the use of AI.
 
   5. PRIVACY
- We collect and process your data in accordance with our 
+ We collect and process your data in accordance with our
  privacy policy.
- Your data is protected and will not be shared with 
+ Your data is protected and will not be shared with
  third parties without your consent.
 
   6. LIABILITY
  The Alex service is not liable for:
     - Incorrect AI responses;
     - Data loss due to technical issues;
-    - The actions of other users. 
+    - The actions of other users.
      
   7. CHANGES TO THE TERMS
  We may amend these terms at any time.
- Your continued use of the service after such changes 
+ Your continued use of the service after such changes
  constitutes your agreement to the new terms.
 
- By agreeing to these terms and conditions, 
+ By agreeing to these terms and conditions,
  you confirm and accept all the above provisions.
 `;
 

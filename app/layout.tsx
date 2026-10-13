@@ -15,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     // HTML структура з мовою англійською
-    <html lang="en">
+    <html lang = "en">
       <body>
         {children}
       </body>

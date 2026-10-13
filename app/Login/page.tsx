@@ -1,10 +1,11 @@
 
 "use client";
+
 // Компонент сторінки логіну/реєстрації, що рендериться на клієнті
 import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import "../css/Login.css";
-import {UKRAINIAN_REGIONS} from "../constants/profileConfig";
+import {Regions} from "../constants/profileConfig";
 import {termsAndConditionsText} from "../constants/profileConfig";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
@@ -39,7 +40,7 @@ export default function LoginPage() {
         confirmPassword: "",
         first_name: "",
         last_name: "",
-        region: UKRAINIAN_REGIONS[0] || "",
+        region: Regions[0] || "",
         agreedToTerms: false,
         isStudent: false,
     });
@@ -63,7 +64,7 @@ export default function LoginPage() {
         const { name, type, checked, value } = e.target as HTMLInputElement;
         setRegisterData((prev) => ({
             ...prev,
-            [name]: type === "checkbox" ? checked : value,
+            [name]: type === "checkbox" ? checked : name === "email" ? value.toLowerCase() : value,
         }));
     };
 
@@ -123,11 +124,12 @@ export default function LoginPage() {
             setError(" You must accept the Terms of Service! ");
             return;
         }
-        if (!registerData.email || !registerData.email.includes("@")) {
+        const email = registerData.email.trim().toLowerCase();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             setError(" Enter a valid email! ");
             return;
         }
-        if (registerData.isStudent && !registerData.email.endsWith("@student.san.edu.pl")) {
+        if (registerData.isStudent && !email.endsWith("@student.san.edu.pl")) {
             setError(" Student email must end with @student.san.edu.pl ");
             return;
         }
@@ -135,8 +137,8 @@ export default function LoginPage() {
             setError("Passwords do not match!");
             return;
         }
-        if (registerData.password.length < 6) {
-            setError(" Password must be at least 6 characters long! ");
+        if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[.,:-])[A-Za-z\d.,:-]{8,}$/.test(registerData.password)) {
+            setError(" Password must be at least 8 characters and include a letter, a number, and one of these symbols: . , : - ");
             return;
         }
         if (!registerData.login.trim()) {
@@ -152,7 +154,7 @@ export default function LoginPage() {
                 },
                 body: JSON.stringify({
                     login: registerData.login,
-                    email: registerData.email,
+                    email,
                     password: registerData.password,
                     first_name: registerData.first_name || registerData.login,
                     last_name: registerData.last_name || "",
@@ -198,7 +200,7 @@ export default function LoginPage() {
             <div className = "login-form-wrapper">
             <div className = "login-form-header">
                 <h1>{isLogin ? "Welcome Back" : "Create Your Account"}</h1>
-                <p>{isLogin ? " Sign in to access your calendar and dashboard. " : " Register to manage your calendar and profile. "}</p>
+                <p>{isLogin ? " Sign in to access your calendar and dashboard " : " Register to manage your calendar and profile "}</p>
             </div>
             {/* Tabs */}
             <div className = "tabs">
@@ -208,34 +210,28 @@ export default function LoginPage() {
                             setIsLogin(true);
                             setError("");
                             setSuccess("");
-                        }}
-                    >
-                        Log In
-                    </button>
+                        }}> Log In </button>
                     <button
                         className = {`tab-btn ${!isLogin ? "active" : ""}`}
                         onClick = {() => {
                             setIsLogin(false);
                             setError("");
                             setSuccess("");
-                        }}
-                    >
-                        Register
-                    </button>
+                        }}> Register </button>
                 </div>
 
-                {error && <div className = " error-message ">{error}</div>}
-                {success && <div className = " success-message ">{success}</div>}
+                {error && <div className = "error-message " > {error}</div>}
+                {success && <div className = "success-message " > {success}</div>}
 
                 {/* Login Form */}
                 {isLogin && (
                     // Відображення форми логіну, якщо обрана вкладка Log In
                     <div className = " form-container ">
-                        <h2>Log In</h2>
-                        <form className = "login-form" onSubmit={handleLoginSubmit}>
+                        <h2> Log In </h2>
+                        <form className = "login-form" onSubmit = {handleLoginSubmit}>
                             <input
                                 name = "email"
-                                placeholder = "Email"
+                                placeholder = " Email"
                                 type = "email"
                                 value = {loginData.email}
                                 onChange = {handleLoginChange}
@@ -257,7 +253,7 @@ export default function LoginPage() {
                                     type = "button"
                                     onClick = {() => setShowLoginPassword(!showLoginPassword)}
                                     className = "password-toggle-btn"
-                                    aria-label= "Toggle password visibility"
+                                    aria-label = "Toggle password visibility"
                                 >
                                     {showLoginPassword ? "1" : "0"}
                                 </button>
@@ -276,7 +272,7 @@ export default function LoginPage() {
                             <button
                                 type = "submit"
                                 className = "submit-btn"
-                                onMouseMove={(e) => {
+                                onMouseMove = {(e) => {
                                     if (!loginData.email.trim() || !loginData.password.trim()) {
                                         const btn = e.currentTarget;
                                         const rect = btn.getBoundingClientRect();
@@ -296,10 +292,7 @@ export default function LoginPage() {
                                     }
                                 }}
                                 onMouseLeave={(e) => {e.currentTarget.style.transform = 'translate(0, 0)';}
-                            }
-                            >
-                                Log In
-                            </button>
+                            }> Log In </button>
                         </form>
                     </div>
                 )}
@@ -325,27 +318,29 @@ export default function LoginPage() {
                                     checked = {registerData.isStudent}
                                     onChange = {handleRegisterChange}
                                 />
-                                {" "}I am a student
+                                {" "} I am a student
                             </label>
 
                             <input
                                 name = "email"
-                                placeholder = {registerData.isStudent ? "Email student's (must end with @student.san.edu.pl) *" : "Email *"}
+                                placeholder = {registerData.isStudent ? " Email student's (must end with @student.san.edu.pl) *" : " Email *"}
                                 type = "email"
                                 value = {registerData.email}
                                 onChange = {handleRegisterChange}
+                                autoCapitalize = "none"
+                                autoCorrect = "off"
                                 required
                             />
                             <input
                                 name = "first_name"
-                                placeholder = "First Name"
+                                placeholder = " First name"
                                 type = "text"
                                 value = {registerData.first_name}
                                 onChange = {handleRegisterChange}
                             />
                             <input
                                 name = "last_name"
-                                placeholder = "Last Name"
+                                placeholder = " Last name"
                                 type = "text"
                                 value = {registerData.last_name}
                                 onChange = {handleRegisterChange}
@@ -354,9 +349,12 @@ export default function LoginPage() {
                                 <input
                                     name="password"
                                     type = {showRegisterPassword ? "text" : "password"}
-                                    placeholder="Password *"
+                                    placeholder=" Password *"
                                     value = {registerData.password}
                                     onChange = {handleRegisterChange}
+                                    minLength = {8}
+                                    pattern = "(?=.*[A-Za-z])(?=.*[0-9])(?=.*[.,:-])[A-Za-z0-9.,:-]{8,}"
+                                    title = " At least 8 characters, including a letter, a number, and one of: . , : -"
                                     id = "pwd"
                                     required
                                 />
@@ -369,11 +367,14 @@ export default function LoginPage() {
                                     {showRegisterPassword ? "⚪" : "⚫"}
                                 </button>
                             </div>
+                            <small className = "password-requirements">
+                                At least 8 characters, with a letter, a number, and one symbol: . , : -
+                            </small>
 
                             <input
                                 name = "confirmPassword"
                                 type = "password"
-                                placeholder = "Confirm Password *"
+                                placeholder = " Confirm Password *"
                                 value = {registerData.confirmPassword}
                                 onChange = {handleRegisterChange}
                                 required
@@ -384,7 +385,7 @@ export default function LoginPage() {
                                 value = {registerData.region}
                                 onChange = {handleRegisterChange}
                             >
-                                {UKRAINIAN_REGIONS.map((region) => (
+                                {Regions.map((region) => (
                                     <option key = {region} value = {region}>
                                         {region}
                                     </option>
@@ -399,14 +400,12 @@ export default function LoginPage() {
                                     checked = {registerData.agreedToTerms}
                                     onChange = {handleRegisterChange}
                                 />
-                                {" "}I agree to the{" "}
+                                {" "} I agree to the {" "}
                                 <button
                                     type = "button"
                                     className = "terms-link"
                                     onClick = {() => setShowTermsModal(true)}
-                                >
-                                    Terms of Service
-                                </button>
+                                > Terms of Service </button>
                             </label>
 
                             <button type = "submit" className = "submit-btn">
@@ -422,7 +421,7 @@ export default function LoginPage() {
                     <div className = "modal-overlay" onClick = {() => setShowTermsModal(false)}>
                         <div className = "modal-content" onClick = {(e) => e.stopPropagation()}>
                             <div className = "modal-header">
-                                <h3 style={{ textAlign: 'center' }}>Terms of Service</h3>
+                                <h3 style = {{ textAlign: 'center' }}> Terms of Service </h3>
                             </div>
                             <div className = "modal-body">
                                 <pre>{termsAndConditionsText}</pre>

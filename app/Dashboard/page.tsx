@@ -1,6 +1,5 @@
 "use client";
 
-// Цей компонент виконується на клієнтській стороні і взаємодіє з localStorage
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "../css/Dashboard.css";
@@ -27,7 +26,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
     }, []);
 
     if (loading) {
-        return <div className="dashboard-container"><p>Loading ...</p></div>;
+        return <div className = "dashboard-container"><p> Loading... </p></div>;
     }
 
     const currentUser: User = user ?? {
@@ -39,22 +38,25 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
     };
 
     return (
-        /* Фікс: змінено "Dashboard-layout" на "dashboard-layout" для збігу з CSS */
-        <div className="dashboard-layout">
-            <div className="dashboard-info-popup">
-                <div className="info-popup-header">
+        <div className = "dashboard-layout">
+            {/* Маленьке акуратне віконце по центру */}
+            <div className = "dashboard-info-popup">
+                <div className = "info-popup-header">
                     <div>
-                        <h2>Quick Info</h2>
-                        <p>Small info panel opened from the calendar.</p>
+                        <h2> Quick Info </h2>
+                        <p> User profile details </p>
                     </div>
-                    <button className="close-info-btn" onClick={() => router.push("/Kalendar")}>Close</button>
+                    {/* Кнопка повернення до календаря */}
+                    <button className = "close-info-btn" onClick={() => router.push("/Kalendar")}>×</button>
                 </div>
-                <div className="info-popup-body">
-                    <p><strong>User:</strong> {currentUser.first_name || currentUser.login}</p>
-                    <p><strong>Login:</strong> {currentUser.login}</p>
-                    <p><strong>Email:</strong> {currentUser.email || "Not set"}</p>
-                    {currentUser.region && <p><strong>Region:</strong> {currentUser.region}</p>}
-                    {currentUser.date_of_birth && <p><strong>Date of Birth:</strong> {currentUser.date_of_birth}</p>}
+                
+                <div className = "info-popup-body">
+                    <p><strong> User: </strong> {currentUser.first_name || currentUser.login}</p>
+                    <p><strong> First name: </strong> {currentUser.first_name || " -- "}</p>
+                    <p><strong> Last name: </strong> {currentUser.last_name || " –– "}</p>
+                    <p><strong> Login: </strong> {currentUser.login}</p>
+                    <p><strong> Email: </strong> {currentUser.email || "Not set"}</p>
+                    {currentUser.region && <p><strong> Region: </strong> {currentUser.region}</p>}
                 </div>
             </div>
         </div>

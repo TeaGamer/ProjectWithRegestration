@@ -193,6 +193,13 @@
 
 .password-input-wrapper input {padding-right: 48px;}
 
+.password-requirements {
+    margin-top: -10px;
+    color: rgba(226, 232, 240, 0.72);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
 .password-toggle-btn {
     position: absolute;
     right: 14px;
@@ -523,4 +530,3 @@
         font-size: 0.8rem;
     }
 }
-

@@ -6,11 +6,10 @@ import Image from "next/image";
 import Profile from "../components/Profile";
 import { sendChatMessage, parseEventFromText } from "../services/chatService";
 import "../css/Kalendar.css";
+import "../css/Dashboard.css";
 import { User } from "../constants/profileConfig";
 import { useProfileModal } from "../hooks/useProfileModal";
 import { useRouter } from "next/navigation";
-
-
 
 // Інтерфейс для нотатки в календарі
 interface Note {
@@ -24,6 +23,26 @@ interface Note {
 // Константи для категорій та днів тижня
 const CATEGORY_OPTIONS = ["Lectures (lessons)", "Exams", "Meetings", "Notes", "Events"];
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const MAX_UPLOAD_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_UPLOAD_TOTAL_SIZE = 20 * 1024 * 1024;
+const MAX_UPLOAD_COUNT = 5;
+const SUPPORTED_FILE_EXTENSIONS = new Set(["txt", "md", "csv", "json", "pdf", "docx"]);
+
+const formatDateForInput = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const getMinimumTimeForToday = (date: Date) => {
+  const minimumTime = new Date(date);
+  minimumTime.setSeconds(0, 0);
+  if (date.getSeconds() > 0 || date.getMilliseconds() > 0) {
+    minimumTime.setMinutes(minimumTime.getMinutes() + 1);
+  }
+  return `${String(minimumTime.getHours()).padStart(2, "0")}:${String(minimumTime.getMinutes()).padStart(2, "0")}`;
+};
 
 // Головний компонент сторінки календаря
 export default function KalendarPage() {
@@ -44,6 +63,7 @@ export default function KalendarPage() {
   const [noteDate, setNoteDate] = useState("");
   // Час нотатки
   const [noteTime, setNoteTime] = useState("");
+  const [noteFormError, setNoteFormError] = useState("");
   // Категорія нотатки
   const [noteCategory, setNoteCategory] = useState(CATEGORY_OPTIONS[0]);
   // Вибрана категорія для фільтрації
@@ -74,9 +94,6 @@ export default function KalendarPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди до допомогти хорошої компанії на ul. Papernicza 1, Łódź. А від неї уже пиздуй на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
-  // Реф для виклику прихованого календарика в полі дати
-  const datePickerRef = useRef<HTMLInputElement | null>(null);
-
   // useEffect для завантаження збереженого користувача без примусової захищеної перевірки
   useEffect(() => {
     const userStr = localStorage.getItem("user");
@@ -186,7 +203,40 @@ export default function KalendarPage() {
   const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
-    setAttachedFiles((prev) => [...prev, ...Array.from(files)]);
+
+    let totalSize = attachedFiles.reduce((size, file) => size + file.size, 0);
+    let remainingCount = MAX_UPLOAD_COUNT - attachedFiles.length;
+    const acceptedFiles: File[] = [];
+    const errors: string[] = [];
+
+    for (const file of Array.from(files)) {
+      const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+      if (!SUPPORTED_FILE_EXTENSIONS.has(extension)) {
+        errors.push(`${file.name}: unsupported file type.`);
+        continue;
+      }
+      if (file.size > MAX_UPLOAD_FILE_SIZE) {
+        errors.push(`${file.name}: exceeds the 10 MB per-file limit.`);
+        continue;
+      }
+      if (remainingCount <= 0) {
+        errors.push(`You can attach up to ${MAX_UPLOAD_COUNT} files.`);
+        continue;
+      }
+      if (totalSize + file.size > MAX_UPLOAD_TOTAL_SIZE) {
+        errors.push("The total attachment size cannot exceed 20 MB.");
+        continue;
+      }
+
+      acceptedFiles.push(file);
+      totalSize += file.size;
+      remainingCount -= 1;
+    }
+
+    if (acceptedFiles.length > 0) {
+      setAttachedFiles((prev) => [...prev, ...acceptedFiles]);
+    }
+    setChatError(errors.length > 0 ? errors.join(" ") : null);
     event.target.value = "";
   };
 
@@ -206,7 +256,8 @@ export default function KalendarPage() {
 
   const handleSendChatMessage = async () => {
     const trimmed = chatInput.trim();
-    const userText = trimmed || (attachedFiles.length > 0 ? "Please review attached file(s)" : "");
+    const filesToSend = attachedFiles.slice();
+    const userText = trimmed || (filesToSend.length > 0 ? "Please review attached file(s)" : "");
     if (!userText) return;
 
     const userId = Date.now();
@@ -216,17 +267,17 @@ export default function KalendarPage() {
 
     try {
       const token = localStorage.getItem("token") || "";
-      const fileNames = attachedFiles.map((file) => file.name);
-      const response = await sendChatMessage(trimmed, token, fileNames.length ? fileNames : undefined);
+      const response = await sendChatMessage(trimmed, token, filesToSend);
       setChatMessages((prev) => [
         ...prev,
-        { id: userId + 1, sender: "ai", text: response.ai_response ?? "No response from AI." },
+        {id: userId + 1, sender: "ai", text: response.ai_response ?? "No response from AI."},
       ]);
 
-      if (attachedFiles.length > 0) {
-        setUsedFiles((prev) => [...prev, ...attachedFiles]);
-        setAttachedFiles([]);
+      if (filesToSend.length > 0) {
+        setUsedFiles((prev) => [...prev, ...filesToSend]);
+        setAttachedFiles((prev) => prev.filter((file) => !filesToSend.includes(file)));
       }
+      setChatInput("");
 
       try {
         const parsed = await parseEventFromText(trimmed, token);
@@ -244,23 +295,20 @@ export default function KalendarPage() {
             {
               id: Date.now() + 2,
               sender: "ai",
-              text: `✅ Додано подію: "${parsed.title}" на ${parsed.date}${parsed.time ? " о " + parsed.time : ""}`,
+              text: `✅ Event added: "${parsed.title}" on ${parsed.date}${parsed.time ? " at " + parsed.time : ""}`,
             },
           ]);
         }
-      } catch {
-        // Пропускаємо помилку парсингу події ШІ
+      } catch {// Пропускаємо помилку парсингу події ШІ
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error sending message";
       setChatError(message);
       setChatMessages((prev) => [
-        ...prev,
-        { id: userId + 2, sender: "ai", text: `Error: ${message}` },
+        ...prev, { id: userId + 2, sender: "ai", text: `Error: ${message}` },
       ]);
     } finally {
       setChatLoading(false);
-      setChatInput("");
     }
   };
 
@@ -318,8 +366,9 @@ export default function KalendarPage() {
     setNoteType(type);
     setNoteCategory(CATEGORY_OPTIONS[0]);
     setNoteText("");
-    setNoteDate("");
+    setNoteDate(formatDateForInput(new Date()));
     setNoteTime("");
+    setNoteFormError("");
     setSelectedNoteId(null);
     setIsNoteModalOpen(true);
   };
@@ -331,6 +380,7 @@ export default function KalendarPage() {
       setNoteDate(selectedNote.date);
       setNoteTime(selectedNote.time);
       setNoteText(selectedNote.text);
+      setNoteFormError("");
       setIsNoteModalOpen(true);
     } else {
       openModal("Note");
@@ -343,13 +393,27 @@ export default function KalendarPage() {
     setNoteText("");
     setNoteDate("");
     setNoteTime("");
+    setNoteFormError("");
   };
 
   const handleSaveNote = () => {
-    if (!noteText || !noteDate) {
+    if (!noteText.trim() || !noteDate) {
+      setNoteFormError("Enter a note and choose a date.");
       return;
     }
 
+    const now = new Date();
+    const today = formatDateForInput(now);
+    if (noteDate < today) {
+      setNoteFormError("You cannot choose a date in the past.");
+      return;
+    }
+    if (noteDate === today && noteTime && noteTime < getMinimumTimeForToday(now)) {
+      setNoteFormError("For today, choose a time that has not passed.");
+      return;
+    }
+
+    setNoteFormError("");
     const newNote: Note = {
       id: selectedNote ? selectedNote.id : Date.now(),
       text: noteText,
@@ -398,7 +462,7 @@ export default function KalendarPage() {
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
         <div className = "logo-section" > <img src="IMG_1074.png" alt = "AI Alex Avatar" className = "avatar-img"/> Calendar with Alex</div>
-        <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}> 
+        <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}>
           <div className = "avatar-icon" > {currentUser.login.charAt(0).toUpperCase()}</div>
           <span>{currentUser.login}</span>
         </button>
@@ -406,10 +470,10 @@ export default function KalendarPage() {
 
       {/* Панель дій */}
       <div className = "controls-row">
-        <button className = "ctrl-btn" onClick = {() => openModal("Holiday")}>📅 Add Date</button>
-        <button className = "ctrl-btn" onClick = {openEditNote}>✏️ Edit Note</button>
-        <button className = "ctrl-btn" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}>🗑️ Delete Note</button>
-        <button className = "ctrl-btn" onClick = {() => openModal("Note")}>📝 Add Note</button>
+        <button className = "ctrl-btn" onClick = {() => openModal("Holiday")}> 📅 Add Date </button>
+        <button className = "ctrl-btn" onClick = {openEditNote}> ✏️ Edit Note </button>
+        <button className = "ctrl-btn" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}> 🗑️ Delete Note </button>
+        <button className = "ctrl-btn" onClick = {() => openModal("Note")}> 📝 Add Note </button>
       </div>
 
       <div className = "main-grid-cal">
@@ -423,7 +487,7 @@ export default function KalendarPage() {
             </button>
           ))}
           <div className = "file-list-box">
-            <div className = "file-list-title">AI files used</div>
+            <div className = "file-list-title"> AI files used </div>
             {usedFiles.length > 0 ? (
               usedFiles.map((file, index) => (
                 <div key = {`${file.name}-${index}`} className = "file-chip">
@@ -434,7 +498,7 @@ export default function KalendarPage() {
                 </div>
               ))
             ) : (
-              <div className = "file-list-empty">No used files yet.</div>
+              <div className = "file-list-empty"> No used files yet </div>
             )}
           </div>
         </div>
@@ -480,7 +544,7 @@ export default function KalendarPage() {
 
         {/* Інформація про нотатки */}
         <div className = "your_notes">
-          <span> Your notes</span>
+          <span> Your notes </span>
           <div className = "circle purple"></div>
           <div style = {{ marginTop: "20px", color: "white" }}>
             <strong> Number of notes ({filteredNotes.length})</strong>
@@ -489,7 +553,7 @@ export default function KalendarPage() {
                 key = {note.id}
                 type = "button"
                 onClick = {() => handleNoteClick(note)}
-                style={{
+                style = {{
                   display: "block",
                   width: "100%",
                   textAlign: "left",
@@ -515,13 +579,13 @@ export default function KalendarPage() {
           <div className = "modal-content note-modal" onClick = {(e) => e.stopPropagation()}>
             <div className = "modal-header note-modal">
               <h2>{noteType === "Holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
-              <button className = "modal-close note-modal" onClick = {closeModal}>✕</button>
+              <button className = "modal-close note-modal" onClick = {closeModal}> ✕ </button>
             </div>
             
             <div className = "modal-body">
               {/* Стрічка: Нотатка */}
               <div className = "modal-form-row">
-                <label>Note</label>
+                <label> Note </label>
                 <input
                   type = "text"
                   placeholder = "Note text..."
@@ -532,7 +596,7 @@ export default function KalendarPage() {
 
               {/* Стрічка: Категорія події */}
               <div className = "modal-form-row">
-                <label>Category</label>
+                <label> Category </label>
                 <select
                   value = {noteCategory}
                   onChange = {(e) => setNoteCategory(e.target.value)}
@@ -545,50 +609,31 @@ export default function KalendarPage() {
 
               {/* Стрічка: Час */}
               <div className = "modal-form-row">
-                <label>Time</label>
+                <label> Time </label>
                 <input
-                  type = "text"
-                  placeholder = "A specific time (e.g., 15:30) or period (12:00-14:00)"
+                  type = "time"
                   value = {noteTime}
-                  onChange = {(e) => setNoteTime(e.target.value)}
+                  min = {noteDate === formatDateForInput(new Date()) ? getMinimumTimeForToday(new Date()) : undefined}
+                  onChange = {(e) => {
+                    setNoteTime(e.target.value);
+                    setNoteFormError("");
+                  }}
                 />
               </div>
 
-              {/* Стрічка: Дата з висувним календариком */}
-              <div className = "modal-form-row" style = {{ position: "relative" }}>
-                <label>Date</label>
-                <div className = "date-input-wrapper">
-                  <button 
-                    type = "button" 
-                    className = "date-dropdown-btn"
-                    onClick = {() => datePickerRef.current?.showPicker()}
-                    title = "Select from the calendar"
-                  >
-                    ▼
-                  </button>
-                  <input
-                    type = "text"
-                    placeholder = "dd.mm.yyyy  or  yyyy-mm-dd"
-                    value = {noteDate}
-                    onChange = {(e) => setNoteDate(e.target.value)}
-                  />
-                  <input
-                    type = "date"
-                    ref = {datePickerRef}
-                    style = {{
-                      position: "absolute",
-                      visibility: "hidden",
-                      width: "0",
-                      height: "0"
-                    }}
-                    onChange = {(e) => {
-                      if (e.target.value) {
-                        setNoteDate(e.target.value);
-                      }
-                    }}
-                  />
-                </div>
+              <div className = "modal-form-row">
+                <label> Date </label>
+                <input
+                  type = "date"
+                  value = {noteDate}
+                  min = {formatDateForInput(new Date())}
+                  onChange = {(e) => {
+                    setNoteDate(e.target.value);
+                    setNoteFormError("");
+                  }}
+                />
               </div>
+              {noteFormError && <p className = "note-form-error" role = "alert">{noteFormError}</p>}
             </div>
 
             <div className = "modal-footer">
@@ -609,11 +654,11 @@ export default function KalendarPage() {
           <div className = "chat-mid">
             {attachedFiles.length > 0 && (
               <div className = "file-list-box" style = {{ marginBottom: '14px' }}>
-                <div className = "file-list-title">Files attached for this request</div>
+                <div className = "file-list-title"> Files attached for this request </div>
                 {attachedFiles.map((file, index) => (
                   <div key = {`${file.name}-${index}`} className = "file-chip">
                     <span>{file.name}</span>
-                    <button type = "button" onClick = {() => removeAttachedFile(index)}>×</button>
+                    <button type = "button" onClick = {() => removeAttachedFile(index)}> × </button>
                   </div>
                 ))}
               </div>
@@ -635,8 +680,8 @@ export default function KalendarPage() {
             </div>
           )}
           <div className = "chat-bottom">
-            <label htmlFor="file-upload" className = "file-upload-button" title = "Attach file">📎</label>
-            <input ref = {fileInputRef} id = "file-upload" type = "file" multiple accept = "*/*" onChange = {handleFileInputChange} hidden />
+            <label htmlFor = "file-upload" className = "file-upload-button" title = "TXT, MD, CSV, JSON, PDF, DOCX — max 5 files, 10 MB each, 20 MB total"> 📎 </label>
+            <input ref = {fileInputRef} id = "file-upload" type = "file" multiple accept = ".txt,.md,.csv,.json,.pdf,.docx" onChange = {handleFileInputChange} disabled = {chatLoading} hidden/>
             <input
               className = "ai-input"
               placeholder = "Ask something..."
@@ -662,44 +707,18 @@ export default function KalendarPage() {
         </div>
       )}
 
-      {/* Панель Dashboard */}
-      {isDashboardOpen && (
-         <div className = "dashboard-overlay" onClick = {() => setIsDashboardOpen(false)}>
-            <div className = "dashboard-panel" onClick = {(e) => e.stopPropagation()}>
-              <div className = "dashboard-panel-header">
-                {/* КРУЖЕЧОК-КНОПКА: Клік по ньому перенаправляє на великий дашборд */}
-                <div 
-                    className = "dashboard-avatar-icon clickable-avatar" 
-                    onClick = {() => router.push("/Dashboard")}
-                    title = "Відкрити повний Dashboard"
-                >
-                    {(currentUser.first_name || currentUser.login)[0].toUpperCase()}
-                </div>
-                <div>
-                    <h3>{currentUser.first_name || currentUser.login}</h3>
-                    <p>Quick View</p>
-                </div>
-                <button className = "close-info-btn" onClick = {() => setIsDashboardOpen(false)}>×</button>
-                </div>
-                <div className="dashboard-panel-body">
-                  <p><strong>Login:</strong> {currentUser.login}</p>
-                  <p><strong>Email:</strong> {currentUser.email || "Not specified"}</p>
-                  {/* Сюди можна додати ще 1-2 важливих поля для швидкого інфо */}
-                </div>
-
-            </div>
-          </div>
-        )}
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
         <div className = "modal-overlay" onClick = {() => setShowLogoutConfirm(false)}>
-          <div className = "modal-content note-modal" onClick = {(e) => e.stopPropagation()}>
+          <div
+            className = "modal-content note-modal"
+            role = "dialog"
+            aria-modal = "true"
+            aria-labelledby = "logout-confirm-title"
+            onClick = {(e) => e.stopPropagation()}
+          >
             <div className = "modal-header note-modal">
-              <h2>Confirm Logout</h2>
-              <button className = "modal-close note-modal" onClick = {() => setShowLogoutConfirm(false)}>✕</button>
-            </div>
-            <div className = "modal-body" style = {{ padding: "20px", textAlign: "center" }}>
-              <p>Are you sure you want to log out?</p>
+              <h2 id = "logout-confirm-title">Are you sure you want to log out of your account?</h2>
             </div>
             <div className = "modal-footer">
               <button
@@ -713,10 +732,7 @@ export default function KalendarPage() {
                   borderRadius: "6px",
                   cursor: "pointer",
                   marginRight: "10px"
-                }}
-              >
-                Cancel
-              </button>
+                }}>Back</button>
               <button
                 className = "modal-btn"
                 onClick = {handleLogout}
@@ -726,11 +742,9 @@ export default function KalendarPage() {
                   border: "none",
                   padding: "10px 20px",
                   borderRadius: "6px",
-                  cursor: "pointer"
-                }}
-              >
-                Log Out
-              </button>
+                  cursor: "pointer",
+                  marginLeft: "10px"
+                }}>Yes</button>
             </div>
           </div>
         </div>
@@ -741,6 +755,7 @@ export default function KalendarPage() {
           <span>💬</span>
         </button>
       )}
+
 
       {/* Редагування профілю (Зв'язано через кастомний хук) */}
       {profileModal.isOpen && user && (
@@ -756,6 +771,37 @@ export default function KalendarPage() {
           }}
         />
       )}
+
+      {/* ТОВІ РЯДКИ З ВІКОНЦЕМ (модалкою) */}
+      {isDashboardOpen && (
+        <div className = "dashboard-overlay calendar-dashboard-overlay" onClick = {() => setIsDashboardOpen(false)}>
+          <div className = "dashboard-info-popup" onClick = {(e) => e.stopPropagation()}>
+              <div className = "info-popup-header">
+                  <div>
+                    <h2> Quick Info </h2>
+                    <p> User profile details </p>
+                  </div>
+                  <button className = "close-info-btn" onClick = {() => setIsDashboardOpen(false)}> × </button>
+              </div>
+              
+              <div className = "info-popup-body">
+                  <p><strong> User: </strong> {user?.first_name || user?.login}</p>
+                  <p><strong> First name: </strong> {user?.first_name || " -- "}</p>
+                  <p><strong> Last name: </strong> {user?.last_name || " –– "}</p>
+                  <p><strong> Login: </strong> {user?.login}</p>
+                  <p><strong> Email: </strong> {user?.email || "Not set"}</p>
+                  {user?.region && <p><strong> Region: </strong> {user?.region}</p>}
+                  <button
+                    type = "button"
+                    className = "dashboard-exit-btn"
+                    onClick = {() => setShowLogoutConfirm(true)}
+                  >
+                    Exit
+                  </button>
+              </div>
+          </div>
+        </div>
+      )}
     </div>
-  );
+);
 }

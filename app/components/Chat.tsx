@@ -29,7 +29,7 @@ const ChatWidget: React.FC = () => {
     if (storedToken) {
       loadChatHistory(storedToken);
     } else {
-      setError('Користувач не авторизований. Будь ласка, увійдіть.');
+      setError('User is not authorized. Please log in.');
     }
   }, []);
 
@@ -44,8 +44,8 @@ const ChatWidget: React.FC = () => {
       const history = await getChatHistory(authToken, 50);
       setMessages(history.messages);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Помилка завантаження історії');
-      console.error('Помилка:', err);
+      setError(err instanceof Error ? err.message : 'Error loading chat history');
+      console.error('Error:', err);
     }
   };
 
@@ -55,7 +55,7 @@ const ChatWidget: React.FC = () => {
     if (!input.trim()) return;
     
     if (!token) {
-      setError('Помилка: користувач не авторизований.');
+      setError('Error: user is not authorized.');
       return;
     }
 
@@ -76,7 +76,7 @@ const ChatWidget: React.FC = () => {
         updated_at: response.timestamp
       }]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Помилка відправки повідомлення');
+      setError(err instanceof Error ? err.message : 'Error sending message');
       setInput(userMessage); // Повернути текст у поле вводу
     } finally {
       setLoading(false);
@@ -88,54 +88,54 @@ const ChatWidget: React.FC = () => {
       await deleteChatMessage(messageId, token);
       setMessages(prev => prev.filter(msg => msg.id !== messageId));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Помилка видалення');
+      setError(err instanceof Error ? err.message : 'Deletion error');
     }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div style = {{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Повідомлення */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
+      <div style = {{ flex: 1, overflowY: 'auto', padding: '10px' }}>
         {messages.length === 0 ? (
-          <p>Немає повідомлень. Почніть розмову!</p>
+          <p> No messages yet. Start the conversation! </p>
         ) : (
           messages.map(msg => (
-            <div key={msg.id} style={{ marginBottom: '15px' }}>
-              <div style={{ 
-                backgroundColor: '#e3f2fd', 
-                padding: '8px', 
+            <div key = {msg.id} style = {{ marginBottom: '15px' }}>
+              <div style = {{
+                backgroundColor: '#e3f2fd',
+                padding: '8px',
                 borderRadius: '8px',
                 marginBottom: '5px'
               }}>
-                <strong>Ви:</strong> {msg.message}
+                <strong> You: </strong> {msg.message}
               </div>
               {msg.response && (
-                <div style={{ 
-                  backgroundColor: '#f5f5f5', 
-                  padding: '8px', 
+                <div style = {{
+                  backgroundColor: '#f5f5f5',
+                  padding: '8px',
                   borderRadius: '8px',
                   marginBottom: '5px'
                 }}>
-                  <strong>ШІ:</strong> {msg.response}
+                  <strong> AI: </strong> {msg.response}
                 </div>
               )}
-              <button 
-                onClick={() => handleDeleteMessage(msg.id)}
-                style={{ fontSize: '12px', color: 'red' }}
+              <button
+                onClick = {() => handleDeleteMessage(msg.id)}
+                style = {{ fontSize: '12px', color: 'red' }}
               >
-                Видалити
+                Delete
               </button>
             </div>
           ))
         )}
-        <div ref={messagesEndRef} />
+        <div ref = {messagesEndRef} />
       </div>
 
       {/* Помилка */}
       {error && (
-        <div style={{ 
-          backgroundColor: '#ffebee', 
-          color: '#c62828', 
+        <div style = {{
+          backgroundColor: '#ffebee',
+          color: '#c62828',
           padding: '10px',
           marginBottom: '10px'
         }}>
@@ -143,24 +143,24 @@ const ChatWidget: React.FC = () => {
         </div>
       )}
 {/* Форма вводу */}
-      <form onSubmit={handleSendMessage} style={{ padding: '10px', display: 'flex', gap: '5px' }}>
+      <form onSubmit={handleSendMessage} style = {{ padding: '10px', display: 'flex', gap: '5px' }}>
         <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Напишіть повідомлення..."
-          disabled={loading}
-          style={{ 
-            flex: 1, 
+          type = "text"
+          value = {input}
+          onChange = {(e) => setInput(e.target.value)}
+          placeholder = "Write a message..."
+          disabled = {loading}
+          style = {{
+            flex: 1,
             padding: '8px',
             border: '1px solid #ddd',
             borderRadius: '4px'
           }}
         />
-        <button 
-          type="submit" 
-          disabled={loading || !input.trim()}
-          style={{
+        <button
+          type = "submit"
+          disabled = {loading || !input.trim()}
+          style = {{
             padding: '8px 16px',
             backgroundColor: loading ? '#ccc' : '#2196F3',
             color: 'white',
@@ -169,7 +169,7 @@ const ChatWidget: React.FC = () => {
             cursor: loading ? 'not-allowed' : 'pointer'
           }}
         >
-          {loading ? '⏳...' : 'Відправити'}
+          {loading ? '⏳...' : 'Send'}
         </button>
       </form>
     </div>

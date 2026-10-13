@@ -3,7 +3,7 @@
 
 // Модальний компонент для редагування профілю користувача
 import { useState, useEffect } from "react";
-import { User, UKRAINIAN_REGIONS, API_BASE } from "../constants/profileConfig";
+import { User, Regions, API_BASE } from "../constants/profileConfig";
 import style from "../css/Profile.css";
 
 // Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки
@@ -141,7 +141,7 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                             onChange={handleEditChange}
                         >
                             <option value = ""> Select Region </option>
-                            {UKRAINIAN_REGIONS.map((region) => (
+                            {Regions.map((region) => (
                                 <option key={region} value = {region}>
                                     {region}
                                 </option>

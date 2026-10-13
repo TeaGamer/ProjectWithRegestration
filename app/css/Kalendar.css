@@ -375,6 +375,8 @@ html, body, #__next {
 
 /* Інпути та селектори подій */
 .modal-form-row input[type="text"],
+.modal-form-row input[type="date"],
+.modal-form-row input[type="time"],
 .modal-form-row select {
   width: 100%;
   padding: 11px 14px;
@@ -388,68 +390,20 @@ html, body, #__next {
   transition: border-color 0.2s;
 }
 
+.modal-form-row input[type="date"],
+.modal-form-row input[type="time"] {
+  color-scheme: dark;
+}
+
 .modal-form-row input:focus,
 .modal-form-row select:focus {
   border-color: #38bdf8;
 }
 
-/* Обгортка для стрічки "Дата" */
-.date-input-wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  overflow: hidden;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Кнопка-стрілочка вниз З ЛІВОЇ СТОРОНИ поля дати */
-.date-dropdown-btn {
-  order: 1; /* Гарантує ліве положення */
-  background: transparent;
-  border: none;
-  color: #38bdf8;
-  padding: 0 14px;
-  cursor: pointer;
+.note-form-error {
+  margin: 0;
+  color: #fca5a5;
   font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 42px;
-  border-right: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.date-dropdown-btn:hover {
-  color: #7dd3fc;
-  background: rgba(255, 255, 255, 0.03);
-}
-
-/* Поле ручного вводу тексту дати (Справа від стрілочки) */
-.date-input-wrapper input {
-  order: 2; /* Поле після іконки */
-  flex: 1;
-  background: transparent !important;
-  border: none !important;
-  padding: 11px 14px !important;
-  color: white;
-  outline: none;
-  font-size: 0.95rem;
-}
-
-/* Випадаючий міні-календарик під стрілкою */
-.date-picker-dropdown {
-  position: absolute;
-  top: 105%;
-  left: 0;
-  z-index: 10000;
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-  padding: 10px;
 }
 
 /* НИЖНЯ ПАНЕЛЬ: РОЗШТОВХУЄ КНОПКИ ПО БОКАХ */
