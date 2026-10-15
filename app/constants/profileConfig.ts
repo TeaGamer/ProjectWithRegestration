@@ -54,9 +54,6 @@ export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:80
 
 
 export const termsAndConditionsText: string = `
-
-    TERMS OF USE FOR THE ALEX SERVICE
-
   1. GENERAL PROVISIONS
  By using the Alex service, you agree to these terms.
  The service is provided ‘"as is"’.
@@ -106,8 +103,7 @@ export const termsAndConditionsText: string = `
  constitutes your agreement to the new terms.
 
  By agreeing to these terms and conditions,
- you confirm and accept all the above provisions.
-`;
+ you confirm and accept all the above provisions.`;
 
 
 export const Study: Teacher[] = [
