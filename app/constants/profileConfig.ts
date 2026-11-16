@@ -121,7 +121,7 @@ export const termsAndConditionsText: string = `
     - Incorrect AI responses;
     - Data loss due to technical issues;
     - The actions of other users.
-     
+
   8. CHANGES TO THE TERMS
  We may amend these terms at any time.
  Your continued use of the service after such changes

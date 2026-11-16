@@ -6,7 +6,18 @@ import Profile from "../components/Profile";
 import type { User } from "../constants/profileConfig";
 import { useProfileModal } from "../hooks/useProfileModal";
 import { useVoiceChat } from "../hooks/useVoiceChat";
-import { parseEventFromText, sendChatMessage } from "../services/chatService";
+import { sendChatMessage } from "../services/chatService";
+import {
+  createCalendarEvent,
+  deleteCalendarEvent,
+  getCalendarEvents,
+  getDeletedCalendarEvents,
+  importLocalCalendarNotes,
+  parseEventFromText,
+  restoreCalendarEvent,
+  updateCalendarEvent,
+  type CalendarEvent,
+} from "../services/calendarService";
 import {
   CATEGORY_OPTIONS,
   createCalendarCells,
@@ -30,14 +41,52 @@ type ChatMessage = {
   text: string;
 };
 
+function eventToNote(event: CalendarEvent): Note {
+  const startTime = new Date(
+    /(?:Z|[+-]\d{2}:\d{2})$/i.test(event.start_time) ? event.start_time : `${event.start_time}Z`
+  );
+  return {
+    id: event.id,
+    text: event.title,
+    date: formatDateForInput(startTime),
+    time: event.is_all_day
+      ? ""
+      : `${String(startTime.getHours()).padStart(2, "0")}:${String(startTime.getMinutes()).padStart(2, "0")}`,
+    category: event.category,
+  };
+}
+
+function noteToEvent(note: Note) {
+  const start = new Date(`${note.date}T${note.time || "00:00"}:00`);
+  const end = new Date(start);
+  if (note.time) {
+    end.setHours(end.getHours() + 1);
+  } else {
+    end.setDate(end.getDate() + 1);
+  }
+  return {
+    title: note.text.trim(),
+    start_time: start.toISOString(),
+    end_time: end.toISOString(),
+    category: note.category,
+    is_all_day: !note.time,
+  };
+}
+
 export default function KalendarPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [calendarStorage, setCalendarStorage] = useState<"loading" | "local" | "backend">("loading");
+  const [calendarError, setCalendarError] = useState<string | null>(null);
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [notes, setNotes] = useState<Note[]>([]);
+  const [deletedNotes, setDeletedNotes] = useState<Note[]>([]);
+  const [showDeletedNotes, setShowDeletedNotes] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
+  const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
+  const [deleteSource, setDeleteSource] = useState<"manual" | "ai">("manual");
 
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -61,24 +110,75 @@ export default function KalendarPage() {
   const [noteTime, setNoteTime] = useState("");
   const [noteFormError, setNoteFormError] = useState("");
   const [noteCategory, setNoteCategory] = useState(CATEGORY_OPTIONS[0]);
+  const [isSavingNote, setIsSavingNote] = useState(false);
   const [smsRemindersSent, setSmsRemindersSent] = useState<number[]>([]);
 
   const profileModal = useProfileModal();
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   useEffect(() => {
-    const userStr = localStorage.getItem("user");
-
-    if (userStr) {
+    let cancelled = false;
+    const readLocalNotes = (): Note[] => {
       try {
-        const userData = JSON.parse(userStr);
-        setUser(userData);
+        const savedNotes: unknown = JSON.parse(localStorage.getItem("calendarNotes") || "[]");
+        return Array.isArray(savedNotes) ? savedNotes as Note[] : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const initializeCalendar = async () => {
+      let savedUser: User | null = null;
+      try {
+        const userStr = localStorage.getItem("user");
+        savedUser = userStr ? JSON.parse(userStr) as User : null;
       } catch (error) {
         console.error("Error parsing user data:", error);
       }
-    }
+      if (cancelled) return;
+      setUser(savedUser);
 
-    setLoading(false);
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const migrationOwner = localStorage.getItem("calendarNotesMigratedToUserId");
+          if (!migrationOwner && savedUser?.id) {
+            await importLocalCalendarNotes(
+              readLocalNotes(),
+              token,
+              new Date().getTimezoneOffset(),
+              Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+            );
+            localStorage.setItem("calendarNotesMigratedToUserId", String(savedUser.id));
+          }
+          const [events, deletedEvents] = await Promise.all([
+            getCalendarEvents(token),
+            getDeletedCalendarEvents(token),
+          ]);
+          if (!cancelled) {
+            setNotes(sortNotesByDateTime(events.map(eventToNote)));
+            setDeletedNotes(sortNotesByDateTime(deletedEvents.map(eventToNote)));
+            setCalendarStorage("backend");
+          }
+        } catch (error) {
+          if (!cancelled) {
+            setCalendarStorage("backend");
+            setCalendarError(error instanceof Error ? error.message : "Could not load calendar data.");
+          }
+        }
+      } else {
+        if (!cancelled) {
+          setNotes(readLocalNotes());
+          setCalendarStorage("local");
+        }
+      }
+      if (!cancelled) setLoading(false);
+    };
+
+    void initializeCalendar();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -96,19 +196,10 @@ export default function KalendarPage() {
   }, [isDashboardOpen, isNoteModalOpen]);
 
   useEffect(() => {
-    const savedNotes = localStorage.getItem("calendarNotes");
-    if (savedNotes) {
-      try {
-        setNotes(JSON.parse(savedNotes));
-      } catch {
-        setNotes([]);
-      }
+    if (calendarStorage === "local") {
+      localStorage.setItem("calendarNotes", JSON.stringify(notes));
     }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("calendarNotes", JSON.stringify(notes));
-  }, [notes]);
+  }, [calendarStorage, notes]);
 
   const sendSmsReminder = useCallback((note: Note) => {
     const reminderText = `Reminder: meeting "${note.text}" starts at ${note.time} on ${note.date}.`;
@@ -229,7 +320,7 @@ export default function KalendarPage() {
         ...prev,
         {id: userId + 1, sender: "ai", text: response.ai_response ?? "No response from AI."},
       ]);
-      if (response.ai_response) voiceChat.speak(response.ai_response);
+      let spokenResponse = response.ai_response ?? "No response from AI.";
 
       if (filesToSend.length > 0) {
         setUsedFiles((prev) => [...prev, ...filesToSend]);
@@ -237,29 +328,57 @@ export default function KalendarPage() {
       }
       setChatInput("");
 
-      try {
-        const parsed = await parseEventFromText(trimmed, token);
-        if (parsed.is_event && parsed.title && parsed.date && parsed.category) {
-          const newNote: Note = {
-            id: Date.now() + 1,
-            text: parsed.title,
-            date: parsed.date,
-            time: parsed.time ?? "",
-            category: parsed.category,
-          };
-          setNotes((prev) => sortNotesByDateTime([...prev, newNote]));
-          setChatMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now() + 2,
-              sender: "ai",
-              text: `✅ Event added: "${parsed.title}" on ${parsed.date}${parsed.time ? " at " + parsed.time : ""}`,
-            },
+      if (trimmed && token) {
+        try {
+          const action = await parseEventFromText(
+            trimmed,
+            token,
+            new Date().getTimezoneOffset(),
+            Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+          );
+          if (action.event && (action.action === "created" || action.action === "updated")) {
+            const updatedNote = eventToNote(action.event);
+            spokenResponse = `${action.action === "created" ? "Event added" : "Event updated"}: ${updatedNote.text}.`;
+            setNotes((previous) => sortNotesByDateTime(
+              action.action === "created"
+                ? [...previous, updatedNote]
+                : previous.map((note) => note.id === updatedNote.id ? updatedNote : note)
+            ));
+            setChatMessages((previous) => [
+              ...previous,
+              {
+                id: Date.now() + 2,
+                sender: "ai",
+                text: `${action.action === "created" ? "✅ Event added" : "✅ Event updated"}: "${updatedNote.text}" on ${updatedNote.date}${updatedNote.time ? ` at ${updatedNote.time}` : ""}.`,
+              },
+            ]);
+          } else if (action.action === "delete_confirmation" && action.event) {
+            const target = eventToNote(action.event);
+            spokenResponse = `Should I delete ${target.text}? Please confirm in the dialog.`;
+            setNoteToDelete(target);
+            setDeleteSource("ai");
+            setChatMessages((previous) => [
+              ...previous,
+              { id: Date.now() + 2, sender: "ai", text: spokenResponse },
+            ]);
+          } else if (action.reason) {
+            spokenResponse = action.reason;
+            setChatMessages((previous) => [
+              ...previous,
+              { id: Date.now() + 2, sender: "ai", text: spokenResponse },
+            ]);
+          }
+        } catch (error) {
+          const actionError = error instanceof Error ? error.message : "Could not process the calendar request.";
+          spokenResponse = `Calendar action failed: ${actionError}`;
+          setChatError(actionError);
+          setChatMessages((previous) => [
+            ...previous,
+            { id: Date.now() + 2, sender: "ai", text: `Calendar action failed: ${actionError}` },
           ]);
         }
-      } catch (error) {
-        console.error("Failed to parse a calendar event from chat:", error);
       }
+      if (response.ai_response) voiceChat.speak(spokenResponse);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error sending message";
       setChatError(message);
@@ -348,7 +467,7 @@ export default function KalendarPage() {
     setNoteFormError("");
   };
 
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     if (!noteText.trim() || !noteDate) {
       setNoteFormError("Enter a note and choose a date.");
       return;
@@ -374,13 +493,35 @@ export default function KalendarPage() {
       category: noteCategory,
     };
 
-    if (selectedNote) {
-      setNotes((prev) => sortNotesByDateTime(prev.map((item) => (item.id === selectedNote.id ? newNote : item))));
-    } else {
-      setNotes((prev) => sortNotesByDateTime([...prev, newNote]));
+    setIsSavingNote(true);
+    try {
+      if (calendarStorage === "backend") {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Your backend session has expired. Sign in again.");
+        const payload = noteToEvent(newNote);
+        const savedEvent = selectedNote
+          ? await updateCalendarEvent(selectedNote.id, payload, token)
+          : await createCalendarEvent(payload, token);
+        const savedNote = eventToNote(savedEvent);
+        setNotes((previous) => sortNotesByDateTime(
+          selectedNote
+            ? previous.map((item) => item.id === selectedNote.id ? savedNote : item)
+            : [...previous, savedNote]
+        ));
+      } else {
+        setNotes((prev) => sortNotesByDateTime(
+          selectedNote
+            ? prev.map((item) => item.id === selectedNote.id ? newNote : item)
+            : [...prev, newNote]
+        ));
+      }
+      setCalendarError(null);
+      closeModal();
+    } catch (error) {
+      setNoteFormError(error instanceof Error ? error.message : "Could not save this note.");
+    } finally {
+      setIsSavingNote(false);
     }
-
-    closeModal();
   };
 
   const handleNoteClick = (note: Note) => {
@@ -389,8 +530,65 @@ export default function KalendarPage() {
 
   const handleDeleteSelectedNote = () => {
     if (!selectedNote) return;
+    if (calendarStorage === "backend") {
+      setDeleteSource("manual");
+      setNoteToDelete(selectedNote);
+      return;
+    }
     setNotes((prev) => prev.filter((item) => item.id !== selectedNote.id));
     setSelectedNoteId(null);
+  };
+
+  const cancelDelete = () => {
+    if (deleteSource === "ai") {
+      setChatMessages((previous) => [
+        ...previous,
+        { id: Date.now(), sender: "ai", text: "Deletion cancelled. The event is unchanged." },
+      ]);
+    }
+    setNoteToDelete(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!noteToDelete) return;
+    if (calendarStorage !== "backend") {
+      setNotes((previous) => previous.filter((note) => note.id !== noteToDelete.id));
+      setSelectedNoteId(null);
+      setNoteToDelete(null);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Your backend session has expired. Sign in again.");
+      const deleted = await deleteCalendarEvent(noteToDelete.id, token);
+      setNotes((previous) => previous.filter((note) => note.id !== noteToDelete.id));
+      setDeletedNotes((previous) => sortNotesByDateTime([...previous, eventToNote(deleted)]));
+      setSelectedNoteId(null);
+      setNoteToDelete(null);
+      setCalendarError(null);
+      if (deleteSource === "ai") {
+        setChatMessages((previous) => [
+          ...previous,
+          { id: Date.now(), sender: "ai", text: `"${noteToDelete.text}" was deleted. It can be restored for 12 hours.` },
+        ]);
+      }
+    } catch (error) {
+      setCalendarError(error instanceof Error ? error.message : "Could not delete this event.");
+    }
+  };
+
+  const restoreDeletedNote = async (note: Note) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Your backend session has expired. Sign in again.");
+      const restored = await restoreCalendarEvent(note.id, token);
+      setNotes((previous) => sortNotesByDateTime([...previous, eventToNote(restored)]));
+      setDeletedNotes((previous) => previous.filter((item) => item.id !== note.id));
+      setCalendarError(null);
+    } catch (error) {
+      setCalendarError(error instanceof Error ? error.message : "Could not restore this event.");
+    }
   };
 
   const changeMonth = (direction: number) => {
@@ -428,7 +626,32 @@ export default function KalendarPage() {
         <button type = "button" className = "ctrl-btn add-note-btn" onClick = {openModal}> 📝 Add Note </button>
         <button type = "button" className = "ctrl-btn edit-note-btn" onClick = {openEditNote}> ✏️ Edit Note </button>
         <button type = "button" className = "ctrl-btn delete-note-btn" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}> 🗑️ Delete Note </button>
+        {calendarStorage === "backend" && (
+          <button
+            type = "button"
+            className = "ctrl-btn deleted-notes-toggle"
+            onClick = {() => setShowDeletedNotes((visible) => !visible)}
+            aria-expanded = {showDeletedNotes}
+          >
+            {showDeletedNotes ? "Hide deleted" : `Recently deleted (${deletedNotes.length})`}
+          </button>
+        )}
       </div>
+      {calendarError && <p className = "calendar-error" role = "alert">{calendarError}</p>}
+      {showDeletedNotes && calendarStorage === "backend" && (
+        <section className = "deleted-notes-panel" aria-label = "Recently deleted events">
+          <div>
+            <strong>Recently deleted</strong>
+            <p>Events can be restored for 12 hours after deletion.</p>
+          </div>
+          {deletedNotes.length ? deletedNotes.map((note) => (
+            <div className = "deleted-note-row" key = {note.id}>
+              <span>{note.text} — {note.date}{note.time ? ` at ${note.time}` : ""}</span>
+              <button type = "button" onClick = {() => restoreDeletedNote(note)}>Restore</button>
+            </div>
+          )) : <p>No events are currently available to restore.</p>}
+        </section>
+      )}
 
       <div className = "main-grid-cal">
         {/* Колонка фільтрів категорій */}
@@ -618,8 +841,36 @@ export default function KalendarPage() {
             </div>
 
             <div className = "modal-footer">
-              <button type = "button" className = "modal-btn save-btn" onClick = {handleSaveNote}> Save </button>
-              <button type = "button" className = "modal-btn cancel-btn" onClick = {closeModal}> Cancel </button>
+              <button type = "button" className = "modal-btn save-btn" onClick = {handleSaveNote} disabled = {isSavingNote}>
+                {isSavingNote ? "Saving..." : "Save"}
+              </button>
+              <button type = "button" className = "modal-btn cancel-btn" onClick = {closeModal} disabled = {isSavingNote}> Cancel </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {noteToDelete && (
+        <div className = "modal-overlay" onClick = {cancelDelete}>
+          <div
+            className = "modal-content note-modal"
+            role = "dialog"
+            aria-modal = "true"
+            aria-labelledby = "delete-event-title"
+            onClick = {(event) => event.stopPropagation()}
+          >
+            <div className = "modal-header note-modal">
+              <h2 id = "delete-event-title">Confirm event deletion</h2>
+            </div>
+            <div className = "modal-body">
+              <p>Delete “{noteToDelete.text}”? It will remain recoverable for 12 hours.</p>
+              {calendarError && <p className = "note-form-error" role = "alert">{calendarError}</p>}
+            </div>
+            <div className = "modal-footer">
+              <button type = "button" className = "modal-btn delete-confirm-btn" onClick = {confirmDelete}>
+                Delete event
+              </button>
+              <button type = "button" className = "modal-btn cancel-btn" onClick = {cancelDelete}>Cancel</button>
             </div>
           </div>
         </div>

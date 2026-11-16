@@ -98,23 +98,21 @@ export default function Profile({ user, onClose }: ProfileProps) {
                         type = "button"
                         className = "modal-close"
                         onClick = {handleClose}
-                    >
-                        ✕
-                    </button>
+                    > ✕ </button>
                 </div>
 
                 {editError && <div className = "error-message">{editError}</div>}
                 {editSuccess && <div className = "success-message">{editSuccess}</div>}
 
-                <form onSubmit={handleEditSubmit} className = "edit-profile-form">
+                <form onSubmit = {handleEditSubmit} className = "edit-profile-form">
                     <div className = "form-group">
                         <label> First Name </label>
                         <input
                             type = "text"
-                            name="first_name"
+                            name = "first_name"
                             value = {editData.first_name || ""}
-                            onChange={handleEditChange}
-                            placeholder="First Name"
+                            onChange = {handleEditChange}
+                            placeholder = "First Name"
                         />
                     </div>
 
@@ -122,19 +120,19 @@ export default function Profile({ user, onClose }: ProfileProps) {
                         <label> Last Name </label>
                         <input
                             type = "text"
-                            name="last_name"
+                            name = "last_name"
                             value = {editData.last_name || ""}
-                            onChange={handleEditChange}
-                            placeholder="Last Name"
+                            onChange = {handleEditChange}
+                            placeholder = "Last Name"
                         />
                     </div>
 
                     <div className = "form-group">
                         <label> Region </label>
                         <select
-                            name="region"
+                            name = "region"
                             value = {editData.region || ""}
-                            onChange={handleEditChange}
+                            onChange = {handleEditChange}
                         >
                             <option value = ""> Select Region </option>
                             {Regions.map((region) => (
@@ -149,10 +147,10 @@ export default function Profile({ user, onClose }: ProfileProps) {
                         <label> Date of birth </label>
                         <input
                             type = "date"
-                            name="date_of_birth"
+                            name = "date_of_birth"
                             value = {editData.date_of_birth || ""}
-                            onChange={handleEditChange}
-                            max={new Date().toISOString().split('T')[0]}
+                            onChange = {handleEditChange}
+                            max = {new Date().toISOString().split('T')[0]}
                         />
                     </div>
 

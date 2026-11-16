@@ -26,7 +26,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
             <div className = "modal-content" onClick = {(e) => e.stopPropagation()}>
                 <div className = "modal-header">
                     <h2>{title}</h2>
-                    <button 
+                    <button
                         className = "modal-close"
                         onClick = {onClose}
                         aria-label = "Close modal"

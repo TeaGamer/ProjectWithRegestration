@@ -158,6 +158,63 @@ html, body, #__next {
   box-shadow: none;
 }
 
+.ctrl-btn.deleted-notes-toggle {
+  background: linear-gradient(135deg, #475569, #64748b);
+}
+
+.calendar-error {
+  width: min(94%, 900px);
+  margin: 0 auto 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(248, 113, 113, 0.65);
+  border-radius: 10px;
+  background: rgba(127, 29, 29, 0.35);
+  color: #fee2e2;
+}
+
+.deleted-notes-panel {
+  width: min(94%, 1100px);
+  margin: 0 auto 16px;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.8);
+  color: white;
+}
+
+.deleted-notes-panel p {
+  margin: 5px 0 0;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.deleted-note-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.deleted-note-row button {
+  padding: 7px 13px;
+  border: 0;
+  border-radius: 8px;
+  background: #15803d;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.modal-btn.delete-confirm-btn {
+  background: #b91c1c;
+  color: white;
+}
+
+.modal-btn.delete-confirm-btn:hover {
+  background: #dc2626;
+}
+
 .active-del { outline: 4px solid rgba(255, 99, 71, 0.6)}
 
 /* Панель категорій ліворуч */

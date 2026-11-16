@@ -377,7 +377,7 @@ export default function LoginPage() {
                             />
                             <div className = "password-input-wrapper">
                                 <input
-                                    name="password"
+                                    name = "password"
                                     type = {showRegisterPassword ? "text" : "password"}
                                     placeholder=" Password *"
                                     value = {registerData.password}
