@@ -123,15 +123,33 @@ html, body, #__next {
 }
 
 .ctrl-btn {
-  padding: 12px 20px;
+  padding: 13px 22px;
   border: none;
   border-radius: 999px;
   font-weight: 700;
+  font-size: 1rem;
   color: white;
   cursor: pointer;
   background: linear-gradient(135deg, #7c3aed, #06b6d4);
   box-shadow: 0 8px 30px rgba(124,58,237,0.12);
   transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.2s ease;
+}
+
+.ctrl-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.ctrl-btn.add-note-btn {
+  background: linear-gradient(135deg, #15803d, #16a34a);
+}
+
+.ctrl-btn.edit-note-btn {
+  background: linear-gradient(135deg, #d97706, #facc15);
+  color: #1f2937;
+}
+
+.ctrl-btn.delete-note-btn {
+  background: linear-gradient(135deg, #b91c1c, #ef4444);
 }
 
 .ctrl-btn:disabled {
@@ -154,18 +172,37 @@ html, body, #__next {
   border: 1px solid rgba(255,255,255,0.1);
 }
 
+.kategories-header {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.category-filter-hint {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
 .side-cat-btn {
   width: 100%;
   background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.25);
   margin-top: 6px;
-  padding: 8px;
+  padding: 10px 8px;
   color: white;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   border-radius: 12px;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 .side-cat-btn:hover { background: rgba(255,255,255,0.2)}
+.side-cat-btn.selected {
+  background: #f8fafc;
+  border-color: #fff;
+  color: #312e81;
+}
 
 /* ЦЕНТРАЛЬНИЙ БЛОК КАЛЕНДАРЯ ТА СІТКА ДНІВ*/
 .calendar-block {
@@ -329,8 +366,8 @@ html, body, #__next {
 .modal-content.note-modal {
   background: #1e293b;
   border: 2px solid rgba(255, 255, 255, 0.15);
-  width: 100%;
-  max-width: 455px;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
   border-radius: 20px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   overflow: hidden;
@@ -358,6 +395,7 @@ html, body, #__next {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
 }
 
 /* Рядок форми (Стрічка) */
@@ -377,7 +415,8 @@ html, body, #__next {
 .modal-form-row input[type="text"],
 .modal-form-row input[type="date"],
 .modal-form-row input[type="time"],
-.modal-form-row select {
+.modal-form-row select,
+.modal-form-row textarea {
   width: 100%;
   padding: 11px 14px;
   background: rgba(255, 255, 255, 0.05);
@@ -390,14 +429,23 @@ html, body, #__next {
   transition: border-color 0.2s;
 }
 
+.modal-form-row textarea {
+  min-height: 108px;
+  resize: vertical;
+  font: inherit;
+}
+
 .modal-form-row input[type="date"],
 .modal-form-row input[type="time"] {
   color-scheme: dark;
 }
 
 .modal-form-row input:focus,
+.modal-form-row textarea:focus,
 .modal-form-row select:focus {
-  border-color: #38bdf8;
+  border-color: #7dd3fc;
+  outline: 2px solid #7dd3fc;
+  outline-offset: 2px;
 }
 
 .note-form-error {
@@ -444,6 +492,25 @@ html, body, #__next {
 .modal-btn.cancel-btn:hover {background: rgba(255, 255, 255, 0.2); color: white}
 .modal-btn:active {transform: scale(0.97)}
 
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #fde047;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 
 /* КНОПКА ТА ВІКНО ЧАТУ ШІ (AI CHAT) */
 .ai-neon-circle {
@@ -489,8 +556,41 @@ html, body, #__next {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   color: white;
   font-weight: 700;
+}
+
+.chat-voice-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.voice-language-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.voice-language-select {
+  max-width: 104px;
+  padding: 5px;
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 8px;
+  background: rgba(15,23,42,0.45);
+  color: white;
+  font-size: 0.75rem;
+}
+
+.voice-language-select option {
+  color: #111827;
 }
 
 .chat-close-btn {
@@ -500,6 +600,66 @@ html, body, #__next {
   color: white;
   cursor: pointer;
   padding: 4px 8px;
+}
+
+.voice-reply-btn,
+.voice-input-btn {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.14);
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.voice-reply-btn.active {
+  background: #166534;
+}
+
+.voice-input-btn {
+  background: rgba(255,255,255,0.12);
+  font-size: 1.05rem;
+}
+
+.voice-input-btn.recording {
+  background: #b91c1c;
+  animation: recording-pulse 1.2s ease-in-out infinite;
+}
+
+.voice-input-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@keyframes recording-pulse {
+  50% { box-shadow: 0 0 0 5px rgba(248,113,113,0.25); }
+}
+
+.voice-help-dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 18px;
+  background: #1e293b;
+  color: #f8fafc;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+}
+
+.voice-help-dialog h2 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+}
+
+.voice-help-dialog p {
+  line-height: 1.5;
+}
+
+.voice-help-note {
+  color: #cbd5e1;
+  font-size: 0.9rem;
 }
 
 .chat-mid {
@@ -534,6 +694,7 @@ html, body, #__next {
   padding: 12px;
   display: flex;
   gap: 8px;
+  align-items: center;
   background: rgba(0,0,0,0.15);
 }
 
@@ -548,11 +709,30 @@ html, body, #__next {
 }
 
 .send-message-btn {
-  background: #38bdf8;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0284c7;
   border: none;
-  border-radius: 10px;
+  border-radius: 50%;
   color: white;
-  padding: 8px 14px;
+  padding: 0;
   cursor: pointer;
   font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.send-message-btn:hover:not(:disabled) {
+  background: #0369a1;
+  transform: translateY(-1px);
+}
+
+.send-message-btn:disabled {
+  background: #64748b;
+  cursor: not-allowed;
 }

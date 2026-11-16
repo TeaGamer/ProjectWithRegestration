@@ -1,5 +1,3 @@
-import { profile } from "console";
-
 export interface User {
     id: number;
     login: string;
@@ -91,13 +89,40 @@ export const termsAndConditionsText: string = `
  Your data is protected and will not be shared with
  third parties without your consent.
 
-  6. LIABILITY
+  6. VOICE INPUT AND SPOKEN RESPONSES
+ Voice input is optional. When you select the microphone button,
+ your browser may ask for permission to use your microphone.
+ You can revoke this permission at any time in your browser settings.
+ If permission is denied, the microphone is unavailable, or speech
+ recognition is unsupported, you can continue using text chat.
+
+ Speech recognition is performed by the browser or a speech service
+ selected by the browser. The service may process audio outside this
+ application and may have its own privacy and retention practices.
+ This application does not intentionally save raw microphone audio.
+ The recognized text is sent to the AI chat service to generate a
+ response and may be processed or retained according to that service's
+ policies. Do not speak passwords, payment details, or other sensitive
+ information.
+
+ If spoken replies are enabled, the AI response text is played using
+ your browser's speech synthesis and is not saved as an audio recording
+ by this application. A separate speaker permission is generally not
+ required; audio output depends on your device, browser, and volume.
+ You can turn spoken replies off and continue reading text responses.
+
+ Voice recognition can misunderstand speech. Review the recognized
+ text before sending it. Review AI-generated calendar changes carefully.
+ Confirmation and recovery options depend on the calendar features
+ available in the application.
+
+  7. LIABILITY
  The Alex service is not liable for:
     - Incorrect AI responses;
     - Data loss due to technical issues;
     - The actions of other users.
      
-  7. CHANGES TO THE TERMS
+  8. CHANGES TO THE TERMS
  We may amend these terms at any time.
  Your continued use of the service after such changes
  constitutes your agreement to the new terms.

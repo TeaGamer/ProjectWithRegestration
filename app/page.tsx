@@ -1,5 +1,6 @@
 
 import Link from 'next/link';
+import Image from 'next/image';
 import './Primary.css';
 
 // Головна сторінка додатку з презентацією проекту
@@ -25,7 +26,7 @@ export default function Home() {
         <div className = "hero-profile">
           {/* Обгортка для аватара */}
           <div className = "avatar-wrapper">
-            <img src = "IMG_1074.png" alt = "AI Alex Avatar" className = "avatar-img"/>
+            <Image src = "/IMG_1074.png" alt = "AI Alex Avatar" width = {220} height = {220} className = "avatar-img"/>
           </div>
           <h2 className = "ai-name"> Alex </h2>
           {/* Посилання на сторінку логіну */}

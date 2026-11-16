@@ -163,8 +163,10 @@ export async function parseEventFromText(
   return response.json();
 }
 
-export default {
+const chatService = {
   sendMessage: sendChatMessage,
   getHistory: getChatHistory,
   deleteMessage: deleteChatMessage,
 };
+
+export default chatService;

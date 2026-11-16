@@ -1,100 +1,71 @@
 "use client";
 
-// Імпорт необхідних хуків та компонентів для сторінки календаря
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import Profile from "../components/Profile";
-import { sendChatMessage, parseEventFromText } from "../services/chatService";
-import "../css/Kalendar.css";
-import "../css/Dashboard.css";
-import { User } from "../constants/profileConfig";
+import type { User } from "../constants/profileConfig";
 import { useProfileModal } from "../hooks/useProfileModal";
-import { useRouter } from "next/navigation";
+import { useVoiceChat } from "../hooks/useVoiceChat";
+import { parseEventFromText, sendChatMessage } from "../services/chatService";
+import {
+  CATEGORY_OPTIONS,
+  createCalendarCells,
+  formatDateForInput,
+  getCategoryClass,
+  getMinimumTimeForToday,
+  MAX_UPLOAD_COUNT,
+  MAX_UPLOAD_FILE_SIZE,
+  MAX_UPLOAD_TOTAL_SIZE,
+  sortNotesByDateTime,
+  SUPPORTED_FILE_EXTENSIONS,
+  WEEKDAYS,
+  type Note,
+} from "./calendarUtils";
+import "../css/Dashboard.css";
+import "../css/Kalendar.css";
 
-// Інтерфейс для нотатки в календарі
-interface Note {
+type ChatMessage = {
   id: number;
+  sender: "user" | "ai";
   text: string;
-  date: string;
-  time: string;
-  category: string;
-}
-
-// Константи для категорій та днів тижня
-const CATEGORY_OPTIONS = ["Lectures (lessons)", "Exams", "Meetings", "Notes", "Events"];
-const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-const MAX_UPLOAD_FILE_SIZE = 10 * 1024 * 1024;
-const MAX_UPLOAD_TOTAL_SIZE = 20 * 1024 * 1024;
-const MAX_UPLOAD_COUNT = 5;
-const SUPPORTED_FILE_EXTENSIONS = new Set(["txt", "md", "csv", "json", "pdf", "docx"]);
-
-const formatDateForInput = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
 };
 
-const getMinimumTimeForToday = (date: Date) => {
-  const minimumTime = new Date(date);
-  minimumTime.setSeconds(0, 0);
-  if (date.getSeconds() > 0 || date.getMilliseconds() > 0) {
-    minimumTime.setMinutes(minimumTime.getMinutes() + 1);
-  }
-  return `${String(minimumTime.getHours()).padStart(2, "0")}:${String(minimumTime.getMinutes()).padStart(2, "0")}`;
-};
-
-// Головний компонент сторінки календаря
 export default function KalendarPage() {
-  const router = useRouter();
-  // Стан для зберігання даних користувача
   const [user, setUser] = useState<User | null>(null);
-  // Стан для індикатора завантаження
   const [loading, setLoading] = useState(true);
-  // Стан для відкриття чату ШІ
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  // Стан для модального вікна нотатки
-  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
-  // Тип нотатки: нотатка або свято
-  const [noteType, setNoteType] = useState<"Note" | "Holiday">("Note");
-  // Текст нотатки
-  const [noteText, setNoteText] = useState("");
-  // Дата нотатки
-  const [noteDate, setNoteDate] = useState("");
-  // Час нотатки
-  const [noteTime, setNoteTime] = useState("");
-  const [noteFormError, setNoteFormError] = useState("");
-  // Категорія нотатки
-  const [noteCategory, setNoteCategory] = useState(CATEGORY_OPTIONS[0]);
-  // Вибрана категорія для фільтрації
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  // Масив нотаток
-  const [notes, setNotes] = useState<Note[]>([]);
-  // ID вибраної нотатки
-  const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
-  // Поточна дата для календаря
+
   const [currentDate, setCurrentDate] = useState(new Date());
-  // Стан чату та SMS-нагадувань
-  const [chatMessages, setChatMessages] = useState<{
-    id: number;
-    sender: "user" | "ai";
-    text: string;
-  }[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
   const [usedFiles, setUsedFiles] = useState<File[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [isVoiceHelpOpen, setIsVoiceHelpOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const voiceChat = useVoiceChat({
+    onTranscript: (transcript) => {
+      setChatInput((current) => `${current}${current.trim() ? " " : ""}${transcript}`);
+    },
+  });
+
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+  const [noteText, setNoteText] = useState("");
+  const [noteDate, setNoteDate] = useState("");
+  const [noteTime, setNoteTime] = useState("");
+  const [noteFormError, setNoteFormError] = useState("");
+  const [noteCategory, setNoteCategory] = useState(CATEGORY_OPTIONS[0]);
   const [smsRemindersSent, setSmsRemindersSent] = useState<number[]>([]);
-  
-  // Стан для відкриття модального вікна редагування профілю через кастомний хук
+
   const profileModal = useProfileModal();
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  //Хочеш програмувати і стати хорошим ІТ-спеціалістом??? Краще іди до допомогти хорошої компанії на ul. Papernicza 1, Łódź. А від неї уже пиздуй на завод BSC(Bosch), ul. Jędrzejowska 83, 93-636 Łódź. Там є круті стажування, а також можливість працювати над реальними посудомийними машинами з сучасними технологіями. Не пропусти шанс отримати цінний досвід і розвиватися в сфері складання посудомийних машин! Більше інформації на сайті Bosch або звертайся до відділу кадрів на ul. Papiernicza 1. Успіхів тобі в кар'єрі!
-  // useEffect для завантаження збереженого користувача без примусової захищеної перевірки
   useEffect(() => {
     const userStr = localStorage.getItem("user");
 
@@ -115,10 +86,14 @@ export default function KalendarPage() {
       if (e.key === "Escape" && isDashboardOpen) {
         setIsDashboardOpen(false);
       }
+      if (e.key === "Escape" && isNoteModalOpen) {
+        setIsNoteModalOpen(false);
+        setSelectedNoteId(null);
+      }
     };
     window.addEventListener("keydown", handleEscKey);
     return () => window.removeEventListener("keydown", handleEscKey);
-  }, [isDashboardOpen]);
+  }, [isDashboardOpen, isNoteModalOpen]);
 
   useEffect(() => {
     const savedNotes = localStorage.getItem("calendarNotes");
@@ -135,7 +110,7 @@ export default function KalendarPage() {
     localStorage.setItem("calendarNotes", JSON.stringify(notes));
   }, [notes]);
 
-  const sendSmsReminder = (note: Note) => {
+  const sendSmsReminder = useCallback((note: Note) => {
     const reminderText = `Reminder: meeting "${note.text}" starts at ${note.time} on ${note.date}.`;
     console.log("SMS reminder sent:", reminderText);
     setChatMessages((prev) => [
@@ -146,9 +121,9 @@ export default function KalendarPage() {
         text: `SMS reminder sent: ${reminderText}`,
       },
     ]);
-  };
+  }, []);
 
-  const checkMeetingReminders = () => {
+  const checkMeetingReminders = useCallback(() => {
     const now = new Date();
     notes.forEach((note) => {
       if (!["Meeting", "Зустрічі"].includes(note.category) || !note.time || !note.date) return;
@@ -161,39 +136,21 @@ export default function KalendarPage() {
         setSmsRemindersSent((prev) => [...prev, note.id]);
       }
     });
-  };
+  }, [notes, sendSmsReminder, smsRemindersSent]);
 
   useEffect(() => {
     checkMeetingReminders();
     const interval = window.setInterval(checkMeetingReminders, 60 * 1000);
     return () => window.clearInterval(interval);
-  }, [notes, smsRemindersSent]);
-
-  const sortNotesByDateTime = (notesToSort: Note[]) =>
-    notesToSort
-      .slice()
-      .sort((a, b) => {
-        const dateCompare = a.date.localeCompare(b.date);
-        if (dateCompare !== 0) return dateCompare;
-        return (a.time || "23:59").localeCompare(b.time || "23:59");
-      });
+  }, [checkMeetingReminders]);
 
   const sortedNotes = useMemo(() => sortNotesByDateTime(notes), [notes]);
 
   const filteredNotes = useMemo(() => {
-    return selectedCategory === "all"
+    return selectedCategories.length === 0
       ? sortedNotes
-      : sortedNotes.filter((note) => note.category === selectedCategory);
-  }, [selectedCategory, sortedNotes]);
-
-  const getCategoryClass = (category: string) => {
-    if (category === "Lectures (lessons)") return "lectures";
-    if (category === "Exams") return "exams";
-    if (category === "Meetings") return "meetings";
-    if (category === "Notes") return "notes";
-    if (category === "Events") return "events";
-    return "events";
-  };
+      : sortedNotes.filter((note) => selectedCategories.includes(note.category));
+  }, [selectedCategories, sortedNotes]);
 
   const selectedNote = useMemo(
     () => notes.find((note) => note.id === selectedNoteId) || null,
@@ -254,8 +211,8 @@ export default function KalendarPage() {
     setUsedFiles((prev) => prev.filter((_, idx) => idx !== index));
   };
 
-  const handleSendChatMessage = async () => {
-    const trimmed = chatInput.trim();
+  const handleSendChatMessage = async (messageText = chatInput) => {
+    const trimmed = messageText.trim();
     const filesToSend = attachedFiles.slice();
     const userText = trimmed || (filesToSend.length > 0 ? "Please review attached file(s)" : "");
     if (!userText) return;
@@ -272,6 +229,7 @@ export default function KalendarPage() {
         ...prev,
         {id: userId + 1, sender: "ai", text: response.ai_response ?? "No response from AI."},
       ]);
+      if (response.ai_response) voiceChat.speak(response.ai_response);
 
       if (filesToSend.length > 0) {
         setUsedFiles((prev) => [...prev, ...filesToSend]);
@@ -299,7 +257,8 @@ export default function KalendarPage() {
             },
           ]);
         }
-      } catch {// Пропускаємо помилку парсингу події ШІ
+      } catch (error) {
+        console.error("Failed to parse a calendar event from chat:", error);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error sending message";
@@ -312,6 +271,11 @@ export default function KalendarPage() {
     }
   };
 
+  const closeChat = () => {
+    voiceChat.closeVoiceChat();
+    setIsChatOpen(false);
+  };
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "auto" });
@@ -321,9 +285,7 @@ export default function KalendarPage() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const monthName = currentDate.toLocaleString("en-US", { month: "long" });
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDayIndex = new Date(year, month, 1).getDay();
-  const shift = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+  const calendarCells = createCalendarCells(year, month);
 
   const normalizeMonth = (offset: number) => {
     const actual = month + offset;
@@ -341,29 +303,20 @@ export default function KalendarPage() {
       .sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
   };
 
-  const prevMonthDays = new Date(year, month, 0).getDate();
-  const totalCells = 42;
-
-  const calendarCells = Array.from({length: totalCells}, (_, index) => {
-    if (index < shift) {
-      return {day: prevMonthDays - shift + 1 + index, offset: -1};
-    }
-    if (index < shift + daysInMonth) {
-      return {day: index - shift + 1, offset: 0};
-    }
-    return {day: index - shift - daysInMonth + 1, offset: 1};
-  });
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setShowLogoutConfirm(false);
+    try {
+      await fetch("/api/demo-login", { method: "DELETE" });
+    } catch (error) {
+      console.error("Failed to clear the demo admin session:", error);
+    }
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     window.location.href = "/Login";
   };
 
-  const openModal = (type: "Note" | "Holiday") => {
-    setNoteType(type);
+  const openModal = () => {
     setNoteCategory(CATEGORY_OPTIONS[0]);
     setNoteText("");
     setNoteDate(formatDateForInput(new Date()));
@@ -375,7 +328,6 @@ export default function KalendarPage() {
 
   const openEditNote = () => {
     if (selectedNote) {
-      setNoteType("Note");
       setNoteCategory(selectedNote.category);
       setNoteDate(selectedNote.date);
       setNoteTime(selectedNote.time);
@@ -383,7 +335,7 @@ export default function KalendarPage() {
       setNoteFormError("");
       setIsNoteModalOpen(true);
     } else {
-      openModal("Note");
+      openModal();
     }
   };
 
@@ -461,7 +413,10 @@ export default function KalendarPage() {
     <div className = "dashboard-layout-calendar">
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
-        <div className = "logo-section" > <img src="IMG_1074.png" alt = "AI Alex Avatar" className = "avatar-img"/> Calendar with Alex</div>
+        <div className = "logo-section">
+          <Image src="/IMG_1074.png" alt="AI Alex Avatar" width={42} height={42} className="avatar-img" />
+          Calendar with Alex
+        </div>
         <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}>
           <div className = "avatar-icon" > {currentUser.login.charAt(0).toUpperCase()}</div>
           <span>{currentUser.login}</span>
@@ -470,19 +425,36 @@ export default function KalendarPage() {
 
       {/* Панель дій */}
       <div className = "controls-row">
-        <button className = "ctrl-btn" onClick = {() => openModal("Holiday")}> 📅 Add Date </button>
-        <button className = "ctrl-btn" onClick = {openEditNote}> ✏️ Edit Note </button>
-        <button className = "ctrl-btn" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}> 🗑️ Delete Note </button>
-        <button className = "ctrl-btn" onClick = {() => openModal("Note")}> 📝 Add Note </button>
+        <button type = "button" className = "ctrl-btn add-note-btn" onClick = {openModal}> 📝 Add Note </button>
+        <button type = "button" className = "ctrl-btn edit-note-btn" onClick = {openEditNote}> ✏️ Edit Note </button>
+        <button type = "button" className = "ctrl-btn delete-note-btn" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}> 🗑️ Delete Note </button>
       </div>
 
       <div className = "main-grid-cal">
         {/* Колонка фільтрів категорій */}
-        <div className = "category-panel">
-          <div className = "kategories-header"> Kategories </div>
-          <button className = "side-cat-btn" onClick = {() => setSelectedCategory("all")}> All </button>
+        <div className = "category-panel" role = "group" aria-labelledby = "category-filter-title">
+          <div className = "kategories-header" id = "category-filter-title"> Categories </div>
+          <p className = "category-filter-hint">Select multiple categories. All shows every note.</p>
+          <button
+            type = "button"
+            className = {`side-cat-btn ${selectedCategories.length === 0 ? "selected" : ""}`}
+            aria-pressed = {selectedCategories.length === 0}
+            onClick = {() => setSelectedCategories([])}
+          > All </button>
           {CATEGORY_OPTIONS.map((cat) => (
-            <button key = {cat} className = "side-cat-btn" onClick = {() => setSelectedCategory(cat)}>
+            <button
+              key = {cat}
+              type = "button"
+              className = {`side-cat-btn ${selectedCategories.includes(cat) ? "selected" : ""}`}
+              aria-pressed = {selectedCategories.includes(cat)}
+              onClick = {() => setSelectedCategories((current) => {
+                if (current.length === 0) return [cat];
+                if (current.includes(cat)) {
+                  return current.length === 1 ? current : current.filter((category) => category !== cat);
+                }
+                return [...current, cat];
+              })}
+            >
               {cat}
             </button>
           ))}
@@ -506,9 +478,9 @@ export default function KalendarPage() {
         {/* Календар */}
         <div className = "calendar-block">
           <div className = "month-picker">
-            <button className = "month-arrow" onClick = {() => changeMonth(-1)}>&lt;</button>
-            <div className = "month-pill">{monthName} {year}</div>
-            <button className = "month-arrow" onClick = {() => changeMonth(1)}>&gt;</button>
+            <button type = "button" className = "month-arrow" aria-label = "Previous month" onClick = {() => changeMonth(-1)}>&lt;</button>
+            <div className = "month-pill" aria-live = "polite">{monthName} {year}</div>
+            <button type = "button" className = "month-arrow" aria-label = "Next month" onClick = {() => changeMonth(1)}>&gt;</button>
           </div>
 
           <div className = "days-grid">
@@ -576,18 +548,24 @@ export default function KalendarPage() {
       {/* ОНОВЛЕНЕ МОДАЛЬНЕ ВІКНО ДЛЯ НОТАТОК */}
       {isNoteModalOpen && (
         <div className = "modal-overlay" onClick = {closeModal}>
-          <div className = "modal-content note-modal" onClick = {(e) => e.stopPropagation()}>
+          <div
+            className = "modal-content note-modal"
+            role = "dialog"
+            aria-modal = "true"
+            aria-labelledby = "note-modal-title"
+            onClick = {(e) => e.stopPropagation()}
+          >
             <div className = "modal-header note-modal">
-              <h2>{noteType === "Holiday" ? "Add Date" : selectedNote ? "Edit Note" : "New Note"}</h2>
-              <button className = "modal-close note-modal" onClick = {closeModal}> ✕ </button>
+              <h2 id = "note-modal-title">{selectedNote ? "Edit Note" : "New Note"}</h2>
+              <button type = "button" className = "modal-close note-modal" aria-label = "Close note dialog" onClick = {closeModal}> ✕ </button>
             </div>
             
             <div className = "modal-body">
               {/* Стрічка: Нотатка */}
               <div className = "modal-form-row">
-                <label> Note </label>
-                <input
-                  type = "text"
+                <label htmlFor = "note-text"> Note </label>
+                <textarea
+                  id = "note-text"
                   placeholder = "Note text..."
                   value = {noteText}
                   onChange = {(e) => setNoteText(e.target.value)}
@@ -596,8 +574,9 @@ export default function KalendarPage() {
 
               {/* Стрічка: Категорія події */}
               <div className = "modal-form-row">
-                <label> Category </label>
+                <label htmlFor = "note-category"> Category </label>
                 <select
+                  id = "note-category"
                   value = {noteCategory}
                   onChange = {(e) => setNoteCategory(e.target.value)}
                 >
@@ -609,8 +588,9 @@ export default function KalendarPage() {
 
               {/* Стрічка: Час */}
               <div className = "modal-form-row">
-                <label> Time </label>
+                <label htmlFor = "note-time"> Time </label>
                 <input
+                  id = "note-time"
                   type = "time"
                   value = {noteTime}
                   min = {noteDate === formatDateForInput(new Date()) ? getMinimumTimeForToday(new Date()) : undefined}
@@ -622,8 +602,9 @@ export default function KalendarPage() {
               </div>
 
               <div className = "modal-form-row">
-                <label> Date </label>
+                <label htmlFor = "note-date"> Date </label>
                 <input
+                  id = "note-date"
                   type = "date"
                   value = {noteDate}
                   min = {formatDateForInput(new Date())}
@@ -637,8 +618,8 @@ export default function KalendarPage() {
             </div>
 
             <div className = "modal-footer">
-              <button className = "modal-btn save-btn" onClick = {handleSaveNote}> Save </button>
-              <button className = "modal-btn cancel-btn" onClick = {closeModal}> Cancel </button>
+              <button type = "button" className = "modal-btn save-btn" onClick = {handleSaveNote}> Save </button>
+              <button type = "button" className = "modal-btn cancel-btn" onClick = {closeModal}> Cancel </button>
             </div>
           </div>
         </div>
@@ -649,7 +630,31 @@ export default function KalendarPage() {
         <div className = "ai-chat-box">
           <div className = "chat-top">
             <span> Chat with your Alex </span>
-            <button className = "chat-close-btn" onClick = {() => setIsChatOpen(false)}>✕</button>
+            <div className = "chat-voice-controls">
+              <label className = "voice-language-label" htmlFor = "voice-language">Speech language</label>
+              <select
+                id = "voice-language"
+                className = "voice-language-select"
+                value = {voiceChat.voiceLanguage}
+                onChange = {(event) => voiceChat.setVoiceLanguage(event.target.value)}
+                aria-label = "Voice language"
+              >
+                <option value = "uk-UA">Українська</option>
+                <option value = "en-US">English</option>
+                <option value = "pl-PL">Polski</option>
+              </select>
+              <button
+                type = "button"
+                className = {`voice-reply-btn ${voiceChat.voiceModeEnabled ? "active" : ""}`}
+                onClick = {voiceChat.toggleSpokenReplies}
+                aria-label = {voiceChat.voiceModeEnabled ? "Turn off spoken AI replies" : "Turn on spoken AI replies"}
+                aria-pressed = {voiceChat.voiceModeEnabled}
+                title = {voiceChat.voiceModeEnabled ? "Spoken AI replies on" : "Spoken AI replies off"}
+              >
+                {voiceChat.voiceModeEnabled ? "🔊" : "🔇"}
+              </button>
+              <button type = "button" className = "chat-close-btn" aria-label = "Close chat" onClick = {closeChat}>✕</button>
+            </div>
           </div>
           <div className = "chat-mid">
             {attachedFiles.length > 0 && (
@@ -696,13 +701,45 @@ export default function KalendarPage() {
               disabled = {chatLoading}
             />
             <button
+              type = "button"
+              className = {`voice-input-btn ${voiceChat.isListening ? "recording" : ""}`}
+              onClick = {voiceChat.toggleRecording}
+              disabled = {chatLoading}
+              aria-label = {voiceChat.isListening ? "Stop voice recording" : "Record a voice message"}
+              aria-pressed = {voiceChat.isListening}
+              title = {voiceChat.isListening ? "Stop recording" : "Record voice message"}
+            >
+              {voiceChat.isListening ? "⏹" : "🎙️"}
+            </button>
+            <button
               className = "send-message-btn"
               type = "button"
-              onClick = {handleSendChatMessage}
+              onClick = {() => handleSendChatMessage()}
               disabled = {chatLoading || (!chatInput.trim() && attachedFiles.length === 0)}
+              aria-label = "Send message"
+              title = "Send"
             >
-              {chatLoading ? 'Sending...' : 'Send'}
+              {chatLoading ? '…' : '➤'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {isVoiceHelpOpen && (
+        <div className = "modal-overlay" onClick = {() => setIsVoiceHelpOpen(false)}>
+          <div
+            className = "voice-help-dialog"
+            role = "dialog"
+            aria-modal = "true"
+            aria-labelledby = "voice-help-title"
+            onClick = {(event) => event.stopPropagation()}
+          >
+            <h2 id = "voice-help-title">Voice input unavailable</h2>
+            <p>{voiceChat.voiceHelpMessage}</p>
+            <p className = "voice-help-note">
+              Spoken replies do not normally need a separate speaker permission. Check your device volume and audio output if you cannot hear Alex. You can always type and read messages instead.
+            </p>
+            <button type = "button" className = "modal-btn save-btn" onClick = {() => setIsVoiceHelpOpen(false)}>Got it</button>
           </div>
         </div>
       )}
@@ -761,7 +798,6 @@ export default function KalendarPage() {
       {profileModal.isOpen && user && (
         <Profile
           user = {user}
-          isOpen = {profileModal.isOpen}
           onClose = {() => {
             profileModal.close();
             const userStr = localStorage.getItem("user");
@@ -772,7 +808,7 @@ export default function KalendarPage() {
         />
       )}
 
-      {/* ТОВІ РЯДКИ З ВІКОНЦЕМ (модалкою) */}
+      {/* ГОТОВІ РЯДКИ З ВІКОНЦЕМ (модалкою) */}
       {isDashboardOpen && (
         <div className = "dashboard-overlay calendar-dashboard-overlay" onClick = {() => setIsDashboardOpen(false)}>
           <div className = "dashboard-info-popup" onClick = {(e) => e.stopPropagation()}>

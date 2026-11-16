@@ -3,18 +3,16 @@
 
 // Модальний компонент для редагування профілю користувача
 import { useState, useEffect } from "react";
-import { User, Regions, API_BASE } from "../constants/profileConfig";
-import style from "../css/Profile.css";
+import { API_BASE, Regions, type User } from "../constants/profileConfig";
+import "../css/Profile.css";
 
 // Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки
 interface ProfileProps {
     user: User;
-    isOpen: boolean;
     onClose: () => void;
 }
 
-export default function Profile({ user, isOpen, onClose }: ProfileProps) {
-    const [isEditing, setIsEditing] = useState(false);
+export default function Profile({ user, onClose }: ProfileProps) {
     const [editData, setEditData] = useState<User>(user);
     const [editError, setEditError] = useState("");
     const [editSuccess, setEditSuccess] = useState("");
@@ -72,7 +70,6 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
                 // Оновлюємо дані користувача у localStorage, щоб інші сторінки побачили зміни
                 localStorage.setItem("user", JSON.stringify(data.user));
                 setTimeout(() => {
-                    setIsEditing(false);
                     setEditSuccess("");
                 }, 1500);
             } else {
@@ -86,7 +83,6 @@ export default function Profile({ user, isOpen, onClose }: ProfileProps) {
     };
 
     const handleClose = () => {
-        setIsEditing(false);
         setEditError("");
         setEditSuccess("");
         setEditData(user);

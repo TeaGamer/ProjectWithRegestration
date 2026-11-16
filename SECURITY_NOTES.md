@@ -1,5 +1,11 @@
 # 🔒 Безпека токенів - Рекомендації для бекенду
 
+## Локальний demo-admin
+
+У development-режимі вхід для локального demo-admin обробляє `app/api/demo-login/route.ts` без зовнішнього API або бази даних. Облікові дані й ключ підпису сесії читаються лише з `.env.local` (`DEMO_ADMIN_LOGIN`, `DEMO_ADMIN_EMAIL`, `DEMO_ADMIN_PASSWORD`, `DEMO_ADMIN_SESSION_SECRET`). Цей маршрут вимкнений у production; demo-cookie підписана та має прапорці `HttpOnly` і `SameSite=Strict`.
+
+Цей акаунт призначений тільки для локальної демонстрації, а не для захисту production-даних. Для production використовуйте окрему серверну автентифікацію з бекендом.
+
 ## ⚠️ Критичні вразливості, виправлені на фронтенді:
 
 ### 1. **localStorage зберігання токена ❌**

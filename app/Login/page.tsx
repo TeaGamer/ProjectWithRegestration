@@ -28,7 +28,7 @@ export default function LoginPage() {
     }, [showTermsModal]);
     // Стан полів форми логіну: email, пароль та запам'ятати мене
     const [loginData, setLoginData] = useState({
-        email: "",
+        identifier: "",
         password: "",
         remember: false,
     });
@@ -74,17 +74,47 @@ export default function LoginPage() {
         setSuccess("");
 
         // Перевірка базових даних перед відправкою логіну
-        if (!loginData.email || !loginData.email.includes("@")) {
-            setError("Use correct email!");
+        if (!loginData.identifier.trim() || !loginData.password) {
+            setError("Enter your username or email and password.");
             return;
         }
 
         try {
+            const demoResponse = await fetch("/api/demo-login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    login: loginData.identifier,
+                    password: loginData.password,
+                    remember: loginData.remember,
+                }),
+            });
+
+            if (demoResponse.ok) {
+                const demoData = await demoResponse.json();
+                if (!demoData.user) {
+                    setError("Server error: invalid response. Please try again.");
+                    return;
+                }
+
+                localStorage.setItem("user", JSON.stringify(demoData.user));
+                localStorage.removeItem("token");
+                setSuccess("Successfully logged in! Redirecting...");
+                setTimeout((): void => { router.push("/Kalendar"); }, 200);
+                return;
+            }
+
+            if (demoResponse.status !== 401 && demoResponse.status !== 404) {
+                const demoData = await demoResponse.json();
+                setError(demoData.error || "Unable to sign in. Please try again.");
+                return;
+            }
+
             const response = await fetch(`${API_BASE}/api/login`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json",},
                 body: JSON.stringify({
-                    login: loginData.email,
+                    login: loginData.identifier,
                     password: loginData.password,
                 }),
             });
@@ -230,12 +260,12 @@ export default function LoginPage() {
                         <h2> Log In </h2>
                         <form className = "login-form" onSubmit = {handleLoginSubmit}>
                             <input
-                                name = "email"
-                                placeholder = " Email"
-                                type = "email"
-                                value = {loginData.email}
+                                name = "identifier"
+                                placeholder = "Email or username"
+                                type = "text"
+                                value = {loginData.identifier}
                                 onChange = {handleLoginChange}
-                                autoComplete = "email"
+                                autoComplete = "username"
                                 required
                             />
 
@@ -273,7 +303,7 @@ export default function LoginPage() {
                                 type = "submit"
                                 className = "submit-btn"
                                 onMouseMove = {(e) => {
-                                    if (!loginData.email.trim() || !loginData.password.trim()) {
+                                    if (!loginData.identifier.trim() || !loginData.password.trim()) {
                                         const btn = e.currentTarget;
                                         const rect = btn.getBoundingClientRect();
                                         const centerX = rect.left + rect.width / 2;
