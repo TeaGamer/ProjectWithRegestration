@@ -98,6 +98,7 @@ export default function KalendarPage() {
   const [isVoiceHelpOpen, setIsVoiceHelpOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const calendarTouchStart = useRef<{ x: number; y: number } | null>(null);
   const voiceChat = useVoiceChat({
     onTranscript: (transcript) => {
       setChatInput((current) => `${current}${current.trim() ? " " : ""}${transcript}`);
@@ -595,6 +596,26 @@ export default function KalendarPage() {
     setCurrentDate(new Date(year, month + direction, 1));
   };
 
+  const handleCalendarTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches.item(0);
+    if (touch) {
+      calendarTouchStart.current = { x: touch.clientX, y: touch.clientY };
+    }
+  };
+
+  const handleCalendarTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const start = calendarTouchStart.current;
+    const touch = event.changedTouches.item(0);
+    calendarTouchStart.current = null;
+    if (!start || !touch) return;
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+    changeMonth(deltaX < 0 ? 1 : -1);
+  };
+
   if (loading) {
     return <div className = "dashboard-container"><p> Loading... </p></div>;
   }
@@ -615,7 +636,13 @@ export default function KalendarPage() {
           <Image src="/IMG_1074.png" alt="AI Alex Avatar" width={42} height={42} className="avatar-img" />
           Calendar with Alex
         </div>
-        <button className = "user-bubble-nav" onClick = {() => setIsDashboardOpen(true)}>
+        <button
+          type = "button"
+          className = "user-bubble-nav"
+          onClick = {() => setIsDashboardOpen(true)}
+          aria-label = {`Open profile for ${currentUser.login}`}
+          title = {currentUser.login}
+        >
           <div className = "avatar-icon" > {currentUser.login.charAt(0).toUpperCase()}</div>
           <span>{currentUser.login}</span>
         </button>
@@ -706,9 +733,17 @@ export default function KalendarPage() {
             <button type = "button" className = "month-arrow" aria-label = "Next month" onClick = {() => changeMonth(1)}>&gt;</button>
           </div>
 
-          <div className = "days-grid">
+          <div
+            className = "days-grid"
+            onTouchStart = {handleCalendarTouchStart}
+            onTouchEnd = {handleCalendarTouchEnd}
+            onTouchCancel = {() => { calendarTouchStart.current = null; }}
+          >
             {WEEKDAYS.map((day) => (
-              <div key = {day} className = "grid-head-cell">{day}</div>
+              <div key = {day} className = "grid-head-cell" aria-label = {day}>
+                <span className = "weekday-full">{day}</span>
+                <span className = "weekday-short" aria-hidden = "true">{day.slice(0, 3)}</span>
+              </div>
             ))}
             {calendarCells.map((cell, index) => {
               const isCurrentMonth = cell.offset === 0;
