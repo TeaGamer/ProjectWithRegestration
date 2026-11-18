@@ -52,8 +52,8 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
                 
                 <div className = "info-popup-body">
                     <p><strong> User: </strong> {currentUser.first_name || currentUser.login}</p>
-                    <p><strong> First name: </strong> {currentUser.first_name || " -- "}</p>
-                    <p><strong> Last name: </strong> {currentUser.last_name || " –– "}</p>
+                    <p><strong> First name: </strong> {currentUser.first_name || " —— "}</p>
+                    <p><strong> Last name: </strong> {currentUser.last_name || " —— "}</p>
                     <p><strong> Login: </strong> {currentUser.login}</p>
                     <p><strong> Email: </strong> {currentUser.email || "Not set"}</p>
                     {currentUser.region && <p><strong> Country: </strong> {currentUser.region}</p>}

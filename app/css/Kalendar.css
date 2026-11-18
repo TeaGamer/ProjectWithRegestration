@@ -732,6 +732,175 @@ textarea:focus-visible {
   gap: 10px;
 }
 
+.chat-file-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 14px;
+  background: rgba(15,23,42,0.55);
+}
+
+.chat-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-file-list .file-list-title {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.chat-file-list .file-list-empty {
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.chat-file-list .file-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 9px;
+  background: rgba(255,255,255,0.07);
+  color: #f8fafc;
+  font-size: 0.82rem;
+}
+
+.file-chip-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-chip-size {
+  flex: 0 0 auto;
+  color: #cbd5e1;
+  font-size: 0.75rem;
+}
+
+.remove-file-btn,
+.file-help-close {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+.remove-file-btn:hover:not(:disabled),
+.file-help-close:hover {
+  background: rgba(248,113,113,0.28);
+}
+
+.remove-file-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.add-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-upload-controls {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.add-file-button {
+  min-height: 42px;
+  padding: 9px 16px;
+  border: 1px solid #facc15;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #facc15, #f97316);
+  color: #1c1917;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(249,115,22,0.25);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.add-file-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.add-file-button:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.65);
+  opacity: 0.65;
+}
+
+.file-help-button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(147,197,253,0.55);
+  border-radius: 50%;
+  background: rgba(37,99,235,0.2);
+  color: #dbeafe;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+.file-help-button:hover,
+.file-help-button[aria-expanded="true"] {
+  background: rgba(37,99,235,0.48);
+}
+
+.file-help-panel {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+  padding: 18px;
+  border: 1px solid rgba(147,197,253,0.42);
+  border-radius: 14px;
+  background: #111827;
+  color: #f8fafc;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.file-help-panel h3 {
+  margin: 0 36px 12px 0;
+  font-size: 1rem;
+}
+
+.file-help-panel p {
+  margin: 9px 0 0;
+  color: #d1d5db;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.file-help-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
 .chat-message {
   border-radius: 14px;
   padding: 10px 12px;
@@ -949,7 +1118,8 @@ textarea:focus-visible {
 
   .kategories-header,
   .category-filter-hint,
-  .file-list-box {
+  .file-list-box,
+  .file-upload-controls {
     grid-column: 1 / -1;
   }
 

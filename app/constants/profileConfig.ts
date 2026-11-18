@@ -92,13 +92,33 @@ export const termsAndConditionsText: string = `
  options depend on the calendar features available in
  the application.
 
-  7. LIABILITY
+  7. FILE UPLOADS
+ File uploads are optional and are sent to the AI only when you send
+ the chat message. Up to 5 files may be attached to a message, with
+ a maximum size of 10 MB per file and 20 MB combined. Supported
+ formats are TXT, MD, CSV, JSON, PDF, and DOCX. Text files must use
+ UTF-8 encoding. Password-protected PDFs, scanned/image-only PDFs,
+ and files without extractable text are not supported. The combined
+ extracted text is limited to 60,000 characters; PDFs are limited to
+ 100 pages.
+
+ The application processes uploaded files in memory and does not
+ intentionally store the original file. Extracted text is sent to the
+ AI service to answer the request and may be processed or retained
+ under that service's own policies. The user's chat message and the
+ AI response may be saved in chat history, but the uploaded file
+ contents are not saved there by this application. Do not upload
+ passwords, payment details, or other sensitive information. You are
+ responsible for having the right to share the files and for reviewing
+ AI responses based on their contents.
+
+  8. LIABILITY
  The Alex service is not liable for:
     - Incorrect AI responses;
     - Data loss due to technical issues;
     - The actions of other users.
 
-  8. CHANGES TO THE TERMS
+  9. CHANGES TO THE TERMS
  We may amend these terms at any time.
  Your continued use of the service after such changes
  constitutes your agreement to the new terms.

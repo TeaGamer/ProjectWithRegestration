@@ -103,6 +103,7 @@ export default function KalendarPage() {
   const [chatError, setChatError] = useState<string | null>(null);
   const [usedFiles, setUsedFiles] = useState<File[]>([]);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [isFileHelpOpen, setIsFileHelpOpen] = useState(false);
   const [isVoiceHelpOpen, setIsVoiceHelpOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -206,6 +207,7 @@ export default function KalendarPage() {
         setIsNoteModalOpen(false);
         setSelectedNoteId(null);
       }
+      if (e.key === "Escape") setIsFileHelpOpen(false);
     };
     window.addEventListener("keydown", handleEscKey);
     return () => window.removeEventListener("keydown", handleEscKey);
@@ -268,12 +270,19 @@ export default function KalendarPage() {
     const files = event.target.files;
     if (!files) return;
 
+    const sameFile = (first: File, second: File) =>
+      first.name === second.name && first.size === second.size && first.lastModified === second.lastModified;
     let totalSize = attachedFiles.reduce((size, file) => size + file.size, 0);
     let remainingCount = MAX_UPLOAD_COUNT - attachedFiles.length;
     const acceptedFiles: File[] = [];
     const errors: string[] = [];
 
     for (const file of Array.from(files)) {
+      if (attachedFiles.some((attachedFile) => sameFile(attachedFile, file))
+        || acceptedFiles.some((acceptedFile) => sameFile(acceptedFile, file))) {
+        errors.push(`${file.name}: this file is already attached.`);
+        continue;
+      }
       const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
       if (!SUPPORTED_FILE_EXTENSIONS.has(extension)) {
         errors.push(`${file.name}: unsupported file type.`);
@@ -310,7 +319,13 @@ export default function KalendarPage() {
 
   const openFile = (file: File) => {
     const url = URL.createObjectURL(file);
-    window.open(url, "_blank");
+    const openedWindow = window.open(url, "_blank");
+    if (!openedWindow) {
+      URL.revokeObjectURL(url);
+      setChatError("Your browser blocked the file preview. Allow pop-ups and try again.");
+      return;
+    }
+    openedWindow.opener = null;
     setTimeout(() => URL.revokeObjectURL(url), 10000);
   };
 
@@ -526,7 +541,7 @@ export default function KalendarPage() {
     try {
       if (calendarStorage === "backend") {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("Your backend session has expired. Sign in again.");
+        if (!token) throw new Error(" Your backend session has expired. Sign in again.");
         const payload = noteToEvent(newNote, calendarTimezone);
         const savedEvent = selectedNote
           ? await updateCalendarEvent(selectedNote.id, payload, token)
@@ -661,7 +676,7 @@ export default function KalendarPage() {
       {/* Верхня панель з логотипом і користувачем */}
       <div className = "topbar-cal">
         <div className = "logo-section">
-          <Image src="/IMG_1074.png" alt="AI Alex Avatar" width={42} height={42} className="avatar-img" />
+          <Image src = "/IMG_1074.png" alt = "AI Alex Avatar" width = {42} height = {42} className = "avatar-img" />
           Calendar with Alex
         </div>
         <button
@@ -696,15 +711,15 @@ export default function KalendarPage() {
       {showDeletedNotes && calendarStorage === "backend" && (
         <section className = "deleted-notes-panel" aria-label = "Recently deleted events">
           <div>
-            <strong>Recently deleted</strong>
-            <p>Events can be restored for 12 hours after deletion.</p>
+            <strong> Recently deleted </strong>
+            <p> Events can be restored for 12 hours after deletion. </p>
           </div>
           {deletedNotes.length ? deletedNotes.map((note) => (
             <div className = "deleted-note-row" key = {note.id}>
               <span>{note.text} — {note.date}{note.time ? ` at ${note.time}` : ""}</span>
-              <button type = "button" onClick = {() => restoreDeletedNote(note)}>Restore</button>
+              <button type = "button" onClick = {() => restoreDeletedNote(note)}> Restore </button>
             </div>
-          )) : <p>No events are currently available to restore.</p>}
+          )) : <p> No events are currently available to restore. </p>}
         </section>
       )}
 
@@ -712,7 +727,7 @@ export default function KalendarPage() {
         {/* Колонка фільтрів категорій */}
         <div className = "category-panel" role = "group" aria-labelledby = "category-filter-title">
           <div className = "kategories-header" id = "category-filter-title"> Categories </div>
-          <p className = "category-filter-hint">Select multiple categories. All shows every note.</p>
+          <p className = "category-filter-hint"> Select multiple categories. All shows every note. </p>
           <button
             type = "button"
             className = {`side-cat-btn ${selectedCategories.length === 0 ? "selected" : ""}`}
@@ -750,6 +765,45 @@ export default function KalendarPage() {
             ) : (
               <div className = "file-list-empty"> No used files yet </div>
             )}
+          </div>
+          <div className = "file-upload-controls">
+            <div className = "add-file-actions">
+              <button
+                type = "button"
+                className = "add-file-button"
+                onClick = {() => {
+                  setIsChatOpen(true);
+                  fileInputRef.current?.click();
+                }}
+                disabled = {chatLoading || attachedFiles.length >= MAX_UPLOAD_COUNT}
+              >
+                Add file
+              </button>
+              <button
+                type = "button"
+                className = "file-help-button"
+                onClick = {() => {
+                  setIsChatOpen(true);
+                  setIsFileHelpOpen((open) => !open);
+                }}
+                aria-label = "Information about adding files"
+                aria-expanded = {isFileHelpOpen}
+                aria-controls = "file-upload-help"
+                title = "File upload instructions"
+              >
+                ℹ️
+              </button>
+            </div>
+            <input
+              ref = {fileInputRef}
+              id = "file-upload"
+              type = "file"
+              multiple
+              accept = ".txt,.md,.csv,.json,.pdf,.docx"
+              onChange = {handleFileInputChange}
+              disabled = {chatLoading || attachedFiles.length >= MAX_UPLOAD_COUNT}
+              hidden
+            />
           </div>
         </div>
 
@@ -971,16 +1025,62 @@ export default function KalendarPage() {
             </div>
           </div>
           <div className = "chat-mid">
-            {attachedFiles.length > 0 && (
-              <div className = "file-list-box" style = {{ marginBottom: '14px' }}>
-                <div className = "file-list-title"> Files attached for this request </div>
-                {attachedFiles.map((file, index) => (
-                  <div key = {`${file.name}-${index}`} className = "file-chip">
-                    <span>{file.name}</span>
-                    <button type = "button" onClick = {() => removeAttachedFile(index)}> × </button>
+            <section className = "chat-file-section" aria-label = "Files for the next message">
+              <div className = "chat-file-list">
+                <div className = "file-list-title">
+                  Files attached for this request ({attachedFiles.length}/{MAX_UPLOAD_COUNT})
+                </div>
+                {attachedFiles.length > 0 ? attachedFiles.map((file, index) => (
+                  <div
+                    key = {`${file.name}-${file.size}-${file.lastModified}`}
+                    className = "file-chip"
+                  >
+                    <span className = "file-chip-name" title = {file.name}>{file.name}</span>
+                    <span className = "file-chip-size">
+                      {file.size < 1024 * 1024
+                        ? `${(file.size / 1024).toFixed(1)} KB`
+                        : `${(file.size / (1024 * 1024)).toFixed(2)} MB`}
+                    </span>
+                    <button
+                      type = "button"
+                      className = "remove-file-btn"
+                      onClick = {() => removeAttachedFile(index)}
+                      disabled = {chatLoading}
+                      aria-label = {`Remove ${file.name}`}
+                    >×</button>
                   </div>
-                ))}
+                )) : (
+                  <div className = "file-list-empty">No files selected. Files are attached only when you send your message.</div>
+                )}
               </div>
+            </section>
+
+            {isFileHelpOpen && (
+              <section
+                className = "file-help-panel"
+                id = "file-upload-help"
+                aria-labelledby = "file-upload-help-title"
+              >
+                <button
+                  type = "button"
+                  className = "file-help-close"
+                  onClick = {() => setIsFileHelpOpen(false)}
+                  aria-label = "Close file instructions"
+                >×</button>
+                <h3 id = "file-upload-help-title">How file uploads work</h3>
+                <p>Attach up to {MAX_UPLOAD_COUNT} files per message.
+                Each file can be up to 10 MB, with a combined limit of 20 MB.
+                Supported formats: TXT, MD, CSV, JSON, PDF, and DOCX.
+                Text must be UTF-8.
+                Password-protected PDFs, scanned PDFs, and image-only files are not supported.
+                Files are sent only when you send the message.
+                The app extracts text for the AI and does not save the uploaded file itself.
+                The message and AI response may appear in chat history;
+                the AI provider may process the extracted text under its own policies.
+                Avoid uploading passwords or other sensitive information.
+                Remove a file before sending to exclude it.
+                You can attach files again after sending.</p>
+              </section>
             )}
             {chatMessages.length === 0 ? (
               <div className = "ai-text"> Welcome, {currentUser.first_name}! Ask something... </div>
@@ -994,13 +1094,11 @@ export default function KalendarPage() {
             <div ref = {messagesEndRef} />
           </div>
           {chatError && (
-            <div className = "file-list-box" style = {{ margin: '0 20px 10px', background: 'rgba(255, 0, 0, 0.1)', color: '#ffdddd', borderColor: 'rgba(255,0,0,0.25)' }}>
+            <div className = "file-list-box" role = "alert" style = {{ margin: '0 20px 10px', background: 'rgba(255, 0, 0, 0.1)', color: '#ffdddd', borderColor: 'rgba(255,0,0,0.25)' }}>
               {chatError}
             </div>
           )}
           <div className = "chat-bottom">
-            <label htmlFor = "file-upload" className = "file-upload-button" title = "TXT, MD, CSV, JSON, PDF, DOCX — max 5 files, 10 MB each, 20 MB total"> 📎 </label>
-            <input ref = {fileInputRef} id = "file-upload" type = "file" multiple accept = ".txt,.md,.csv,.json,.pdf,.docx" onChange = {handleFileInputChange} disabled = {chatLoading} hidden/>
             <input
               className = "ai-input"
               placeholder = "Ask something..."
@@ -1039,6 +1137,7 @@ export default function KalendarPage() {
         </div>
       )}
 
+
       {isVoiceHelpOpen && (
         <div className = "modal-overlay" onClick = {() => setIsVoiceHelpOpen(false)}>
           <div
@@ -1057,6 +1156,7 @@ export default function KalendarPage() {
           </div>
         </div>
       )}
+
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
@@ -1100,6 +1200,7 @@ export default function KalendarPage() {
           </div>
         </div>
       )}
+
 
       {!isChatOpen && (
         <button className = "ai-neon-circle" onClick = {() => setIsChatOpen(true)} aria-label = "Open AI chat">
