@@ -3,17 +3,36 @@
 
 // Модальний компонент для редагування профілю користувача
 import { useState, useEffect } from "react";
-import { API_BASE, Regions, type User } from "../constants/profileConfig";
+import { API_BASE, type User } from "../constants/profileConfig";
+import {
+    COUNTRY_OPTIONS,
+    getCountryIdByName,
+    getCountryTimezones,
+    getDefaultTimezoneForCountry,
+    getTimezoneLabel,
+} from "../constants/countryTimezones";
 import "../css/Profile.css";
 
 // Інтерфейс пропсів для компонента Profile, який приймає дані користувача та функцію закриття модалки
 interface ProfileProps {
     user: User;
     onClose: () => void;
+    onUserUpdated: (user: User) => void;
 }
 
-export default function Profile({ user, onClose }: ProfileProps) {
-    const [editData, setEditData] = useState<User>(user);
+function normalizedProfile(user: User): User {
+    const country = COUNTRY_OPTIONS.find(({ name }) => name === user.region);
+    const region = country?.name ?? "Poland";
+    const countryId = country?.id ?? "PL";
+    const timezoneName = getCountryTimezones(countryId).includes(user.timezone_name || "")
+        ? user.timezone_name!
+        : getDefaultTimezoneForCountry(countryId, "Europe/Warsaw");
+
+    return { ...user, region, timezone_name: timezoneName };
+}
+
+export default function Profile({ user, onClose, onUserUpdated }: ProfileProps) {
+    const [editData, setEditData] = useState<User>(() => normalizedProfile(user));
     const [editError, setEditError] = useState("");
     const [editSuccess, setEditSuccess] = useState("");
 
@@ -28,14 +47,23 @@ export default function Profile({ user, onClose }: ProfileProps) {
         return () => window.removeEventListener("keydown", handleEsc);
     }, [onClose]);
 
+    useEffect(() => {
+        setEditData(normalizedProfile(user));
+    }, [user]);
+
     // Обробник змін полів форми редагування профілю
     const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         // Оновлюємо локальний стан editData при зміні будь-якого поля форми
         const { name, value } = e.target;
-        setEditData({
-            ...editData,
-            [name]: value,
-        });
+        if (name === "region") {
+            setEditData((previous) => ({
+                ...previous,
+                region: value,
+                timezone_name: getDefaultTimezoneForCountry(getCountryIdByName(value)),
+            }));
+            return;
+        }
+        setEditData((previous) => ({ ...previous, [name]: value }));
     };
 
     const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -59,6 +87,7 @@ export default function Profile({ user, onClose }: ProfileProps) {
                     first_name: editData.first_name,
                     last_name: editData.last_name,
                     region: editData.region,
+                    timezone_name: editData.timezone_name,
                     date_of_birth: editData.date_of_birth,
                 }),
             });
@@ -69,6 +98,7 @@ export default function Profile({ user, onClose }: ProfileProps) {
                 setEditSuccess("Profile updated successfully!");
                 // Оновлюємо дані користувача у localStorage, щоб інші сторінки побачили зміни
                 localStorage.setItem("user", JSON.stringify(data.user));
+                onUserUpdated(data.user);
                 setTimeout(() => {
                     setEditSuccess("");
                 }, 1500);
@@ -128,16 +158,32 @@ export default function Profile({ user, onClose }: ProfileProps) {
                     </div>
 
                     <div className = "form-group">
-                        <label> Region </label>
+                        <label htmlFor = "profile-country">Country</label>
                         <select
+                            id = "profile-country"
                             name = "region"
                             value = {editData.region || ""}
                             onChange = {handleEditChange}
                         >
-                            <option value = ""> Select Region </option>
-                            {Regions.map((region) => (
-                                <option key={region} value = {region}>
-                                    {region}
+                            {COUNTRY_OPTIONS.map((country) => (
+                                <option key={country.id} value = {country.name}>
+                                    {country.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className = "form-group">
+                        <label htmlFor = "profile-timezone">Time zone</label>
+                        <select
+                            id = "profile-timezone"
+                            name = "timezone_name"
+                            value = {editData.timezone_name || ""}
+                            onChange = {handleEditChange}
+                        >
+                            {getCountryTimezones(getCountryIdByName(editData.region || "Poland")).map((timezone) => (
+                                <option key={timezone} value = {timezone}>
+                                    {getTimezoneLabel(timezone)}
                                 </option>
                             ))}
                         </select>

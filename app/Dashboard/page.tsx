@@ -56,7 +56,8 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
                     <p><strong> Last name: </strong> {currentUser.last_name || " –– "}</p>
                     <p><strong> Login: </strong> {currentUser.login}</p>
                     <p><strong> Email: </strong> {currentUser.email || "Not set"}</p>
-                    {currentUser.region && <p><strong> Region: </strong> {currentUser.region}</p>}
+                    {currentUser.region && <p><strong> Country: </strong> {currentUser.region}</p>}
+                    {currentUser.timezone_name && <p><strong> Time zone: </strong> {currentUser.timezone_name}</p>}
                 </div>
             </div>
         </div>

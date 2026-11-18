@@ -6,6 +6,7 @@ export interface User {
     last_name: string;
     date_of_birth?: string;
     region?: string;
+    timezone_name?: string;
     avatar?: string;
 }
 
@@ -16,36 +17,6 @@ export interface Teacher {
     format: (0 | 1)[];
     subjects: string[];
 } export const FORMAT_LABELS: Record<number, string> = { 0: "Online", 1: "Face to face"};
-
-
-export const Regions = [
-    " -- none -- ",
-    " Autonomous Republic of Crimea",
-    " Cherkasy",
-    " Chernivtsi",
-    " Chernihiv",
-    " Dnipro",
-    " Donetsk",
-    " Ivano-Frankivsk",
-    " Kharkiv",
-    " Kherson",
-    " Khmelnytskyi",
-    " Kirovohrad",
-    " Kyiv",
-    " Lviv",
-    " Luhansk",
-    " Mykolaiv",
-    " Odesa",
-    " Poltava",
-    " Rivne",
-    " Sumy",
-    " Ternopil",
-    " Vinnytsia",
-    " Volyn",
-    " Zakarpattia",
-    " Zaporizhzhia",
-    " Zhytomyr",
-];
 
 
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
@@ -90,31 +61,36 @@ export const termsAndConditionsText: string = `
  third parties without your consent.
 
   6. VOICE INPUT AND SPOKEN RESPONSES
- Voice input is optional. When you select the microphone button,
- your browser may ask for permission to use your microphone.
- You can revoke this permission at any time in your browser settings.
- If permission is denied, the microphone is unavailable, or speech
- recognition is unsupported, you can continue using text chat.
+ Voice input is optional. When you select the microphone
+ button, your browser may ask for permission to use your
+ microphone. You can revoke this permission at any time
+ in your browser settings. If permission is denied, the
+ microphone is unavailable, or speech recognition is
+ unsupported, you can continue using text chat.
 
- Speech recognition is performed by the browser or a speech service
- selected by the browser. The service may process audio outside this
- application and may have its own privacy and retention practices.
- This application does not intentionally save raw microphone audio.
- The recognized text is sent to the AI chat service to generate a
- response and may be processed or retained according to that service's
- policies. Do not speak passwords, payment details, or other sensitive
- information.
+ Speech recognition is performed by the browser or
+ a speech service selected by the browser. The service
+ may process audios outside this application and may
+ have its own privacy and retention practices. This
+ application does not intentionally save raw microphone
+ audio. The recognized text is sent to the AI chat service
+ to generate a response and may be processed or retained
+ according to that service's policies. Do not speak
+ passwords, payment details, or other sensitive information.
 
- If spoken replies are enabled, the AI response text is played using
- your browser's speech synthesis and is not saved as an audio recording
- by this application. A separate speaker permission is generally not
- required; audio output depends on your device, browser, and volume.
- You can turn spoken replies off and continue reading text responses.
+ If spoken replies are enabled, the AI response text
+ is played using your browser's speech synthesis and is
+ not saved as an audio recording by this application.
+ A separate speaker permission is generally not required;
+ audio output depends on your device, browser, and volume.
+ You can turn spoken replies off and continue reading text
+ responses.
 
- Voice recognition can misunderstand speech. Review the recognized
- text before sending it. Review AI-generated calendar changes carefully.
- Confirmation and recovery options depend on the calendar features
- available in the application.
+ Voice recognition can misunderstand speech. Review the
+ recognized text before sending it. Review AI-generated
+ calendar changes carefully. Confirmation and recovery
+ options depend on the calendar features available in
+ the application.
 
   7. LIABILITY
  The Alex service is not liable for:

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } f
 import Image from "next/image";
 import Profile from "../components/Profile";
 import type { User } from "../constants/profileConfig";
+import { getCountryIdByName, getDefaultTimezoneForCountry } from "../constants/countryTimezones";
 import { useProfileModal } from "../hooks/useProfileModal";
 import { useVoiceChat } from "../hooks/useVoiceChat";
 import { sendChatMessage } from "../services/chatService";
@@ -22,8 +23,12 @@ import {
   CATEGORY_OPTIONS,
   createCalendarCells,
   formatDateForInput,
+  formatDateForInputInTimezone,
   getCategoryClass,
-  getMinimumTimeForToday,
+  getMinimumTimeForTodayInTimezone,
+  formatTimeForInputInTimezone,
+  localDateTimeToDate,
+  addCalendarDays,
   MAX_UPLOAD_COUNT,
   MAX_UPLOAD_FILE_SIZE,
   MAX_UPLOAD_TOTAL_SIZE,
@@ -41,28 +46,28 @@ type ChatMessage = {
   text: string;
 };
 
-function eventToNote(event: CalendarEvent): Note {
+function eventToNote(event: CalendarEvent, timeZone: string): Note {
   const startTime = new Date(
     /(?:Z|[+-]\d{2}:\d{2})$/i.test(event.start_time) ? event.start_time : `${event.start_time}Z`
   );
   return {
     id: event.id,
     text: event.title,
-    date: formatDateForInput(startTime),
+    date: formatDateForInputInTimezone(startTime, timeZone),
     time: event.is_all_day
       ? ""
-      : `${String(startTime.getHours()).padStart(2, "0")}:${String(startTime.getMinutes()).padStart(2, "0")}`,
+      : formatTimeForInputInTimezone(startTime, timeZone),
     category: event.category,
   };
 }
 
-function noteToEvent(note: Note) {
-  const start = new Date(`${note.date}T${note.time || "00:00"}:00`);
-  const end = new Date(start);
+function noteToEvent(note: Note, timeZone: string) {
+  const start = localDateTimeToDate(note.date, note.time || "00:00", timeZone);
+  const end: Date = new Date(start);
   if (note.time) {
-    end.setHours(end.getHours() + 1);
+    end.setTime(end.getTime() + 60 * 60 * 1000);
   } else {
-    end.setDate(end.getDate() + 1);
+    end.setTime(localDateTimeToDate(addCalendarDays(note.date, 1), "00:00", timeZone).getTime());
   }
   return {
     title: note.text.trim(),
@@ -75,6 +80,9 @@ function noteToEvent(note: Note) {
 
 export default function KalendarPage() {
   const [user, setUser] = useState<User | null>(null);
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const calendarTimezone = user?.timezone_name
+    || getDefaultTimezoneForCountry(getCountryIdByName(user?.region || "Poland"), browserTimezone);
   const [loading, setLoading] = useState(true);
   const [calendarStorage, setCalendarStorage] = useState<"loading" | "local" | "backend">("loading");
   const [calendarError, setCalendarError] = useState<string | null>(null);
@@ -117,6 +125,12 @@ export default function KalendarPage() {
   const profileModal = useProfileModal();
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  useEffect(() => {
+    const [yearText, monthText] = formatDateForInputInTimezone(new Date(), calendarTimezone).split("-");
+    setCurrentDate(new Date(Number(yearText), Number(monthText) - 1, 1));
+  }, [calendarTimezone]);
+
   useEffect(() => {
     let cancelled = false;
     const readLocalNotes = (): Note[] => {
@@ -138,6 +152,7 @@ export default function KalendarPage() {
       }
       if (cancelled) return;
       setUser(savedUser);
+      const selectedTimezone = savedUser?.timezone_name || browserTimezone;
 
       const token = localStorage.getItem("token");
       if (token) {
@@ -157,8 +172,8 @@ export default function KalendarPage() {
             getDeletedCalendarEvents(token),
           ]);
           if (!cancelled) {
-            setNotes(sortNotesByDateTime(events.map(eventToNote)));
-            setDeletedNotes(sortNotesByDateTime(deletedEvents.map(eventToNote)));
+            setNotes(sortNotesByDateTime(events.map((event) => eventToNote(event, selectedTimezone))));
+            setDeletedNotes(sortNotesByDateTime(deletedEvents.map((event) => eventToNote(event, selectedTimezone))));
             setCalendarStorage("backend");
           }
         } catch (error) {
@@ -180,7 +195,7 @@ export default function KalendarPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [browserTimezone]);
 
   useEffect(() => {
     const handleEscKey = (e: KeyboardEvent) => {
@@ -220,7 +235,7 @@ export default function KalendarPage() {
     notes.forEach((note) => {
       if (!["Meeting", "Зустрічі"].includes(note.category) || !note.time || !note.date) return;
 
-      const reminderDate = new Date(`${note.date}T${note.time}`);
+      const reminderDate = localDateTimeToDate(note.date, note.time, calendarTimezone);
       const diffMs = reminderDate.getTime() - now.getTime();
 
       if (diffMs > 0 && diffMs <= 60 * 60 * 1000 && !smsRemindersSent.includes(note.id)) {
@@ -228,7 +243,7 @@ export default function KalendarPage() {
         setSmsRemindersSent((prev) => [...prev, note.id]);
       }
     });
-  }, [notes, sendSmsReminder, smsRemindersSent]);
+  }, [calendarTimezone, notes, sendSmsReminder, smsRemindersSent]);
 
   useEffect(() => {
     checkMeetingReminders();
@@ -335,10 +350,10 @@ export default function KalendarPage() {
             trimmed,
             token,
             new Date().getTimezoneOffset(),
-            Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+            calendarTimezone
           );
           if (action.event && (action.action === "created" || action.action === "updated")) {
-            const updatedNote = eventToNote(action.event);
+            const updatedNote = eventToNote(action.event, calendarTimezone);
             spokenResponse = `${action.action === "created" ? "Event added" : "Event updated"}: ${updatedNote.text}.`;
             setNotes((previous) => sortNotesByDateTime(
               action.action === "created"
@@ -354,7 +369,7 @@ export default function KalendarPage() {
               },
             ]);
           } else if (action.action === "delete_confirmation" && action.event) {
-            const target = eventToNote(action.event);
+            const target = eventToNote(action.event, calendarTimezone);
             spokenResponse = `Should I delete ${target.text}? Please confirm in the dialog.`;
             setNoteToDelete(target);
             setDeleteSource("ai");
@@ -404,17 +419,13 @@ export default function KalendarPage() {
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-  const monthName = currentDate.toLocaleString("en-US", { month: "long" });
+  const monthName = new Date(Date.UTC(year, month, 1)).toLocaleString("en-US", { month: "long", timeZone: "UTC" });
   const calendarCells = createCalendarCells(year, month);
-
-  const normalizeMonth = (offset: number) => {
-    const actual = month + offset;
-    return ((actual % 12) + 12) % 12;
-  };
+  const calendarToday = formatDateForInputInTimezone(new Date(), calendarTimezone);
 
   const noteMatchesCell = (note: Note, day: number, offset: number) => {
-    const noteDateObj = new Date(note.date);
-    return noteDateObj.getDate() === day && noteDateObj.getMonth() === normalizeMonth(offset);
+    const noteDate = new Date(year, month + offset, day);
+    return note.date === formatDateForInput(noteDate);
   };
 
   const cellNotes = (day: number, offset: number) => {
@@ -436,10 +447,27 @@ export default function KalendarPage() {
     window.location.href = "/Login";
   };
 
+  const handleProfileUpdated = (updatedUser: User) => {
+    setUser(updatedUser);
+    if (calendarStorage !== "backend") return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    void Promise.all([getCalendarEvents(token), getDeletedCalendarEvents(token)])
+      .then(([events, deletedEvents]) => {
+        const timezoneName = updatedUser.timezone_name || browserTimezone;
+        setNotes(sortNotesByDateTime(events.map((event) => eventToNote(event, timezoneName))));
+        setDeletedNotes(sortNotesByDateTime(deletedEvents.map((event) => eventToNote(event, timezoneName))));
+      })
+      .catch((error: unknown) => {
+        setCalendarError(error instanceof Error ? error.message : "Could not reload calendar data.");
+      });
+  };
+
   const openModal = () => {
     setNoteCategory(CATEGORY_OPTIONS[0]);
     setNoteText("");
-    setNoteDate(formatDateForInput(new Date()));
+    setNoteDate(calendarToday);
     setNoteTime("");
     setNoteFormError("");
     setSelectedNoteId(null);
@@ -475,12 +503,12 @@ export default function KalendarPage() {
     }
 
     const now = new Date();
-    const today = formatDateForInput(now);
+    const today = calendarToday;
     if (noteDate < today) {
       setNoteFormError("You cannot choose a date in the past.");
       return;
     }
-    if (noteDate === today && noteTime && noteTime < getMinimumTimeForToday(now)) {
+    if (noteDate === today && noteTime && noteTime < getMinimumTimeForTodayInTimezone(now, calendarTimezone)) {
       setNoteFormError("For today, choose a time that has not passed.");
       return;
     }
@@ -499,11 +527,11 @@ export default function KalendarPage() {
       if (calendarStorage === "backend") {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Your backend session has expired. Sign in again.");
-        const payload = noteToEvent(newNote);
+        const payload = noteToEvent(newNote, calendarTimezone);
         const savedEvent = selectedNote
           ? await updateCalendarEvent(selectedNote.id, payload, token)
           : await createCalendarEvent(payload, token);
-        const savedNote = eventToNote(savedEvent);
+        const savedNote = eventToNote(savedEvent, calendarTimezone);
         setNotes((previous) => sortNotesByDateTime(
           selectedNote
             ? previous.map((item) => item.id === selectedNote.id ? savedNote : item)
@@ -564,7 +592,7 @@ export default function KalendarPage() {
       if (!token) throw new Error("Your backend session has expired. Sign in again.");
       const deleted = await deleteCalendarEvent(noteToDelete.id, token);
       setNotes((previous) => previous.filter((note) => note.id !== noteToDelete.id));
-      setDeletedNotes((previous) => sortNotesByDateTime([...previous, eventToNote(deleted)]));
+      setDeletedNotes((previous) => sortNotesByDateTime([...previous, eventToNote(deleted, calendarTimezone)]));
       setSelectedNoteId(null);
       setNoteToDelete(null);
       setCalendarError(null);
@@ -584,7 +612,7 @@ export default function KalendarPage() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Your backend session has expired. Sign in again.");
       const restored = await restoreCalendarEvent(note.id, token);
-      setNotes((previous) => sortNotesByDateTime([...previous, eventToNote(restored)]));
+      setNotes((previous) => sortNotesByDateTime([...previous, eventToNote(restored, calendarTimezone)]));
       setDeletedNotes((previous) => previous.filter((item) => item.id !== note.id));
       setCalendarError(null);
     } catch (error) {
@@ -747,7 +775,7 @@ export default function KalendarPage() {
             ))}
             {calendarCells.map((cell, index) => {
               const isCurrentMonth = cell.offset === 0;
-              const isToday = isCurrentMonth && new Date().toDateString() === new Date(year, month, cell.day).toDateString();
+              const isToday = isCurrentMonth && calendarToday === formatDateForInput(new Date(year, month, cell.day));
               const notesInCell = cellNotes(cell.day, cell.offset);
 
               return (
@@ -851,7 +879,7 @@ export default function KalendarPage() {
                   id = "note-time"
                   type = "time"
                   value = {noteTime}
-                  min = {noteDate === formatDateForInput(new Date()) ? getMinimumTimeForToday(new Date()) : undefined}
+                  min = {noteDate === calendarToday ? getMinimumTimeForTodayInTimezone(new Date(), calendarTimezone) : undefined}
                   onChange = {(e) => {
                     setNoteTime(e.target.value);
                     setNoteFormError("");
@@ -865,7 +893,7 @@ export default function KalendarPage() {
                   id = "note-date"
                   type = "date"
                   value = {noteDate}
-                  min = {formatDateForInput(new Date())}
+                  min = {calendarToday}
                   onChange = {(e) => {
                     setNoteDate(e.target.value);
                     setNoteFormError("");
@@ -1084,6 +1112,7 @@ export default function KalendarPage() {
       {profileModal.isOpen && user && (
         <Profile
           user = {user}
+          onUserUpdated = {handleProfileUpdated}
           onClose = {() => {
             profileModal.close();
             const userStr = localStorage.getItem("user");
@@ -1112,7 +1141,8 @@ export default function KalendarPage() {
                   <p><strong> Last name: </strong> {user?.last_name || " –– "}</p>
                   <p><strong> Login: </strong> {user?.login}</p>
                   <p><strong> Email: </strong> {user?.email || "Not set"}</p>
-                  {user?.region && <p><strong> Region: </strong> {user?.region}</p>}
+                  {user?.region && <p><strong> Country: </strong> {user.region}</p>}
+                  {user?.timezone_name && <p><strong> Time zone: </strong> {user.timezone_name}</p>}
                   <button
                     type = "button"
                     className = "dashboard-exit-btn"

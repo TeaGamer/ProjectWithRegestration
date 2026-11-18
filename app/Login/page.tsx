@@ -5,8 +5,14 @@
 import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import "../css/Login.css";
-import {Regions} from "../constants/profileConfig";
 import {termsAndConditionsText} from "../constants/profileConfig";
+import {
+    COUNTRY_OPTIONS,
+    getCountryIdByName,
+    getCountryTimezones,
+    getDefaultTimezoneForCountry,
+    getTimezoneLabel,
+} from "../constants/countryTimezones";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 export default function LoginPage() {
@@ -40,7 +46,8 @@ export default function LoginPage() {
         confirmPassword: "",
         first_name: "",
         last_name: "",
-        region: Regions[0] || "",
+        region: "Poland",
+        timezone_name: "Europe/Warsaw",
         agreedToTerms: false,
         isStudent: false,
     });
@@ -65,6 +72,16 @@ export default function LoginPage() {
         setRegisterData((prev) => ({
             ...prev,
             [name]: type === "checkbox" ? checked : name === "email" ? value.toLowerCase() : value,
+        }));
+    };
+
+    const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const countryName = e.target.value;
+        const countryId = getCountryIdByName(countryName);
+        setRegisterData((prev) => ({
+            ...prev,
+            region: countryName,
+            timezone_name: getDefaultTimezoneForCountry(countryId),
         }));
     };
 
@@ -188,7 +205,8 @@ export default function LoginPage() {
                     password: registerData.password,
                     first_name: registerData.first_name || registerData.login,
                     last_name: registerData.last_name || "",
-                    region: registerData.region || "Ukraine",
+                    region: registerData.region || "Poland",
+                    timezone_name: registerData.timezone_name || "Europe/Warsaw",
                     isStudent: registerData.isStudent,
                 }),
             });
@@ -204,7 +222,8 @@ export default function LoginPage() {
                     confirmPassword: "",
                     first_name: "",
                     last_name: "",
-                    region: "Ukraine",
+                    region: "Poland",
+                    timezone_name: "Europe/Warsaw",
                     agreedToTerms: false,
                     isStudent: false,
                 });
@@ -410,14 +429,31 @@ export default function LoginPage() {
                                 required
                             />
 
+                            <label htmlFor = "register-country">Country</label>
                             <select
+                                id = "register-country"
                                 name = "region"
                                 value = {registerData.region}
-                                onChange = {handleRegisterChange}
+                                onChange = {handleCountryChange}
+                                required
                             >
-                                {Regions.map((region) => (
-                                    <option key = {region} value = {region}>
-                                        {region}
+                                {COUNTRY_OPTIONS.map((country) => (
+                                    <option key = {country.id} value = {country.name}>
+                                        {country.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <label htmlFor = "register-timezone">Time zone</label>
+                            <select
+                                id = "register-timezone"
+                                name = "timezone_name"
+                                value = {registerData.timezone_name}
+                                onChange = {handleRegisterChange}
+                                required
+                            >
+                                {getCountryTimezones(getCountryIdByName(registerData.region)).map((timezone) => (
+                                    <option key = {timezone} value = {timezone}>
+                                        {getTimezoneLabel(timezone)}
                                     </option>
                                 ))}
                             </select>
