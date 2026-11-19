@@ -1076,6 +1076,11 @@ textarea:focus-visible {
   color: #111827;
 }
 
+.chat-message p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .chat-bottom {
   padding: 12px;
   display: flex;
