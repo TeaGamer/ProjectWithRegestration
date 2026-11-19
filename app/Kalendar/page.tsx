@@ -105,6 +105,7 @@ export default function KalendarPage() {
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isFileHelpOpen, setIsFileHelpOpen] = useState(false);
   const [isVoiceHelpOpen, setIsVoiceHelpOpen] = useState(false);
+  const [isVoiceInfoOpen, setIsVoiceInfoOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const calendarTouchStart = useRef<{ x: number; y: number } | null>(null);
@@ -208,6 +209,7 @@ export default function KalendarPage() {
         setSelectedNoteId(null);
       }
       if (e.key === "Escape") setIsFileHelpOpen(false);
+      if (e.key === "Escape") setIsVoiceInfoOpen(false);
     };
     window.addEventListener("keydown", handleEscKey);
     return () => window.removeEventListener("keydown", handleEscKey);
@@ -693,9 +695,9 @@ export default function KalendarPage() {
 
       {/* Панель дій */}
       <div className = "controls-row">
-        <button type = "button" className = "ctrl-btn add-note-btn" onClick = {openModal}> 📝 Add Note </button>
-        <button type = "button" className = "ctrl-btn edit-note-btn" onClick = {openEditNote}> ✏️ Edit Note </button>
-        <button type = "button" className = "ctrl-btn delete-note-btn" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}> 🗑️ Delete Note </button>
+        <button type = "button" className = "ctrl-btn add-note-btn" onClick = {openModal}>  Add Note </button>
+        <button type = "button" className = "ctrl-btn edit-note-btn" onClick = {openEditNote}>  Edit Note </button>
+        <button type = "button" className = "ctrl-btn delete-note-btn" onClick = {handleDeleteSelectedNote} disabled={!selectedNote}>  Delete Note </button>
         {calendarStorage === "backend" && (
           <button
             type = "button"
@@ -857,26 +859,14 @@ export default function KalendarPage() {
         {/* Інформація про нотатки */}
         <div className = "your_notes">
           <span> Your notes </span>
-          <div className = "circle purple"></div>
-          <div style = {{ marginTop: "20px", color: "white" }}>
-            <strong> Number of notes ({filteredNotes.length})</strong>
+          <div className = "your-notes-content">
+            <strong className = "your-notes-count"> Number of notes ({filteredNotes.length})</strong>
             {filteredNotes.map((note) => (
               <button
                 key = {note.id}
                 type = "button"
+                className = {`your-note-button ${selectedNoteId === note.id ? "selected" : ""}`}
                 onClick = {() => handleNoteClick(note)}
-                style = {{
-                  display: "block",
-                  width: "100%",
-                  textAlign: "left",
-                  marginTop: "10px",
-                  padding: "10px",
-                  borderRadius: "10px",
-                  border: selectedNoteId === note.id ? "2px solid #fff" : "1px solid rgba(255,255,255,0.5)",
-                  background: selectedNoteId === note.id ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
-                  color: "white",
-                  cursor: "pointer",
-                }}
               >
                 {note.category}: {note.text}
               </button>
@@ -1013,6 +1003,17 @@ export default function KalendarPage() {
               </select>
               <button
                 type = "button"
+                className = "voice-info-button"
+                onClick = {() => setIsVoiceInfoOpen((open) => !open)}
+                aria-label = "Information about voice chat"
+                aria-expanded = {isVoiceInfoOpen}
+                aria-controls = "voice-chat-info"
+                title = "Voice chat instructions"
+              >
+                ℹ️
+              </button>
+              <button
+                type = "button"
                 className = {`voice-reply-btn ${voiceChat.voiceModeEnabled ? "active" : ""}`}
                 onClick = {voiceChat.toggleSpokenReplies}
                 aria-label = {voiceChat.voiceModeEnabled ? "Turn off spoken AI replies" : "Turn on spoken AI replies"}
@@ -1021,6 +1022,25 @@ export default function KalendarPage() {
               >
                 {voiceChat.voiceModeEnabled ? "🔊" : "🔇"}
               </button>
+              {isVoiceInfoOpen && (
+                <section
+                  className = "voice-info-popup"
+                  id = "voice-chat-info"
+                  aria-labelledby = "voice-chat-info-title"
+                >
+                  <button
+                    type = "button"
+                    className = "voice-info-close"
+                    onClick = {() => setIsVoiceInfoOpen(false)}
+                    aria-label = "Close voice chat instructions"
+                  >×</button>
+                  <h3 id = "voice-chat-info-title">Voice chat with Alex</h3>
+                  <p>Choose the language you will speak using the language menu.</p>
+                  <p><strong>🔊 / 🔇</strong> turns spoken AI replies on or off. When enabled, Alex reads the reply aloud.</p>
+                  <p><strong>🎙️</strong> starts browser speech recognition. Your words appear in the message field; press Send to send them to Alex. This is not a continuous live call.</p>
+                  <p>Microphone recognition depends on browser support and permission. You can always type to Alex.</p>
+                </section>
+              )}
               <button type = "button" className = "chat-close-btn" aria-label = "Close chat" onClick = {closeChat}>✕</button>
             </div>
           </div>
@@ -1094,7 +1114,7 @@ export default function KalendarPage() {
             <div ref = {messagesEndRef} />
           </div>
           {chatError && (
-            <div className = "file-list-box" role = "alert" style = {{ margin: '0 20px 10px', background: 'rgba(255, 0, 0, 0.1)', color: '#ffdddd', borderColor: 'rgba(255,0,0,0.25)' }}>
+            <div className = "file-list-box chat-error" role = "alert">
               {chatError}
             </div>
           )}
@@ -1175,27 +1195,13 @@ export default function KalendarPage() {
               <button
                 className = "modal-btn"
                 onClick = {() => setShowLogoutConfirm(false)}
-                style = {{
-                  background: "#6b7280",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 20px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  marginRight: "10px"
-                }}>Back</button>
+                type = "button"
+              >Back</button>
               <button
-                className = "modal-btn"
+                className = "modal-btn delete-confirm-btn"
                 onClick = {handleLogout}
-                style = {{
-                  background: "#dc2626",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 20px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  marginLeft: "10px"
-                }}>Yes</button>
+                type = "button"
+              >Yes</button>
             </div>
           </div>
         </div>

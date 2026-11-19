@@ -1,5 +1,5 @@
 "use client";
-
+{/* І нахера їм цей Dashboard?? */}
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "../css/Dashboard.css";
@@ -49,7 +49,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
                     {/* Кнопка повернення до календаря */}
                     <button className = "close-info-btn" onClick={() => router.push("/Kalendar")}>×</button>
                 </div>
-                
+                {/* Тіло вікна з інформацією про користувача */}
                 <div className = "info-popup-body">
                     <p><strong> User: </strong> {currentUser.first_name || currentUser.login}</p>
                     <p><strong> First name: </strong> {currentUser.first_name || " —— "}</p>

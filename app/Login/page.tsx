@@ -1,4 +1,4 @@
-
+//Ось тут і починався цей жахливий код, який я писав вночі, коли всі спали, а я сидів і мучився з цим проектом. Але тепер він працює, і я можу спати спокійно. Допоки Ренат знову не зробить херні і мені треба буде щось поправляти, бо у нього екран з жопи і в нього постійно щось обрізає і стоїть не там. Заїбав
 "use client";
 
 // Компонент сторінки логіну/реєстрації, що рендериться на клієнті
@@ -33,12 +33,14 @@ export default function LoginPage() {
         return () => window.removeEventListener("keydown", handleEsc);
     }, [showTermsModal]);
     // Стан полів форми логіну: email, пароль та запам'ятати мене
+    //Убийте мене уже просто, я хочу спати, а не писати цей код.
     const [loginData, setLoginData] = useState({
         identifier: "",
         password: "",
         remember: false,
     });
     // Стан полів форми реєстрації, що містить усі дані користувача
+    // Хтось у світі повинен був би написати нормальний бекенд, щоб не було такої жахливої валідації на фронтенді, але поки що доводиться робити це тут.
     const [registerData, setRegisterData] = useState({
         login: "",
         email: "",
@@ -269,8 +271,8 @@ export default function LoginPage() {
                         }}> Register </button>
                 </div>
 
-                {error && <div className = "error-message " > {error}</div>}
-                {success && <div className = "success-message " > {success}</div>}
+                {error && <div className = "error-message" > {error}</div>}
+                {success && <div className = "success-message" > {success}</div>}
 
                 {/* Login Form */}
                 {isLogin && (
@@ -315,7 +317,7 @@ export default function LoginPage() {
                                     checked = {loginData.remember}
                                     onChange = {handleLoginChange}
                                 />
-                                {" "}Remember me
+                                {" "} Remember me
                             </label>
 
                             <button
@@ -349,9 +351,9 @@ export default function LoginPage() {
                 {/* Register Form */}
                 {!isLogin && (
                     // Відображення форми реєстрації, якщо активна вкладка Register
-                    <div className = " form-container ">
+                    <div className = "form-container">
                         <h2> Create Account </h2>
-                        <form className = " login-form " onSubmit={handleRegisterSubmit}>
+                        <form className = " login-form " onSubmit = {handleRegisterSubmit}>
                             <input
                                 name = "login"
                                 placeholder = "Username *"
@@ -398,7 +400,7 @@ export default function LoginPage() {
                                 <input
                                     name = "password"
                                     type = {showRegisterPassword ? "text" : "password"}
-                                    placeholder=" Password *"
+                                    placeholder = " Password *"
                                     value = {registerData.password}
                                     onChange = {handleRegisterChange}
                                     minLength = {8}
@@ -416,9 +418,7 @@ export default function LoginPage() {
                                     {showRegisterPassword ? "⚪" : "⚫"}
                                 </button>
                             </div>
-                            <small className = "password-requirements">
-                                At least 8 characters, with a letter, a number, and one symbol: . , : -
-                            </small>
+                            <small className = "password-requirements"> Must contain at least 2 special characters (for example: !, ., -, @, #, $) </small>
 
                             <input
                                 name = "confirmPassword"
@@ -429,7 +429,7 @@ export default function LoginPage() {
                                 required
                             />
 
-                            <label htmlFor = "register-country">Country</label>
+                            <label htmlFor = "register-country"> Country </label>
                             <select
                                 id = "register-country"
                                 name = "region"
@@ -443,7 +443,7 @@ export default function LoginPage() {
                                     </option>
                                 ))}
                             </select>
-                            <label htmlFor = "register-timezone">Time zone</label>
+                            <label htmlFor = "register-timezone"> Time zone </label>
                             <select
                                 id = "register-timezone"
                                 name = "timezone_name"

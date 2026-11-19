@@ -5,6 +5,21 @@ html, body {
     box-sizing: border-box;
 }
 
+/* SAN-inspired palette: white, SAN blue, lavender surfaces, and magenta accents. */
+.dashboard-layout {
+    --dashboard-base: #fff;
+    --dashboard-secondary: #00347c;
+    --dashboard-accent: #c2297d;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 24px;
+    background: var(--dashboard-base);
+    color: #111827;
+}
+
 /* Напівпрозорий темний фон для імітації модалки на сторінці Dashboard */
 .dashboard-overlay {
     position: fixed;
@@ -23,11 +38,12 @@ html, body {
 .dashboard-info-popup {
     width: 100%;
     max-width: 420px;
+    box-sizing: border-box;
     background: rgba(255, 255, 255, 0.98);
     border-radius: 22px;
     box-shadow: 0 28px 80px rgba(0, 0, 0, 0.25);
     overflow: hidden;
-    border: 1px solid rgba(102, 126, 234, 0.25);
+    border: 1px solid rgba(0, 52, 124, 0.18);
     animation: scaleUp 0.2s ease-out;
 }
 
@@ -49,8 +65,12 @@ html, body {
     justify-content: space-between;
     gap: 16px;
     padding: 18px 20px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #00347c;
     color: white;
+}
+
+.dashboard-layout .info-popup-header {
+    background: var(--dashboard-secondary);
 }
 
 .info-popup-header h2 {
@@ -85,8 +105,8 @@ html, body {
 /* Кнопка закриття */
 .close-info-btn {
     border: none;
-    background: rgba(255, 255, 255, 0.18);
-    color: white;
+    background: #c2297d;
+    color: #fff;
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -98,8 +118,13 @@ html, body {
     transition: background 0.2s ease;
 }
 
+.dashboard-layout .close-info-btn {
+    background: var(--dashboard-accent);
+    color: #fff;
+}
+
 .close-info-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: #a91f6c;
 }
 
 /* Стан завантаження */
@@ -108,8 +133,8 @@ html, body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
+    background: #fff;
+    color: #111827;
     font-size: 1.2rem;
 }
 
@@ -127,7 +152,7 @@ html, body {
     max-height: calc(100vh - 100px);
     overflow-y: auto;
     color: #1f2937;
-    border-color: rgba(102, 126, 234, 0.28);
+    border-color: rgba(0, 52, 124, 0.22);
     box-shadow: 0 24px 64px rgba(25, 20, 60, 0.32);
     animation: quick-view-appear 180ms ease-out;
 }
@@ -153,9 +178,9 @@ html, body {
 .calendar-dashboard-overlay .info-popup-body p {
     margin: 0;
     padding: 11px 13px;
-    border: 1px solid rgba(102, 126, 234, 0.12);
+    border: 1px solid rgba(0, 52, 124, 0.12);
     border-radius: 12px;
-    background: #f7f7ff;
+    background: #f8f8fc;
     color: #374151;
     font-size: 0.9rem;
     line-height: 1.5;
@@ -165,7 +190,7 @@ html, body {
 .calendar-dashboard-overlay .info-popup-body strong {
     display: inline;
     width: auto;
-    color: #5965c4;
+    color: #00347c;
 }
 
 .calendar-dashboard-overlay .dashboard-info-popup .close-info-btn {
@@ -175,15 +200,15 @@ html, body {
     margin-left: auto;
     padding: 0;
     border-radius: 50%;
-    color: #6b7280;
-    background: #f1f2fa;
+    color: #fff;
+    background: #c2297d;
     font-size: 1.3rem;
     line-height: 1;
 }
 
 .calendar-dashboard-overlay .dashboard-info-popup .close-info-btn:hover {
-    color: #b4234d;
-    background: #ffe8ef;
+    color: #fff;
+    background: #a91f6c;
 }
 
 .calendar-dashboard-overlay .dashboard-exit-btn {
@@ -193,7 +218,7 @@ html, body {
     border: 0;
     border-radius: 12px;
     color: white;
-    background: linear-gradient(135deg, #ef4444, #be123c);
+    background: #c2297d;
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
@@ -202,12 +227,18 @@ html, body {
 
 .calendar-dashboard-overlay .dashboard-exit-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 18px rgba(190, 18, 60, 0.24);
+    background: #a91f6c;
+    box-shadow: 0 8px 18px rgba(194, 41, 125, 0.24);
 }
 
 .calendar-dashboard-overlay .dashboard-exit-btn:focus-visible {
-    outline: 3px solid rgba(190, 18, 60, 0.35);
+    outline: 3px solid rgba(194, 41, 125, 0.35);
     outline-offset: 2px;
+}
+
+.dashboard-layout .close-info-btn:focus-visible {
+    outline: 3px solid #c2297d;
+    outline-offset: 3px;
 }
 
 @keyframes quick-view-appear {
