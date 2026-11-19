@@ -30,6 +30,69 @@ body {
   color: var(--san-ink);
 }
 
+:root[data-theme="dark"] {
+  --surface: #202124;
+  --surface-strong: #2b2636;
+  --san-lavender-light: #2b2636;
+  --san-ink: #f4f1ff;
+  --san-muted: #c5bfd1;
+  --san-border: rgba(196, 181, 253, 0.22);
+  --shadow-strong: rgba(8, 7, 12, 0.55);
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] body {
+  background: #202124;
+  color: #f4f1ff;
+}
+
+:root[data-theme="dark"] .dashboard-layout-calendar,
+:root[data-theme="dark"] .dashboard-layout,
+:root[data-theme="dark"] .calendar-main,
+:root[data-theme="dark"] .kalendar-page,
+:root[data-theme="dark"] .chat-mid,
+:root[data-theme="dark"] .modal-content,
+:root[data-theme="dark"] .dashboard-info-popup {
+  background: #202124;
+  color: #f4f1ff;
+}
+
+:root[data-theme="dark"] .calendar-week,
+:root[data-theme="dark"] .calendar-grid,
+:root[data-theme="dark"] .side-panel,
+:root[data-theme="dark"] .calendar-top,
+:root[data-theme="dark"] .chat-bottom,
+:root[data-theme="dark"] .chat-top,
+:root[data-theme="dark"] .modal-body,
+:root[data-theme="dark"] .info-popup-body {
+  background: #29252f;
+  color: #f4f1ff;
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] .ai-input,
+:root[data-theme="dark"] .calendar-cell,
+:root[data-theme="dark"] .note-modal-panel {
+  background: #34303b;
+  color: #f7f4ff;
+  border-color: rgba(196, 181, 253, 0.24);
+}
+
+:root[data-theme="dark"] .chat-message.ai,
+:root[data-theme="dark"] .ai-chat-box,
+:root[data-theme="dark"] .modal-header,
+:root[data-theme="dark"] .info-popup-header {
+  background: #4a3f63;
+  color: #fff;
+}
+
+:root[data-theme="dark"] .chat-message.user {
+  background: #b13a82;
+  color: #fff;
+}
+
 * {box-sizing: border-box;}
 
 button,

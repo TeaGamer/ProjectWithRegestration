@@ -82,6 +82,7 @@ function noteToEvent(note: Note, timeZone: string) {
 export default function KalendarPage() {
   const [user, setUser] = useState<User | null>(null);
   const [interfaceLanguage, setInterfaceLanguage] = useState<"uk" | "pl" | "en">("en");
+  const [interfaceTheme, setInterfaceTheme] = useState<"light" | "dark">("light");
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
   const calendarTimezone = user?.timezone_name
     || getDefaultTimezoneForCountry(getCountryIdByName(user?.region || "Poland"), browserTimezone);
@@ -128,11 +129,27 @@ export default function KalendarPage() {
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem("interfaceLanguage") as "uk" | "pl" | "en" | null;
+    const savedTheme = localStorage.getItem("interfaceTheme") as "light" | "dark" | null;
     if (savedLanguage && ["uk", "pl", "en"].includes(savedLanguage)) {
       setInterfaceLanguage(savedLanguage);
       document.documentElement.lang = savedLanguage;
     }
+    const theme = savedTheme === "dark" ? "dark" : "light";
+    setInterfaceTheme(theme);
+    document.documentElement.dataset.theme = theme;
   }, []);
+
+  const changeInterfaceLanguage = (language: "uk" | "pl" | "en") => {
+    setInterfaceLanguage(language);
+    localStorage.setItem("interfaceLanguage", language);
+    document.documentElement.lang = language;
+  };
+
+  const changeInterfaceTheme = (theme: "light" | "dark") => {
+    setInterfaceTheme(theme);
+    localStorage.setItem("interfaceTheme", theme);
+    document.documentElement.dataset.theme = theme;
+  };
 
   const interfaceLabels = {
     uk: { title: "Чат з вашим Alex", welcome: "Привіт", placeholder: "Запитайте щось...", voiceLanguage: "Мова розмови" },
@@ -1282,6 +1299,29 @@ export default function KalendarPage() {
                   <p><strong> Last name: </strong> {user?.last_name || " –– "}</p>
                   <p><strong> Login: </strong> {user?.login}</p>
                   <p><strong> Email: </strong> {user?.email || "Not set"}</p>
+                  <p className="chat-language-setting">
+                    <strong> Мова чату: </strong>
+                    <select
+                      value={interfaceLanguage}
+                      onChange={(event) => changeInterfaceLanguage(event.target.value as "uk" | "pl" | "en")}
+                      aria-label="Мова чату"
+                    >
+                      <option value="uk">Українська</option>
+                      <option value="pl">Polski</option>
+                      <option value="en">English</option>
+                    </select>
+                  </p>
+                  <p className="chat-language-setting">
+                    <strong> Тема: </strong>
+                    <select
+                      value={interfaceTheme}
+                      onChange={(event) => changeInterfaceTheme(event.target.value as "light" | "dark")}
+                      aria-label="Тема інтерфейсу"
+                    >
+                      <option value="light">Світла</option>
+                      <option value="dark">Темна</option>
+                    </select>
+                  </p>
                   {user?.region && <p><strong> Country: </strong> {user.region}</p>}
                   {user?.timezone_name && <p><strong> Time zone: </strong> {user.timezone_name}</p>}
                   <button

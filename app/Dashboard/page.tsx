@@ -10,6 +10,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [chatLanguage, setChatLanguage] = useState<"uk" | "pl" | "en">("en");
+    const [interfaceTheme, setInterfaceTheme] = useState<"light" | "dark">("light");
 
     useEffect(() => {
         const userStr = localStorage.getItem("user");
@@ -24,10 +25,15 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
         }
 
         const savedChatLanguage = localStorage.getItem("interfaceLanguage") as "uk" | "pl" | "en" | null;
+        const savedTheme = localStorage.getItem("interfaceTheme") as "light" | "dark" | null;
         if (savedChatLanguage && ["uk", "pl", "en"].includes(savedChatLanguage)) {
             setChatLanguage(savedChatLanguage);
             document.documentElement.lang = savedChatLanguage;
         }
+
+        const theme = savedTheme === "dark" ? "dark" : "light";
+        setInterfaceTheme(theme);
+        document.documentElement.dataset.theme = theme;
 
         setLoading(false);
     }, []);
@@ -36,6 +42,12 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
         setChatLanguage(language);
         localStorage.setItem("interfaceLanguage", language);
         document.documentElement.lang = language;
+    };
+
+    const changeInterfaceTheme = (theme: "light" | "dark") => {
+        setInterfaceTheme(theme);
+        localStorage.setItem("interfaceTheme", theme);
+        document.documentElement.dataset.theme = theme;
     };
 
     if (loading) {
@@ -79,6 +91,17 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
                             <option value="uk">Українська</option>
                             <option value="pl">Polski</option>
                             <option value="en">English</option>
+                        </select>
+                    </p>
+                    <p className="chat-language-setting">
+                        <strong> Тема: </strong>
+                        <select
+                            value={interfaceTheme}
+                            onChange={(event) => changeInterfaceTheme(event.target.value as "light" | "dark")}
+                            aria-label="Тема інтерфейсу"
+                        >
+                            <option value="light">Світла</option>
+                            <option value="dark">Темна</option>
                         </select>
                     </p>
                     {currentUser.region && <p><strong> Country: </strong> {currentUser.region}</p>}
