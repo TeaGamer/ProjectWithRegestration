@@ -78,6 +78,7 @@
     margin: 12px auto 0;
     max-width: 420px;
     color: rgba(255, 255, 255, 0.82);
+    font-size: 1.05rem;
     line-height: 1.5;
 }
 
@@ -195,7 +196,7 @@
 .password-requirements {
     margin-top: -10px;
     color: var(--san-muted);
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     line-height: 1.4;
 }
 

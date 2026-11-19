@@ -1050,7 +1050,7 @@ export default function KalendarPage() {
                 <option value = "uk-UA">Ukrainian</option>
                 <option value = "en-US">English</option>
                 <option value = "pl-PL">Polish</option>
-                <option value = "ru-RU">Русский</option>
+                <option value = "ru-RU">Russian</option>
               </select>
               <button
                 type = "button"

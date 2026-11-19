@@ -59,7 +59,7 @@ html, body, #__next {
   gap: 12px; /* Відступ між круглим фото та текстом */
   color: var(--calendar-secondary);
   font-weight: 800;
-  font-size: 1.45rem;
+  font-size: 1.7rem;
   letter-spacing: 0.5px;
   padding: 0;
   margin-left: 6px;
@@ -239,15 +239,15 @@ html, body, #__next {
 }
 
 .kategories-header {
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   font-weight: 700;
 }
 
 .category-filter-hint {
   margin: 0;
   color: #374151;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 1.05rem;
+  line-height: 1.45;
 }
 
 .side-cat-btn {
@@ -444,6 +444,7 @@ html, body, #__next {
 .your_notes > span {
   color: #00347c;
   font-weight: 700;
+  font-size: 1.25rem;
 }
 
 .your-notes-content {
@@ -455,7 +456,7 @@ html, body, #__next {
 
 .your-notes-count {
   color: #374151;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
 }
 
 .your-note-button {
@@ -699,6 +700,10 @@ textarea:focus-visible {
   gap: 8px;
   color: white;
   font-weight: 700;
+}
+
+.chat-top > span {
+  font-size: 1.25rem;
 }
 
 .chat-voice-controls {
