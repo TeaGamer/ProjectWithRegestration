@@ -102,6 +102,26 @@ html, body {
     width: 100px;
 }
 
+.chat-language-setting {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+}
+
+.chat-language-setting strong {
+   flex-shrink: 0;
+}
+
+.chat-language-setting select {
+   min-width: 150px;
+   padding: 6px 8px;
+   border: 1px solid rgba(0, 52, 124, 0.28);
+   border-radius: 8px;
+   background: #fff;
+   color: #111827;
+   cursor: pointer;
+}
+
 /* Кнопка закриття */
 .close-info-btn {
     border: none;

@@ -134,12 +134,6 @@ export default function KalendarPage() {
     }
   }, []);
 
-  const changeInterfaceLanguage = (language: "uk" | "pl" | "en") => {
-    setInterfaceLanguage(language);
-    localStorage.setItem("interfaceLanguage", language);
-    document.documentElement.lang = language;
-  };
-
   const interfaceLabels = {
     uk: { title: "Чат з вашим Alex", welcome: "Привіт", placeholder: "Запитайте щось...", voiceLanguage: "Мова розмови" },
     pl: { title: "Czat z Alexem", welcome: "Cześć", placeholder: "Zapytaj o coś...", voiceLanguage: "Język mowy" },
@@ -1028,12 +1022,6 @@ export default function KalendarPage() {
           <div className = "chat-top">
             <span>{interfaceLabels.title}</span>
             <div className = "chat-voice-controls">
-              <label className="voice-language-label" htmlFor="interface-language">Interface language</label>
-              <select id="interface-language" value={interfaceLanguage} onChange={(event) => changeInterfaceLanguage(event.target.value as "uk" | "pl" | "en")}>
-                <option value="uk">Українська</option>
-                <option value="pl">Polski</option>
-                <option value="en">English</option>
-              </select>
               <label className="voice-language-label" htmlFor="voice-language">{interfaceLabels.voiceLanguage}</label>
               <select
                 id = "voice-language"
