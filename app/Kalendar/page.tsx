@@ -1047,9 +1047,9 @@ export default function KalendarPage() {
                 onChange = {(event) => voiceChat.setVoiceLanguage(event.target.value)}
                 aria-label = "Voice language"
               >
-                <option value = "uk-UA">Українська</option>
+                <option value = "uk-UA">Ukrainian</option>
                 <option value = "en-US">English</option>
-                <option value = "pl-PL">Polski</option>
+                <option value = "pl-PL">Polish</option>
                 <option value = "ru-RU">Русский</option>
               </select>
               <button
@@ -1299,27 +1299,27 @@ export default function KalendarPage() {
                   <p><strong> Last name: </strong> {user?.last_name || " –– "}</p>
                   <p><strong> Login: </strong> {user?.login}</p>
                   <p><strong> Email: </strong> {user?.email || "Not set"}</p>
-                  <p className="chat-language-setting">
-                    <strong> Мова чату: </strong>
+                  <p className = "chat-language-setting">
+                    <strong> Chat language: </strong>
                     <select
-                      value={interfaceLanguage}
-                      onChange={(event) => changeInterfaceLanguage(event.target.value as "uk" | "pl" | "en")}
-                      aria-label="Мова чату"
+                      value = {interfaceLanguage}
+                      onChange = {(event) => changeInterfaceLanguage(event.target.value as "uk" | "pl" | "en")}
+                      aria-label = "Chat language"
                     >
-                      <option value="uk">Українська</option>
-                      <option value="pl">Polski</option>
-                      <option value="en">English</option>
+                      <option value = "uk"> Ukrainian </option>
+                      <option value = "pl"> Polish </option>
+                      <option value = "en"> English </option>
                     </select>
                   </p>
-                  <p className="chat-language-setting">
-                    <strong> Тема: </strong>
+                  <p className = "chat-language-setting">
+                    <strong> Select a theme color </strong>
                     <select
-                      value={interfaceTheme}
-                      onChange={(event) => changeInterfaceTheme(event.target.value as "light" | "dark")}
-                      aria-label="Тема інтерфейсу"
+                      value = {interfaceTheme}
+                      onChange = {(event) => changeInterfaceTheme(event.target.value as "light" | "dark")}
+                      aria-label = "Interface theme"
                     >
-                      <option value="light">Світла</option>
-                      <option value="dark">Темна</option>
+                      <option value = "light"> Light </option>
+                      <option value = "dark"> Dark </option>
                     </select>
                   </p>
                   {user?.region && <p><strong> Country: </strong> {user.region}</p>}
