@@ -15,7 +15,14 @@ export default function RootLayout({
 }) {
   return (
     // HTML структура з мовою англійською
-    <html lang = "en">
+    <html lang = "en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('interfaceTheme');var l=localStorage.getItem('interfaceLanguage');document.documentElement.dataset.theme=t==='dark'?'dark':'light';if(l==='uk'||l==='pl'||l==='en'){document.documentElement.lang=l;}}catch(e){document.documentElement.dataset.theme='light';}})();`,
+          }}
+        />
+      </head>
       <body>
         {children}
       </body>

@@ -72,7 +72,7 @@ export default function Dashboard(): import("react/jsx-runtime").JSX.Element {
                         <p> User profile details </p>
                     </div>
                     {/* Кнопка повернення до календаря */}
-                    <button className = "close-info-btn" onClick={() => router.push("/Kalendar")}>×</button>
+                    <button className = "close-info-btn" onClick = {() => router.push("/Kalendar")}>×</button>
                 </div>
                 {/* Тіло вікна з інформацією про користувача */}
                 <div className = "info-popup-body">
