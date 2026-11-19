@@ -609,6 +609,24 @@ a:focus-visible {
   color: #ffffff !important;
 }
 
+:root[data-theme="dark"] .file-help-panel {
+ background: #34303b !important;
+ color: #ffffff !important;
+ border-color: rgba(196, 181, 253, 0.24) !important;
+ box-shadow: 0 12px 28px rgba(8, 7, 12, 0.48) !important;
+}
+
+:root[data-theme="dark"] .file-help-panel h3,
+:root[data-theme="dark"] .file-help-panel p,
+:root[data-theme="dark"] .file-help-panel strong {
+ color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .file-help-close {
+ background: #403a49 !important;
+ color: #ffffff !important;
+}
+
 :root[data-theme="dark"] .chat-mid {
   background: #29252f !important;
 }
