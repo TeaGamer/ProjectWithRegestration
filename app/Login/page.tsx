@@ -117,7 +117,6 @@ export default function LoginPage() {
                 }
 
                 localStorage.setItem("user", JSON.stringify(demoData.user));
-                localStorage.removeItem("token");
                 setSuccess("Successfully logged in! Redirecting...");
                 setTimeout((): void => { router.push("/Kalendar"); }, 200);
                 return;
@@ -132,6 +131,7 @@ export default function LoginPage() {
             const response = await fetch(`${API_BASE}/api/login`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json",},
+                credentials: "include",
                 body: JSON.stringify({
                     login: loginData.identifier,
                     password: loginData.password,
@@ -142,7 +142,7 @@ export default function LoginPage() {
 
             if (response.ok) {
                 // Валідація: обидва поля мають бути присутні
-                if (!data.token || !data.user) {
+                if (!data.user) {
                     setError(" Server error: invalid response. Please try again.");
                     return;
                 }
@@ -150,11 +150,7 @@ export default function LoginPage() {
                 setSuccess(" Successfully logged in! Redirecting...");
 
                 localStorage.setItem("user", JSON.stringify(data.user));
-                localStorage.setItem("token", data.token);
-
-                const maxAge = loginData.remember ? "; max-age=86400" : "";
-                const isSecure = location.protocol === "https:" ? "; Secure" : "";
-                document.cookie = `token=${data.token}; path=/; SameSite=Strict${isSecure}${maxAge}`;
+                // Authentication cookie is set by the backend as HttpOnly.
 
                 setTimeout((): void => {router.push("/Kalendar")}, 200);
             } else {
@@ -201,6 +197,7 @@ export default function LoginPage() {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     login: registerData.login,
                     email,

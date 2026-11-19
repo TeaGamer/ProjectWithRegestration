@@ -23,7 +23,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    const token = request.cookies.get('token')?.value ||
+    const token = request.cookies.get('auth_token')?.value ||
+      request.cookies.get('token')?.value ||
       request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
 
     if (!token) {
@@ -44,6 +45,7 @@ export async function middleware(request: NextRequest) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          "Cookie": `auth_token=${token}`,
           'Authorization': `Bearer ${token}`,
         },
         signal: controller.signal,

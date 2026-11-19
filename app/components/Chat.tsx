@@ -22,7 +22,7 @@ const ChatWidget: React.FC = () => {
   // Завантажити історію при монтуванні компонента
   useEffect(() => {
     // Отримуємо токен з localStorage
-    const storedToken = localStorage.getItem('token') || '';
+    const storedToken = 'cookie-session';
     console.log('Token from localStorage:', storedToken ? 'Present' : 'Missing');
     setToken(storedToken);
     

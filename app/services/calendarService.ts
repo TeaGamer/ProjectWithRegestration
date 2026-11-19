@@ -31,11 +31,15 @@ async function calendarRequest<T>(
   token: string,
   init: RequestInit = {}
 ): Promise<T> {
+  const csrfToken = document.cookie
+    .split("; ")
+    .find((item) => item.startsWith("csrf_token="))
+    ?.split("=")[1];
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
       ...(init.body ? { "Content-Type": "application/json" } : {}),
-      Authorization: `Bearer ${token}`,
+      ...(csrfToken ? { "X-CSRF-Token": decodeURIComponent(csrfToken) } : {}),
       ...init.headers,
     },
     credentials: "include",
@@ -101,6 +105,13 @@ export async function deleteCalendarEvent(id: number, token: string): Promise<Ca
 export async function getDeletedCalendarEvents(token: string): Promise<CalendarEvent[]> {
   const result = await calendarRequest<{ events: CalendarEvent[] }>("/api/events/deleted", token);
   return result.events;
+}
+
+export async function sendEmailReminder(subject: string, text: string, token: string): Promise<void> {
+  await calendarRequest<{ status: string }>("/api/notifications/email", token, {
+    method: "POST",
+    body: JSON.stringify({ subject, text }),
+  });
 }
 
 export async function restoreCalendarEvent(id: number, token: string): Promise<CalendarEvent> {

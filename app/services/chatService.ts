@@ -4,6 +4,15 @@
  */
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
+
+function getCsrfHeaders(): Record<string, string> {
+  const csrfToken = document.cookie
+    .split("; ")
+    .find((item) => item.startsWith("csrf_token="))
+    ?.split("=")[1];
+  return csrfToken ? { "X-CSRF-Token": decodeURIComponent(csrfToken) } : {};
+}
+
 /**
  * Типи даних для повідомлень чату та відповідей
  */
@@ -53,7 +62,7 @@ export async function sendChatMessage(
       method: 'POST',
       headers: {
         ...(files?.length ? {} : { 'Content-Type': 'application/json' }),
-        'Authorization': `Bearer ${token}`
+        ...getCsrfHeaders(),
       },
       credentials: 'include',
       body: requestBody
@@ -85,9 +94,7 @@ export async function getChatHistory(
     console.log('Fetching chat history with token:', token ? 'Present' : 'Missing');
 
     const response = await fetch(url.toString(), {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
+      headers: getCsrfHeaders(),
       credentials: 'include'
     });
 
@@ -115,9 +122,7 @@ export async function deleteChatMessage(
 
     const response = await fetch(`${API_BASE_URL}/api/chat/${messageId}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
+      headers: getCsrfHeaders(),
       credentials: 'include'
     });
 
@@ -143,14 +148,13 @@ export interface ParsedEvent {
 }
 
 export async function parseEventFromText(
-  text: string,
-  token: string
+  text: string
 ): Promise<ParsedEvent> {
   const response = await fetch(`${API_BASE_URL}/api/chat/parse-event`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+        ...getCsrfHeaders(),
     },
     credentials: 'include',
     body: JSON.stringify({ text })

@@ -16,6 +16,7 @@ import {
   importLocalCalendarNotes,
   parseEventFromText,
   restoreCalendarEvent,
+  sendEmailReminder,
   updateCalendarEvent,
   type CalendarEvent,
 } from "../services/calendarService";
@@ -80,6 +81,7 @@ function noteToEvent(note: Note, timeZone: string) {
 
 export default function KalendarPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [interfaceLanguage, setInterfaceLanguage] = useState<"uk" | "pl" | "en">("en");
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
   const calendarTimezone = user?.timezone_name
     || getDefaultTimezoneForCountry(getCountryIdByName(user?.region || "Poland"), browserTimezone);
@@ -122,7 +124,27 @@ export default function KalendarPage() {
   const [noteFormError, setNoteFormError] = useState("");
   const [noteCategory, setNoteCategory] = useState(CATEGORY_OPTIONS[0]);
   const [isSavingNote, setIsSavingNote] = useState(false);
-  const [smsRemindersSent, setSmsRemindersSent] = useState<number[]>([]);
+  const [remindersSent, setRemindersSent] = useState<number[]>([]);
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem("interfaceLanguage") as "uk" | "pl" | "en" | null;
+    if (savedLanguage && ["uk", "pl", "en"].includes(savedLanguage)) {
+      setInterfaceLanguage(savedLanguage);
+      document.documentElement.lang = savedLanguage;
+    }
+  }, []);
+
+  const changeInterfaceLanguage = (language: "uk" | "pl" | "en") => {
+    setInterfaceLanguage(language);
+    localStorage.setItem("interfaceLanguage", language);
+    document.documentElement.lang = language;
+  };
+
+  const interfaceLabels = {
+    uk: { title: "Чат з вашим Alex", welcome: "Привіт", placeholder: "Запитайте щось...", voiceLanguage: "Мова розмови" },
+    pl: { title: "Czat z Alexem", welcome: "Cześć", placeholder: "Zapytaj o coś...", voiceLanguage: "Język mowy" },
+    en: { title: "Chat with your Alex", welcome: "Welcome", placeholder: "Ask something...", voiceLanguage: "Speech language" },
+  }[interfaceLanguage];
 
   const profileModal = useProfileModal();
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
@@ -156,8 +178,8 @@ export default function KalendarPage() {
       setUser(savedUser);
       const selectedTimezone = savedUser?.timezone_name || browserTimezone;
 
-      const token = localStorage.getItem("token");
-      if (token) {
+      const token = "";
+      if (true) {
         try {
           const migrationOwner = localStorage.getItem("calendarNotesMigratedToUserId");
           if (!migrationOwner && savedUser?.id) {
@@ -221,33 +243,46 @@ export default function KalendarPage() {
     }
   }, [calendarStorage, notes]);
 
-  const sendSmsReminder = useCallback((note: Note) => {
+  const sendReminder = useCallback(async (note: Note) => {
     const reminderText = `Reminder: meeting "${note.text}" starts at ${note.time} on ${note.date}.`;
-    console.log("SMS reminder sent:", reminderText);
-    setChatMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now() + Math.floor(Math.random() * 1000),
-        sender: "ai",
-        text: `SMS reminder sent: ${reminderText}`,
-      },
-    ]);
+    if ("Notification" in window) {
+      let permission = Notification.permission;
+      if (permission === "default") {
+        permission = await Notification.requestPermission();
+      }
+      if (permission === "granted") {
+        new Notification("Alex calendar reminder", { body: reminderText });
+      }
+    }
+
+    try {
+      await sendEmailReminder("Alex calendar reminder", reminderText, "");
+      setChatMessages((prev) => [
+        ...prev,
+        { id: Date.now(), sender: "ai", text: `Email reminder sent: ${reminderText}` },
+      ]);
+    } catch (error) {
+      setChatMessages((prev) => [
+        ...prev,
+        { id: Date.now(), sender: "ai", text: `Browser notification ready; email unavailable: ${error instanceof Error ? error.message : "SMTP not configured"}` },
+      ]);
+    }
   }, []);
 
   const checkMeetingReminders = useCallback(() => {
     const now = new Date();
     notes.forEach((note) => {
-      if (!["Meeting", "Зустрічі"].includes(note.category) || !note.time || !note.date) return;
+      if (!["Meetings", "Meeting", "Зустрічі", "Meetings (meeting)"].includes(note.category) || !note.time || !note.date) return;
 
       const reminderDate = localDateTimeToDate(note.date, note.time, calendarTimezone);
       const diffMs = reminderDate.getTime() - now.getTime();
 
-      if (diffMs > 0 && diffMs <= 60 * 60 * 1000 && !smsRemindersSent.includes(note.id)) {
-        sendSmsReminder(note);
-        setSmsRemindersSent((prev) => [...prev, note.id]);
+      if (diffMs > 0 && diffMs <= 60 * 60 * 1000 && !remindersSent.includes(note.id)) {
+        void sendReminder(note);
+        setRemindersSent((prev) => [...prev, note.id]);
       }
     });
-  }, [calendarTimezone, notes, sendSmsReminder, smsRemindersSent]);
+  }, [calendarTimezone, notes, sendReminder, remindersSent]);
 
   useEffect(() => {
     checkMeetingReminders();
@@ -347,7 +382,7 @@ export default function KalendarPage() {
     setChatError(null);
 
     try {
-      const token = localStorage.getItem("token") || "";
+      const token = "";
       const response = await sendChatMessage(trimmed, token, filesToSend);
       setChatMessages((prev) => [
         ...prev,
@@ -361,7 +396,7 @@ export default function KalendarPage() {
       }
       setChatInput("");
 
-      if (trimmed && token) {
+      if (trimmed) {
         try {
           const action = await parseEventFromText(
             trimmed,
@@ -454,13 +489,21 @@ export default function KalendarPage() {
   const handleLogout = async () => {
     setShowLogoutConfirm(false);
     try {
-      await fetch("/api/demo-login", { method: "DELETE" });
+      await fetch("/api/demo-login", { method: "DELETE", credentials: "include" });
     } catch (error) {
       console.error("Failed to clear the demo admin session:", error);
     }
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    try {
+      const csrfToken = document.cookie.split("; ").find((item) => item.startsWith("csrf_token="))?.split("=")[1];
+      await fetch(`${process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000"}/api/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: csrfToken ? { "X-CSRF-Token": decodeURIComponent(csrfToken) } : {},
+      });
+    } catch (error) {
+      console.error("Failed to clear backend session:", error);
+    }
     window.location.href = "/Login";
   };
 
@@ -468,8 +511,7 @@ export default function KalendarPage() {
     setUser(updatedUser);
     if (calendarStorage !== "backend") return;
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    const token = "";
     void Promise.all([getCalendarEvents(token), getDeletedCalendarEvents(token)])
       .then(([events, deletedEvents]) => {
         const timezoneName = updatedUser.timezone_name || browserTimezone;
@@ -542,8 +584,7 @@ export default function KalendarPage() {
     setIsSavingNote(true);
     try {
       if (calendarStorage === "backend") {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error(" Your backend session has expired. Sign in again.");
+        const token = "";
         const payload = noteToEvent(newNote, calendarTimezone);
         const savedEvent = selectedNote
           ? await updateCalendarEvent(selectedNote.id, payload, token)
@@ -605,8 +646,7 @@ export default function KalendarPage() {
     }
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Your backend session has expired. Sign in again.");
+      const token = "";
       const deleted = await deleteCalendarEvent(noteToDelete.id, token);
       setNotes((previous) => previous.filter((note) => note.id !== noteToDelete.id));
       setDeletedNotes((previous) => sortNotesByDateTime([...previous, eventToNote(deleted, calendarTimezone)]));
@@ -626,8 +666,7 @@ export default function KalendarPage() {
 
   const restoreDeletedNote = async (note: Note) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Your backend session has expired. Sign in again.");
+      const token = "";
       const restored = await restoreCalendarEvent(note.id, token);
       setNotes((previous) => sortNotesByDateTime([...previous, eventToNote(restored, calendarTimezone)]));
       setDeletedNotes((previous) => previous.filter((item) => item.id !== note.id));
@@ -987,9 +1026,15 @@ export default function KalendarPage() {
       {isChatOpen && (
         <div className = "ai-chat-box">
           <div className = "chat-top">
-            <span> Chat with your Alex </span>
+            <span>{interfaceLabels.title}</span>
             <div className = "chat-voice-controls">
-              <label className = "voice-language-label" htmlFor = "voice-language">Speech language</label>
+              <label className="voice-language-label" htmlFor="interface-language">Interface language</label>
+              <select id="interface-language" value={interfaceLanguage} onChange={(event) => changeInterfaceLanguage(event.target.value as "uk" | "pl" | "en")}>
+                <option value="uk">Українська</option>
+                <option value="pl">Polski</option>
+                <option value="en">English</option>
+              </select>
+              <label className="voice-language-label" htmlFor="voice-language">{interfaceLabels.voiceLanguage}</label>
               <select
                 id = "voice-language"
                 className = "voice-language-select"
@@ -1104,7 +1149,7 @@ export default function KalendarPage() {
               </section>
             )}
             {chatMessages.length === 0 ? (
-              <div className = "ai-text"> Welcome, {currentUser.first_name}! Ask something... </div>
+              <div className = "ai-text"> {interfaceLabels.welcome}, {currentUser.first_name}! {interfaceLabels.placeholder} </div>
             ) : ( chatMessages.map((message) => (
                 <div key = {message.id} className = {`chat-message ${message.sender}`}>
                   <span className = "message-sender">{message.sender === "user" ? "You" : "Alex"}</span>
