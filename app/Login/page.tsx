@@ -98,65 +98,67 @@ export default function LoginPage() {
             return;
         }
 
-        try {
-            const demoResponse = await fetch("/api/demo-login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    login: loginData.identifier,
-                    password: loginData.password,
-                    remember: loginData.remember,
-                }),
-            });
+            try {
+                if (process.env.NODE_ENV === "development") {
+                if (process.env.NODE_ENV === "development") {
+                const demoResponse = await fetch("/api/demo-login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        login: loginData.identifier,
+                        password: loginData.password,
+                        remember: loginData.remember,
+                    }),
+                });
 
-            if (demoResponse.ok) {
-                const demoData = await demoResponse.json();
-                if (!demoData.user) {
-                    setError("Server error: invalid response. Please try again.");
+                if (demoResponse.ok) {
+                    const demoData = await demoResponse.json();
+                    if (!demoData.user) {
+                        setError("Server error: invalid response. Please try again.");
+                        return;
+                    }
+
+                    localStorage.setItem("user", JSON.stringify(demoData.user));
+                    setSuccess("Successfully logged in! Redirecting...");
+                    setTimeout((): void => { router.push("/Kalendar"); }, 200);
                     return;
                 }
 
-                localStorage.setItem("user", JSON.stringify(demoData.user));
-                setSuccess("Successfully logged in! Redirecting...");
-                setTimeout((): void => { router.push("/Kalendar"); }, 200);
-                return;
-            }
-
-            if (demoResponse.status !== 401 && demoResponse.status !== 404) {
-                const demoData = await demoResponse.json();
-                setError(demoData.error || "Unable to sign in. Please try again.");
-                return;
-            }
-
-            const response = await fetch(`${API_BASE}/api/login`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json",},
-                credentials: "include",
-                body: JSON.stringify({
-                    login: loginData.identifier,
-                    password: loginData.password,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Валідація: обидва поля мають бути присутні
-                if (!data.user) {
-                    setError(" Server error: invalid response. Please try again.");
+                if (demoResponse.status !== 401 && demoResponse.status !== 404) {
+                    const demoData = await demoResponse.json();
+                    setError(demoData.error || "Unable to sign in. Please try again.");
                     return;
                 }
+            }}
+                const response = await fetch(`${API_BASE}/api/login`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json",},
+                    credentials: "include",
+                    body: JSON.stringify({
+                        login: loginData.identifier,
+                        password: loginData.password,
+                    }),
+                });
 
-                setSuccess(" Successfully logged in! Redirecting...");
+                const data = await response.json();
 
-                localStorage.setItem("user", JSON.stringify(data.user));
-                // Authentication cookie is set by the backend as HttpOnly.
+                if (response.ok) {
+                    // Валідація: обидва поля мають бути присутні
+                    if (!data.user) {
+                        setError(" Server error: invalid response. Please try again.");
+                        return;
+                    }
 
-                setTimeout((): void => {router.push("/Kalendar")}, 200);
-            } else {
-                setError(data.error || "Invalid email or password!");
-            }
-        } catch {setError(" Connection error. Please try again.");} 
+                    setSuccess(" Successfully logged in! Redirecting...");
+
+                    localStorage.setItem("user", JSON.stringify(data.user));
+                    // Authentication cookie is set by the backend as HttpOnly.
+
+                    setTimeout((): void => {router.push("/Kalendar")}, 200);
+                } else {
+                    setError(data.error || "Invalid email or password!");
+                }
+            } catch {setError(" Connection error. Please try again.");} 
     };
 
     const handleRegisterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -434,7 +436,7 @@ export default function LoginPage() {
                                 onChange = {handleCountryChange}
                                 required
                             >
-                                {COUNTRY_OPTIONS.map((country) => (
+                                {(COUNTRY_OPTIONS as { id: string | number; name: string }[]).map((country) => (
                                     <option key = {country.id} value = {country.name}>
                                         {country.name}
                                     </option>
